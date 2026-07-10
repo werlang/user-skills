@@ -1,0 +1,30 @@
+:root {
+    --main-color-light: #e1eedc;
+    --main-color: #3d6648;
+    --main-color-dark: #0a2906;
+    --secondary-color: #d04b49;
+    --bg-color: #b8c1b1;
+    --border-color: #93a183;
+    --text-color: #324632;
+    --text-color-inverse: #e6f0e6;
+    --shadow-soft: 0 2px 8px rgb(from var(--main-color) r g b / 0.2);
+    --fade-time: 0.3s;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+
+#frame {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}

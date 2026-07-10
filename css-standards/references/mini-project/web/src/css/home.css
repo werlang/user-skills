@@ -1,0 +1,39 @@
+@import "./tokens.css";
+@import "./components/card.css";
+
+#frame {
+    gap: 24px;
+    padding: 24px 16px 48px;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px 20px;
+    border-radius: 16px;
+    color: var(--text-color-inverse);
+    background:
+        linear-gradient(rgb(from var(--main-color-dark) r g b / 0.78), rgb(from var(--main-color) r g b / 0.72)),
+        radial-gradient(circle at top left, rgb(from var(--secondary-color) r g b / 0.55), transparent 45%);
+}
+
+.hero__title {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.hero__cards {
+    display: grid;
+    gap: 16px;
+}
+
+@media only screen and (min-width: 700px) {
+    #frame {
+        padding-inline: 32px;
+    }
+
+    .hero__cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
