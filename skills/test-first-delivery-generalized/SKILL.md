@@ -1,65 +1,103 @@
 ---
 name: test-first-delivery-generalized
-description: Deliver behavior changes, bug fixes, refactors, and feature work in any project with tests or explicit validation. Use when changing application behavior, updating existing tests, reviewing missing coverage, choosing between automated and manual validation, or documenting testing gaps across backend, frontend, CLI, and full-stack work.
+description: Deliver behavior changes, bug fixes, refactors, and feature work in any project with tests or explicit validation. Use when changing application behavior, updating existing tests, writing tests, reviewing missing coverage, choosing between automated and manual validation, or documenting testing gaps across backend, frontend, CLI, and database migrations.
 ---
 
 # Test-First Delivery
 
-Use this skill whenever a task changes behavior.
+Use this skill whenever a task changes application behavior, fixes a bug, or refactors existing structures. 
 
-## Default Quality Contract
+---
 
-- Do not treat a behavior-changing task as done with code changes alone.
-- If the touched area already has automated coverage, update that coverage and run it.
-- Prefer the narrowest honest validation path that can prove the changed contract.
-- Add success cases plus meaningful edge cases, not only happy-path assertions.
-- Prefer project-local tests for the changed area instead of broad repo-wide harness changes.
-- If automation is missing, decide whether a small local test addition is justified or whether explicit manual validation is the honest path.
-- Rebuild generated artifacts when the project expects checked-in bundles, compiled assets, schemas, or generated clients.
-- Finish by stating what was validated, what was not, and why.
+## 1. Default Quality Contract
 
-## Discover The Project Reality
+Unless explicitly directed otherwise:
+1. **Never Stop at Code Changes Alone**: Every behavior-changing task is incomplete without verification.
+2. **Follow Test-First (TDD) cycle** where practical: write or update failing tests before writing minimal code to make them pass.
+3. **Leave Touched Code Easy to Understand**: Enforce JSDoc/docstrings on all touched functions, methods, and constructors. Include focused inline comments near complex or non-obvious logic.
+4. **Target 100% Coverage for Validated Scope**: Run test suites with coverage, fixing failures and gaps iteratively.
+5. **State What Was Verified**: Conclude with a clear report detailing the automated tests run, manual validation performed, and any remaining gaps.
 
-Before changing tests or commands, inspect the repository for its actual validation surface:
+---
 
-1. Find the existing runners and scripts in `package.json`, `pyproject.toml`, `tox.ini`, `noxfile.py`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle*`, `Makefile`, `justfile`, CI workflows, and task docs.
-2. Identify the smallest existing suite that covers the touched behavior: unit, integration, API, component, browser, snapshot, CLI, or contract tests.
-3. Identify required secondary steps such as builds, asset rebundles, schema generation, migrations, or fixture setup.
-4. Identify which behaviors still need a real manual pass: browser interaction, layout, focus, native integrations, auth redirects, or environment-dependent flows.
+## 2. The TDD Workflow (Red-Green-Refactor)
 
-Use [references/testing-decision-tree.md](references/testing-decision-tree.md) to choose the validation path.
-Use [references/validation-commands.md](references/validation-commands.md) to derive project-appropriate commands.
-Use [references/browser-smoke-checklist.md](references/browser-smoke-checklist.md) when browser behavior changed.
+For new features or bug fixes, apply the three-phase loop:
 
-## Web Test Design
+### Phase A: Red (Failing Test)
+1. Write a failing test that defines the desired behavior or reproduces the reported bug.
+2. Verify the test fails with a clear, expected error message before writing any application code.
+*Example:*
+```javascript
+describe('Feature: User password reset', () => {
+  it('should invalidate old tokens and create a new hashed token', async () => {
+    const user = await setupTestUser();
+    const token = await generateResetToken(user.id);
+    expect(token).toBeDefined();
+    // Test fails initially because generateResetToken is not implemented
+  });
+});
+```
 
-- Prefer pure assertions for deterministic helpers, parsing, formatting, normalization, reducers, selectors, and permission logic.
-- Prefer component, DOM, or `jsdom`-style tests for event wiring, rendering branches, busy states, empty states, error states, and form behavior.
-- Prefer route or server tests for SSR output, template variables, API contracts, middleware behavior, and status-code mapping.
-- Prefer browser or manual validation when the change depends on real clicks, typing, focus timing, CSS/layout, storage persistence, redirects, uploads, or cross-service auth flows.
-- Avoid large snapshot-heavy tests when smaller semantic assertions can prove the contract.
+### Phase B: Green (Minimal Code)
+1. Write the simplest possible implementation that satisfies the test.
+2. Avoid over-engineering, optimizations, or additional features. Run tests to confirm they are green.
 
-## Workflow
+### Phase C: Refactor (Clean Code)
+1. Improve code quality (deduplicate, clarify names, extract logic) while running tests to verify no regressions occur.
+2. Document the implementation: add JSDoc for signatures and focused inline comments for intent.
 
-1. Identify the owner of the behavior change: backend, frontend, CLI, mobile, infrastructure, or cross-surface.
-2. Check whether the touched area already has automated tests or whether a small local harness should be added.
-3. Choose the validation path with [references/testing-decision-tree.md](references/testing-decision-tree.md).
-4. Add or update the narrowest honest tests alongside the production change.
-5. Run the relevant commands and build steps from [references/validation-commands.md](references/validation-commands.md).
-6. For browser-facing interaction changes, execute the adapted checklist from [references/browser-smoke-checklist.md](references/browser-smoke-checklist.md).
-7. Fix failures and rerun the validated scope until it is green.
-8. Finish with explicit reporting:
-   - automated tests or commands run
-   - manual checks performed
-   - remaining gaps or environment limits
+---
 
-## Done Criteria
+## 3. Testing Strategy & Decision Tree
 
-A behavior-changing task is complete only when:
+Before executing tests, discover the project reality (e.g. check `package.json`, `pyproject.toml`, Docker Compose config, environment setups). Use the decision tree to determine the validation path:
 
-- the implementation is in place,
-- automated tests were updated and run when they existed or were intentionally bootstrapped,
-- changed behavior has meaningful success and edge-case coverage where deterministic automation is practical,
-- required build or generation steps were rerun when the project depends on them,
-- browser or manual validation was completed for interaction-heavy or environment-dependent behavior when automation could not honestly prove it,
-- and the final report plainly calls out remaining gaps.
+1. **Does the target area already have automated tests?**
+   * **Yes** → Add or update tests within that suite.
+   * **No** → Continue to step 2.
+2. **Did the user explicitly request no test framework changes?**
+   * **Yes** → Do not bootstrap. Provide a manual validation checklist and call out the automation gap.
+   * **No** → Continue to step 3.
+3. **Is there an approved, lightweight framework used in adjacent code?**
+   * **Yes** → Use that framework to write scoped unit/component tests.
+   * **No** → Continue to step 4.
+4. **Fallback to Project Defaults**:
+   * *API (Backend)*: Use the existing Vitest/Jest runner to write unit tests.
+   * *Web (Frontend)*: Write unit/component tests. If Playwright infrastructure is present, update component specs.
+5. **Manual Verification Fallback**:
+   * If automation is impractical, document the manual verification checklist to prove the contract.
+
+See [references/testing-decision-tree.md](references/testing-decision-tree.md) for details.
+
+---
+
+## 4. Documentation & Comments Standard
+
+Maintain documentation as part of code delivery:
+
+* **Doc Comments**: Use the host language's standard (JSDoc for JS/TS, docstrings for Python, etc.) to document parameters, return values, thrown errors, side effects, and invariants for all touched exported functions and class members.
+* **Inline Comments**: Keep comments focused on **why** the logic exists, its assumptions, edge cases, caching precedence, and order of operations. Remove or rewrite comments that mechanically repeat the next line.
+
+---
+
+## 5. Execution Workflow (Docker Environment)
+
+> [!IMPORTANT]
+> **Host Isolation**: Since Python and Node are not installed on the host machine, run all test commands using Docker containers.
+
+1. **Derive project commands** from the environment manifests and [references/validation-commands.md](references/validation-commands.md).
+2. **Run tests inside containers** (e.g., `docker compose run --rm api npm run test`).
+3. **Perform manual smoke tests** in a browser when changing UI interactions, layout, viewport size, or auth states, following the [references/browser-smoke-checklist.md](references/browser-smoke-checklist.md).
+4. **Iterate until green** and the coverage of the changed files is addressed.
+
+---
+
+## 6. Done Criteria
+
+A task is complete only when:
+- The implementation code is in place.
+- Touched code has JSDoc comments and high-signal inline intent comments.
+- Relevant automated tests were created/updated and run successfully in the Docker container.
+- Manual browser validation was executed and logged for UI/UX changes.
+- A final validation report highlights what was tested, what commands were run, and any remaining gaps.
