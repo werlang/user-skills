@@ -1,0 +1,50 @@
+{
+  "evaluationId": "production-run-2026-07-12-001",
+  "skillId": "target-skill-name",
+  "baseSkillSha256": "ae830093ad5684a14302d42f5300701f0396021585785eb35e03136f1c4faf92",
+  "baseMemorySha256": "5376636b7c2f316568b1e227afc85c88e383c860ecd600292856ae889cc00fde",
+  "candidates": [
+    {
+      "id": "explicit-constraints",
+      "summary": "Add explicit constraints.",
+      "tags": [
+        "constraints"
+      ],
+      "candidateSkill": "# Target Skill\n\nFollow explicit constraints before acting.",
+      "response": "Candidate A response"
+    },
+    {
+      "id": "concrete-example",
+      "summary": "Introduce one concrete example.",
+      "tags": [
+        "examples"
+      ],
+      "candidateSkill": "# Target Skill\n\nInclude one concrete example.",
+      "response": "Candidate B response"
+    },
+    {
+      "id": "priority-order",
+      "summary": "Clarify priority order.",
+      "tags": [
+        "prioritization"
+      ],
+      "candidateSkill": "# Target Skill\n\nState the priority order.",
+      "response": "Candidate C response"
+    }
+  ],
+  "outcomes": [
+    {
+      "candidateId": "explicit-constraints",
+      "improved": true
+    },
+    {
+      "candidateId": "concrete-example",
+      "improved": true
+    },
+    {
+      "candidateId": "priority-order",
+      "improved": false
+    }
+  ],
+  "winnerId": "explicit-constraints"
+}

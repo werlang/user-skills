@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "skillId": "target-skill-name",
+  "processedEvaluationIds": [],
+  "mutations": [
+    {
+      "id": "explicit-constraints",
+      "summary": "Add explicit constraints.",
+      "tags": [
+        "constraints"
+      ],
+      "wins": 1,
+      "losses": 1,
+      "score": 0,
+      "evaluations": 2
+    }
+  ]
+}

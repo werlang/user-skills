@@ -1,0 +1,49 @@
+{
+  "updatedMemory": {
+    "schemaVersion": 1,
+    "skillId": "target-skill-name",
+    "processedEvaluationIds": [
+      "production-run-2026-07-12-001"
+    ],
+    "mutations": [
+      {
+        "id": "explicit-constraints",
+        "summary": "Add explicit constraints.",
+        "tags": [
+          "constraints"
+        ],
+        "wins": 2,
+        "losses": 1,
+        "score": 1,
+        "evaluations": 3
+      },
+      {
+        "id": "concrete-example",
+        "summary": "Introduce one concrete example.",
+        "tags": [
+          "examples"
+        ],
+        "wins": 1,
+        "losses": 0,
+        "evaluations": 1,
+        "score": 1
+      },
+      {
+        "id": "priority-order",
+        "summary": "Clarify priority order.",
+        "tags": [
+          "prioritization"
+        ],
+        "wins": 0,
+        "losses": 1,
+        "evaluations": 1,
+        "score": -1
+      }
+    ]
+  },
+  "promotion": {
+    "action": "promote",
+    "mutationId": "explicit-constraints",
+    "reason": "The evaluator winner has a positive skill-local score after this update."
+  }
+}
