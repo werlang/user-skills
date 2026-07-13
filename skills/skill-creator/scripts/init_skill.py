@@ -17,7 +17,7 @@ from pathlib import Path
 
 SKILL_TEMPLATE = """---
 name: {skill_name}
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: [TODO: Complete and informative explanation of what the skill does and when to use it. Make the description slightly "pushy" to ensure the model triggers it when relevant. Include specific triggers/contexts and instruct the model to use the skill when certain keywords/concepts are mentioned, even if they aren't explicitly named. All "when to use" info should live here rather than in the body.]
 ---
 
 # {skill_title}
@@ -97,9 +97,14 @@ Files not intended to be loaded into context, but rather used within the output 
 
 **Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
 
+### evals/
+Evaluation test cases for verifying the skill's performance and accuracy.
+
+**Appropriate for:** `evals.json` containing 2-3 realistic user prompts to run against the skill for testing.
+
 ---
 
-**Any unneeded directories can be deleted.** Not every skill requires all three types of resources.
+**Any unneeded directories can be deleted.** Not every skill requires all types of resources.
 """
 
 EXAMPLE_SCRIPT = '''#!/usr/bin/env python3
@@ -185,6 +190,19 @@ Example asset files from other skills:
 Note: This is a text placeholder. Actual assets can be any file type.
 """
 
+EXAMPLE_EVALS_JSON = """{{
+  "skill_name": "{skill_name}",
+  "evals": [
+    {{
+      "id": 1,
+      "prompt": "Example test prompt that a user would actually say to trigger this skill",
+      "expected_output": "Detailed description of the expected result or verification criteria",
+      "files": []
+    }}
+  ]
+}}
+"""
+
 
 def title_case_skill_name(skill_name):
     """Convert hyphenated skill name to Title Case for display."""
@@ -256,6 +274,13 @@ def init_skill(skill_name, path):
         example_asset = assets_dir / 'example_asset.txt'
         example_asset.write_text(EXAMPLE_ASSET)
         print("✅ Created assets/example_asset.txt")
+
+        # Create evals/ directory with template evals.json
+        evals_dir = skill_dir / 'evals'
+        evals_dir.mkdir(exist_ok=True)
+        evals_json = evals_dir / 'evals.json'
+        evals_json.write_text(EXAMPLE_EVALS_JSON.format(skill_name=skill_name))
+        print("✅ Created evals/evals.json")
     except Exception as e:
         print(f"❌ Error creating resource directories: {e}")
         return None
@@ -263,9 +288,10 @@ def init_skill(skill_name, path):
     # Print next steps
     print(f"\n✅ Skill '{skill_name}' initialized successfully at {skill_dir}")
     print("\nNext steps:")
-    print("1. Edit SKILL.md to complete the TODO items and update the description")
-    print("2. Customize or delete the example files in scripts/, references/, and assets/")
-    print("3. Run the validator when ready to check the skill structure")
+    print("1. Edit SKILL.md to complete the TODO items and update the description (make it slightly 'pushy')")
+    print("2. Define 2-3 realistic test prompts in evals/evals.json to test the skill")
+    print("3. Customize or delete the example files in scripts/, references/, and assets/")
+    print("4. Run the validator when ready to check the skill structure")
 
     return skill_dir
 

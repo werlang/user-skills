@@ -299,23 +299,45 @@ Any example files and directories not needed for the skill should be deleted. Th
 
 #### Update SKILL.md
 
-**Writing Guidelines:** Always use imperative/infinitive form.
-
 ##### Frontmatter
 
 Write the YAML frontmatter with `name` and `description`:
 
-- `name`: The skill name
+- `name`: The skill name (lowercase, hyphen-case, maximum 64 characters)
 - `description`: This is the primary triggering mechanism for your skill, and helps Agent understand when to use the skill.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
-  - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Agent.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Agent needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+  - Include all "when to use" information here - **Not in the body**. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Agent.
+  - **Make descriptions slightly "pushy"**: Currently, LLMs have a tendency to "undertrigger" skills (i.e. solve tasks manually instead of loading the skill). Make the description slightly pushy. E.g., instruct the model to use the skill when certain keywords/concepts are mentioned, even if they aren't explicitly named.
+  - *Example description for a `docx` skill*: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Make sure to use this skill whenever the user mentions document creation, editing professional documents, or working with .docx files, even if they do not explicitly request the docx skill by name."
 
 Do not include any other fields in YAML frontmatter.
 
 ##### Body
 
-Write instructions for using the skill and its bundled resources.
+Write instructions for using the skill and its bundled resources. Follow these writing style guidelines:
+
+- **Writing Guidelines:** Use imperative/infinitive forms for structured step-by-step instructions.
+- **Theory of Mind & Style:** Today's LLMs are intelligent and possess good reasoning capabilities. Explain the **why** behind instructions rather than using rigid constraints (like ALL-CAPS ALWAYS or NEVER). If the model understands the underlying reasoning and intent, it will generalize much better to edge cases and unexpected inputs. Avoid overly narrow constraints that overfit to specific examples.
+- **Explain the "why":** Reframe rules so that the model understands why a constraint or design choice is important. This is a more humane, powerful, and effective approach.
+
+#### Test Cases & Evals
+
+After drafting the skill, write 2-3 realistic test prompts that real users would actually type.
+Save these test cases in the `evals/evals.json` file inside your skill directory. Evals help verify that changes work, provide a regression safety net, and serve as documentation of the skill's capabilities.
+
+```json
+{
+  "skill_name": "my-skill-name",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The user's task prompt. E.g. 'Can you rotate the PDF in my downloads called Q4_report.pdf 90 degrees?'",
+      "expected_output": "Description of the expected result",
+      "files": []
+    }
+  ]
+}
+```
 
 ### Step 5: Packaging a Skill
 
