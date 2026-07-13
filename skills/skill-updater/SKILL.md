@@ -1,6 +1,6 @@
 ---
 name: skill-updater
-description: Auto-detect when generated code, prompts, or repeated agent behavior indicate a reusable workflow or durable rule. Update README, SKILL.md files, prompts, Copilot instructions, or durable coding conventions to reflect those lessons. Auto-invoke when user or agent text contains the exact phrases: "update docs", "update the skill", "fix Copilot instructions", "create new skill", "update skill", "document recurring pattern", "capture reusable workflow", or "this should be a skill".
+description: "Auto-detect when generated code, prompts, or repeated agent behavior indicate a reusable workflow or durable rule. Update README, SKILL.md files, prompts, Copilot instructions, or durable coding conventions to reflect those lessons. Auto-invoke when user or agent text contains the exact phrases: \"update docs\", \"update the skill\", \"fix Copilot instructions\", \"create new skill\", \"update skill\", \"document recurring pattern\", \"capture reusable workflow\", or \"this should be a skill\"."
 ---
 
 # Skill Updater
@@ -75,13 +75,11 @@ Convert stable lessons from the current task into the smallest correct documenta
 
 Prefer updating an existing skill before adding a new one.
 
-- Update `api-development` for API routes, validation, auth flows, response contracts, and persistence boundaries.
+- Update `api-building` for API routes, validation, auth flows, response contracts, and persistence boundaries.
 - Update `entity-models` for model responsibilities, defaults, normalization, and relation-loading rules.
 - Update `web-frontend` for SSR, client modules, component patterns, DOM conventions, and frontend API usage.
 - Update `css-standards` for layout systems, visual patterns, tokens, component styling, and reusable CSS structure.
-- Update `test-first-delivery` for validation expectations, test scope, and regression-prevention practices.
-- Update `debugging-operations` for durable diagnostic workflows and verified troubleshooting practices.
-- Update `docker-deployment` for stable container and compose workflows.
+- Update `test-first-delivery-generalized` for validation expectations, test scope, and regression-prevention practices.
 - Update `.github/copilot-instructions.md` only for rules that should shape the whole repository.
 
 Create a new skill only when the guidance is cross-cutting but still coherent as its own reusable workflow, or when an uncovered domain has recurring decisions that deserve a dedicated guide.

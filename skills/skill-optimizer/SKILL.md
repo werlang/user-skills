@@ -108,19 +108,22 @@ Each `outcomes` entry must contain the candidate id and an `improved` boolean. `
 
 Use `references/mutation-memory.json` and `references/updater-output.json` as the exact before-and-after reference. Copy `mutation-memory.template.json` to the target skill's directory before its first evaluation.
 
+> [!IMPORTANT]
+> **No Local Node Runtime**: Since the host environment has no local Node.js installed, all Node scripts must be executed within a Node Docker container.
+
 For deterministic bookkeeping, run:
 
 ```sh
-node scripts/update-mutation-memory.mjs <memory.json> <evaluation.json> <current-skill.md>
+docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/update-mutation-memory.mjs <memory.json> <evaluation.json> <current-skill.md>
 ```
 
 The script verifies that `baseSkillSha256` matches `<current-skill.md>` before it updates memory. It writes JSON matching `references/updater-output.json` to standard output. It does not evaluate responses or edit a skill file. If its promotion action is `promote`, use the corresponding candidate's `candidateSkill` verbatim as the updated skill.
 
-For a complete orchestration run, use these scripts:
+For a complete orchestration run, run the scripts inside the Node container:
 
 ```sh
-node scripts/prepare-optimization-run.mjs <target-skill.md> <run-directory>
-node scripts/apply-optimization-result.mjs <target-skill.md> <memory.json> <evaluation.json>
+docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/prepare-optimization-run.mjs <target-skill.md> <run-directory>
+docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/apply-optimization-result.mjs <target-skill.md> <memory.json> <evaluation.json>
 ```
 
 ---

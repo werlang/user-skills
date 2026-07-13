@@ -263,8 +263,11 @@ When creating a new skill from scratch, always run the `init_skill.py` script. T
 
 Usage:
 
+> [!IMPORTANT]
+> **No Local Python Runtime**: Since the host environment does not have Python installed, all Python scripts must be executed inside a Python Docker container.
+
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+docker run --rm -v $(pwd):/app -w /app python:3.10-slim python scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
 The script:
@@ -343,14 +346,17 @@ Save these test cases in the `evals/evals.json` file inside your skill directory
 
 Once development of the skill is complete, it must be packaged into a distributable .skill file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
 
+> [!IMPORTANT]
+> **No Local Python Runtime**: Since the host environment does not have Python installed, all Python scripts must be executed inside a Python Docker container.
+
 ```bash
-scripts/package_skill.py <path/to/skill-folder>
+docker run --rm -v $(pwd):/app -w /app python:3.10-slim python scripts/package_skill.py <path/to/skill-folder>
 ```
 
 Optional output directory specification:
 
 ```bash
-scripts/package_skill.py <path/to/skill-folder> ./dist
+docker run --rm -v $(pwd):/app -w /app python:3.10-slim python scripts/package_skill.py <path/to/skill-folder> ./dist
 ```
 
 The packaging script will:
