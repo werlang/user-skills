@@ -52,6 +52,7 @@ Do not spend the review on style-only feedback or speculative redesigns without 
 Prefer investigating these patterns early:
 
 - markup hooks changed without matching selector or test updates
+- domain data stored in DOM `data-*` attributes instead of JavaScript data structures (getAttribute call sites, dataset reads, or data-* attributes carrying IDs/values/lookups that should live in a Map, plain object, or class property)
 - filters or pagination that change the UI without preserving state, defaults, or deep links
 - auth flows that trust unsafe redirect targets or rely on stale client state
 - date or locale values submitted without normalization or displayed with time-zone drift
