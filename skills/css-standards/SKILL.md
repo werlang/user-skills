@@ -22,7 +22,8 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 
 ## Typography and Icons
 
-- Define default fonts and icon imports in the shared `tokens.css` file.
+- Define default fonts, font family CSS variables (`var(--font-body)`, `var(--font-display)`, `var(--font-mono)`) and any other relevant font variables to the project and icon imports in the shared tokens/common stylesheet.
+- Always use font CSS variables (`var(--font-*)`) instead of hardcoding literal font family names in leaf or partial stylesheets.
 - Do not add new font or icon imports inside leaf CSS files.
 - Reserve special accent typefaces for the cases the UI already uses, not for arbitrary styling.
 - Prefer a single shared icon system for the app. Keep icon styling tied to the package-provided CSS variables or documented API instead of version-pinned font-family names.
@@ -48,8 +49,8 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 
 1. `web/src/css/tokens.css` owns shared CSS variables, font imports, and global browser chrome such as scrollbar styling.
 2. Page CSS entry files should import `./tokens.css` first, then the component partials they need.
-3. Reuse existing shared color tokens from `web/src/css/tokens.css` instead of hardcoding duplicate palette values.
-4. Use `var(--token)` for pure shared colors.
+3. Reuse existing shared color tokens and font variables (`var(--font-*)`) from the shared stylesheet instead of hardcoding duplicate palette values or literal font strings.
+4. Use `var(--token)` for pure shared colors and font family variables (`var(--font-body)`, `var(--font-display)`, etc.).
 5. Use `rgb(from var(--token) r g b / alpha)` when a shared color needs opacity.
 6. Use `color-mix(...)` or another standards-compliant blend only when the result is not a pure shared color.
 7. Prefer consistent plain-CSS media queries using `min-width` and the shared breakpoint scale: `640px`, `768px`, `1024px`, `1280px`, `1536px`.
