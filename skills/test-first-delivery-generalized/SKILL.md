@@ -85,10 +85,11 @@ Maintain documentation as part of code delivery:
 
 > [!IMPORTANT]
 > **Host Isolation**: Since Python and Node are not installed on the host machine, run all test commands using Docker containers.
+> **Test Scope Rule**: Run **unit tests only** by default during AI tasks. Integration/functional tests and E2E/Playwright browser smoke tests are reserved for **explicit requests**.
 
 1. **Derive project commands** from the environment manifests and [references/validation-commands.md](references/validation-commands.md).
-2. **Run tests inside containers** (e.g., `docker compose run --rm api npm run test`).
-3. **Perform manual smoke tests** in a browser when changing UI interactions, layout, viewport size, or auth states, following the [references/browser-smoke-checklist.md](references/browser-smoke-checklist.md).
+2. **Run unit tests inside containers** (e.g., `docker compose run --rm api npm run test:unit`).
+3. **Run integration / E2E tests ONLY upon explicit request**.
 4. **Iterate until green** and the coverage of the changed files is addressed.
 
 ---

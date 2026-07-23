@@ -36,14 +36,13 @@ src/
 - `helpers/*.js`: response helpers, database helpers, date utilities, mailers, render helpers, or other support code.
 - `middlewares/*.js`: JWT auth, request guards, and reusable cross-cutting logic.
 
-## Rules
-
 - Routes talk to model instances, not raw SQL.
 - Only models use the database driver.
 - Passwords are hashed with `bcrypt`.
 - Auth defaults to JWT bearer tokens.
 - Helpers are for support logic, not endpoint handlers and not direct entities.
 - Keep route logic explicit, but keep persistence and entity behavior inside models.
+- **Maintainability & Simplicity**: Default to simple, direct, non-overengineered code. Avoid unnecessary abstraction layers, duplicate helper functions, or excessive complexity. Keep code robust, safe, performant, and easy to maintain.
 
 ## Endpoint Pattern
 
@@ -54,6 +53,20 @@ Prefer this request flow:
 3. Instantiate the relevant model class.
 4. Call model methods.
 5. Return JSON through response helpers.
+
+## Error Response Format
+
+Error responses emitted by API error middleware must return HTTP status codes along with machine-readable error codes (`code`) and default messages (`error`, `message`) to enable frontend localization:
+
+```json
+{
+  "error": "Name is required.",
+  "code": "NAME_REQUIRED",
+  "message": "Name is required."
+}
+```
+
+Include a stable, machine-readable `code` string in all 4xx/5xx responses so frontend clients can map error codes to localized translation files.
 
 ## References
 
