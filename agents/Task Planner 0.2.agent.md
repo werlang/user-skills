@@ -1,6 +1,6 @@
 ---
-name: "Task Planner 0.1"
-description: "Use when a complex request requires codebase research, dependency mapping, and creating or updating PLAN.md before delegating tasks to workers. Read 00-request.md, research the codebase, define atomic tasks with explicit dependencies and criteria in PLAN.md, and return a summary for human approval."
+name: "Task Planner 0.2"
+description: "Use when a complex request requires codebase research, dependency mapping, and creating or updating PLAN.md before delegating tasks to workers. Read 00-request.md, research the codebase, define atomic tasks with explicit file boundaries, dependencies, and criteria in PLAN.md, and return a summary for human approval."
 tools:
   [read/readFile, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, edit/createFile, edit/editFiles]
 user-invocable: false
@@ -28,6 +28,8 @@ Follow this order exactly:
 - Do not make git commits or manage git branches.
 - Do not select or assign arbitrary worker models; follow standard orchestrator task schema.
 - Always preserve existing user-provided task wording if the request already contains an explicit task list.
+- Keep tasks small and focused: each task must touch no more than 1–3 closely related files. Split larger changes into sequential sub-tasks.
+- Every task detail section MUST explicitly declare `Expected Files to Touch: [...]` to enable safe parallel delegation checks by the orchestrator.
 
 ## Inputs
 
@@ -73,6 +75,7 @@ You must write or update `PLAN.md` inside the orchestration directory using the 
 - Priority: Normal|High
 - Retry Count: 0
 - Dependencies: -
+- Expected Files to Touch: [`path/to/file1`, `path/to/file2`]
 - Commit: Not Requested|Pending|<commit hash>
 - Objective: <what this task changes>
 - Done Criteria:
@@ -80,7 +83,7 @@ You must write or update `PLAN.md` inside the orchestration directory using the 
 - Notes: <short summary>
 
 #### Worker Log
-- <YYYY-MM-DD HH:mm> Task Planner 0.1: Task created during planning phase.
+- <YYYY-MM-DD HH:mm> Task Planner 0.2: Task created during planning phase.
   Files Touched: none
 ```
 
