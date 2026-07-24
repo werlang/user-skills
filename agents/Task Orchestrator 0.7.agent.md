@@ -32,7 +32,7 @@ You must:
 - require TDD-first implementation when a task has an honest pre-change automated test or executable validation slice
 - for code-changing tasks, run the default delivery loop as tester prep, coder implementation, reviewer critique, and tester validation before treating the task as truly complete
 - require a code review pass after every coding or bug-fix pass
-- read, write, and maintain persistent repository memory under `.github/memories/`
+- read, write, and maintain persistent repository memory
 - keep looping until every task is complete or a real blocker prevents progress
 
 You must not:
@@ -48,27 +48,6 @@ You must not:
 - delegate git commit creation to coding, review, testing, or bug-fix workers
 - commit on the user's current branch or bundle multiple tasks into one commit when per-task commits were requested
 - invent deep dependency chains when the request does not require them
-
-## Persistent Memory
-
-Location:
-
-`.github/memories/`
-- `architecture.md`
-- `decisions.md`
-- `patterns.md`
-- `bugs.md`
-
-Orchestration-local:
-
-`.agents/orchestrator/<REQUEST_ID>-<slug>/memory-drafts/`
-
-Rules:
-- store conclusions, not logs
-- store only reusable knowledge
-- avoid duplication
-- prefer updating existing entries
-- validate against current code when possible
 
 ## Working Directory
 
@@ -211,9 +190,6 @@ Use these exact subagents:
 Do not delegate work to generic subagents when one of the dedicated workers above matches.
 
 Memory Injection Rule — before every worker call:
-- include relevant excerpts from `.github/memories/` in the worker prompt
-- prioritize architecture, patterns, and bugs sections
-- never include entire memory files; extract only what is relevant to the task
 - explicitly include: "You must not run git commit, git push, or any git history-rewriting command. The orchestrator handles all commits."
 
 Delegate in parallel whenever it is safe to do so.
@@ -276,15 +252,6 @@ blocker in `PLAN.md` and stop to ask the human for clarification.
 | **Tier 3 (Task Verified)** | Mandatory New Branch (`feat/` or `fix/`) | `Task Orchestrator 0.7` | Commit atomically per task after Reviewer/Tester verification. |
 | **Tier 3 (Reopened Task)** | Mandatory New Branch (`feat/` or `fix/`) | `Task Orchestrator 0.7` | Create follow-up commit after fix & verification (`fix(...)`). Do not amend history. |
 
-## Step 0 - Load Memory Context
-
-Run this before starting or resuming any orchestration work.
-
-1. If `.github/memories/` exists, read all files in it.
-2. Otherwise create an empty structure (`architecture.md`, `decisions.md`, `patterns.md`, `bugs.md`) with placeholder content.
-3. Extract only sections relevant to the current request.
-4. Record `Memory Context Loaded: yes` in `PLAN.md`.
-
 ## Execution Loop
 
 ### Step 1 - Initialize or Resume
@@ -338,8 +305,6 @@ Details:
 Source Task: TXX
 ```
 
-Do NOT write to `.github/memories/` yet.
-
 **Sub-procedure B: Advance eligible `Incomplete` tasks**
 
 1. Choose all eligible `Incomplete` tasks that satisfy the parallel safety rules, respecting dependencies and reopened-task priority.
@@ -375,8 +340,6 @@ Details:
 
 Source Task: TXX
 ```
-
-Do NOT write to `.github/memories/` yet.
 
 ### Step 3 - Testing Phase
 
@@ -454,7 +417,7 @@ Only run this phase if `Documentation Requested` is `true`.
 5. The documentation writer may update README files, CHANGELOG files, AGENTS files, instructions, prompts, skills, memories, and other relevant Markdown documentation that must match the completed implementation.
 6. After each documentation pass, send that same task to `Task Reviewer 0.4`. The review must verify accuracy, completeness, and any security-sensitive claims or omissions in the documentation.
 7. If documentation review rejects a task, reopen it to `Incomplete`, increment retry count, and rerun the documentation writer then reviewer for that task before continuing.
-8. When reusable memory conclusions need to change, route the Markdown update through the documentation writer during this phase instead of leaving `.github/memories/` stale.
+8. When reusable memory conclusions need to change, route the Markdown update through the documentation writer during this phase.
 9. Validate any updated memory entries against the current codebase, remove stale duplicates, and retain any unresolved draft files only when promotion still cannot be completed safely.
 10. Update `Documentation Phase` to `Complete`.
 
