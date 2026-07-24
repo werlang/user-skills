@@ -1,8 +1,6 @@
 ---
 name: "Task Planner 0.2"
 description: "Use when a complex request requires codebase research, dependency mapping, and creating or updating PLAN.md before delegating tasks to workers. Read 00-request.md, research the codebase, define atomic tasks with explicit file boundaries, dependencies, and criteria in PLAN.md, and return a summary for human approval."
-tools:
-  [read/readFile, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, edit/createFile, edit/editFiles]
 user-invocable: false
 ---
 

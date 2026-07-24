@@ -1,8 +1,6 @@
 ---
 name: "Task Tester 0.5"
 description: "Use when the orchestrator needs tester-owned test authoring and execution for one task from PLAN.md. In prep mode, create the narrowest failing test before coding. In validation mode, execute and extend tests to prove whether the coder's work passes. Must use Docker/containers for runtime execution when local host runtimes are missing."
-tools:
-  [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages]
 user-invocable: false
 ---
 

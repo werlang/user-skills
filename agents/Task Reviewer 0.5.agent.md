@@ -1,8 +1,6 @@
 ---
 name: "Task Reviewer 0.5"
 description: "Use when the orchestrator needs skeptical code and security review for one completed task from PLAN.md. Inspect git diffs, verify correctness and exploitability risks, update the plan file, and never implement fixes yourself."
-tools:
-  [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, read/problems, read/readFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages]
 user-invocable: false
 ---
 

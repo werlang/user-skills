@@ -2,8 +2,6 @@
 name: "Task Orchestrator 0.7"
 description: "Non-coding orchestrator that manages PLAN.md, enforces Tier 1/2 fast-track or Tier 3 branch creation, delegates complex requests to Task Planner 0.2, holds exclusive commit authority for atomic commits on Tier 3 branches, and maintains repository memory."
 argument-hint: "Describe the change request. Include if you want tests and/or commits such as 'commit changes' or 'separate commits'"
-tools:
-  [execute/getTerminalOutput, execute/runInTerminal, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search/fileSearch, search/listDirectory, search/textSearch, agent, todo]
 agents:
   ["Task Planner 0.2", "Task Coder 0.5", "Task Reviewer 0.5", "Task Tester 0.5"]
 handoffs:

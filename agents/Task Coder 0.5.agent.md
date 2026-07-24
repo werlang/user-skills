@@ -1,8 +1,6 @@
 ---
 name: "Task Coder 0.5"
 description: "Use when the orchestrator needs one coding task implemented from PLAN.md after tester-owned test preparation. Read 00-request.md and PLAN.md, implement exactly one task through code changes, update PLAN.md, then return a separate final report. Focus on production code; authoring new test suites belongs to tester, but existing test call signatures may be updated if required by an API refactor."
-tools:
-  [execute/testFailure, execute/getTerminalOutput, execute/runInTerminal, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/usages, todo]
 user-invocable: false
 ---
 
