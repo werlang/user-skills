@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Change Workflow"
+  short_description: "Choose branches and atomic commits by task size"
+  default_prompt: "Use $git-change-workflow to choose the right branch and commit workflow for this change."

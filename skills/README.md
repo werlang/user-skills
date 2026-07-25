@@ -20,6 +20,7 @@ which skill to read.
 | `audit-project-context` | Auditing README files, prompts, skills, agents, and instructions against the actual codebase. | [`SKILL.md`](audit-project-context/SKILL.md) |
 | `backend-bug-review-generalized` | Reviewing backend, API, worker, and data-layer logic, contracts, authorization, and state transitions. | [`SKILL.md`](backend-bug-review-generalized/SKILL.md) |
 | `frontend-bug-review-generalized` | Reviewing frontend rendering, interaction, URL/auth state, accessibility, and browser behavior. | [`SKILL.md`](frontend-bug-review-generalized/SKILL.md) |
+| `git-change-workflow` | Choosing current-branch fast tracks or dedicated branches with small, focused, atomic commits for larger work. | [`SKILL.md`](git-change-workflow/SKILL.md) |
 | `test-first-delivery-generalized` | Choosing tests, preparing regression coverage, validating behavior changes, and documenting testing gaps. | [`SKILL.md`](test-first-delivery-generalized/SKILL.md) |
 | `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |
 

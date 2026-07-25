@@ -28,6 +28,10 @@ reference projects or scripts that accompany it.
   executable helpers in `scripts/`.
 - Keep [`skills/README.md`](skills/README.md) synchronized with the skill
   directories and their `SKILL.md` descriptions.
+- When updating `obsidian-dev-brain`, keep its in-vault protocol note and the
+  User Skills project changelog synchronized with the skill's operational
+  rules. Record contract, migration, and validation guidance as behavior-level
+  changes rather than a file-by-file inventory.
 
 ## Agent conventions
 

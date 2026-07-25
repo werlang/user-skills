@@ -40,6 +40,12 @@ Rules:
 - **ADRs are for decisions, not tasks.** If no alternative was considered, it is a changelog bullet, not an ADR.
 - **When in doubt: less ceremony, never less truth.** Always write the changelog entry; the other artifacts are optional per the table.
 
+### First-class contract and context changes
+
+Treat migrations, API/UI contracts, schema changes, authentication or locale behavior, project-local skills, prompts, and agent guidance as real project changes. Record the behavior and compatibility impact in the changelog even when the implementation is mostly configuration or documentation. For migrations and contract changes, include the affected boundary, legacy behavior removed or retained, and the validation result. Group related files by intent; do not create a component note for every helper touched.
+
+When a feature crosses server, client, and persistence boundaries, write one behavior-level entry and link the relevant project, helpers, components, and ADRs. Record exact test or validation commands and their result; report environment failures separately from content or contract failures.
+
 ### Component Categories (what counts as a "reusable component")
 
 The following categories of code are tracked in the Component Registry when they are reusable across projects or pages:
@@ -121,6 +127,10 @@ If a significant technical choice was made (state library, ORM change, styling r
 ### Artifact 5: Index Verification
 Dataview auto-populates all index tables (`Master Dev Index.md` and the 4 `README` indices in each folder). After creating a new entity note, reload the index to verify Dataview discovers it — no manual index editing needed.
 
+### Frontmatter Contract
+
+Every vault note begins with YAML frontmatter containing the fields required by its entity type. At minimum, use `type`, the applicable `project`/`component`/`status`, `updated_at`, and tags. YAML tags use the vault's bare slug form (`project/user-skills`, `type/changelog`, `cat/helper`); `#` is the inline Markdown notation used when searching or describing those tags, not a required YAML prefix.
+
 ---
 
 ## 📐 Note Templates (in Vault)
@@ -176,3 +186,4 @@ Before completing any coding turn:
 8. [ ] All `[[Wikilinks]]` valid, YAML frontmatter complete, spaces in `file://` links encoded as `%20`?
 9. [ ] Did Dataview auto-discover the new note in the index tables (no manual index editing)?
 10. [ ] Vault unreachable → did I retry at the end and explicitly disclose the skip to the user?
+11. [ ] Contract, migration, skill, prompt, or guidance changes include compatibility impact and exact validation evidence?

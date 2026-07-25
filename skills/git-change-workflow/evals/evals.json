@@ -1,0 +1,23 @@
+{
+  "skill_name": "git-change-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Fix the typo in the README heading and leave the change for me to commit.",
+      "expected_output": "Classify this as fast-track work, edit the current branch without creating a branch or commit, and leave the change unstaged and uncommitted.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Add account deletion across the API, database model, UI, and tests. Keep the Git history easy to review.",
+      "expected_output": "Classify this as planned work, create a new feat/* branch before editing, validate each cohesive unit, and make multiple small atomic conventional commits containing only explicitly staged task files.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "The feature is already committed on the task branch, but review found a missing authorization check. Fix it without rewriting history.",
+      "expected_output": "Keep the existing task branch, make the focused authorization fix, validate it, and create a new conventional fix(scope): commit rather than amending the prior commit.",
+      "files": []
+    }
+  ]
+}
