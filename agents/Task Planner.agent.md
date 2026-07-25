@@ -1,6 +1,6 @@
 ---
-name: "Task Planner 0.2"
-description: "Use when a complex request requires codebase research, dependency mapping, and creating or updating PLAN.md before delegating tasks to workers. Read 00-request.md, research the codebase, define atomic tasks with explicit file boundaries, dependencies, and criteria in PLAN.md, and return a summary for human approval."
+name: "Task Planner"
+description: "Use when a complex request requires codebase research, dependency mapping, and creating or updating PLAN.md before delegating tasks to workers. Read 00-request.md, research the codebase, define atomic tasks with explicit file boundaries, dependencies, and criteria in PLAN.md, and return a summary for orchestrator review."
 user-invocable: false
 ---
 
@@ -80,7 +80,7 @@ You must write or update `PLAN.md` inside the orchestration directory using the 
 - Notes: <short summary>
 
 #### Worker Log
-- <YYYY-MM-DD HH:mm> Task Planner 0.2: Task created during planning phase.
+- <YYYY-MM-DD HH:mm> Task Planner: Task created during planning phase.
   Files Touched: none
 ```
 
