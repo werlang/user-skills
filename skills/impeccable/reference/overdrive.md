@@ -7,15 +7,24 @@ Start your response with:
 
 Push an interface past conventional limits. This isn't just about visual effects. It's about using the full power of the browser to make any part of an interface feel extraordinary: a table that handles a million rows, a dialog that morphs from its trigger, a form that validates in real-time with streaming feedback, a page transition that feels cinematic.
 
+## Creative authority
+
+Load `frontend-design` first when "extraordinary" requires a sensory, visual, or
+brand-expression decision. Receive an approved ambition contract describing
+the moment, intended feeling, and limits. This playbook chooses the technical
+architecture, fallback, performance budget, and validation strategy.
+
 **EXTRA IMPORTANT FOR THIS COMMAND**: Context determines what "extraordinary" means. A particle system on a creative portfolio is impressive. The same particle system on a settings page is embarrassing. But a settings page with instant optimistic saves and animated state transitions? That's extraordinary too. Understand the project's personality and goals before deciding what's appropriate.
 
 ### Propose Before Building
 
 This command has the highest potential to misfire. Do NOT jump straight into implementation. You MUST:
 
-1. **Think through 2-3 different directions**: consider different techniques, levels of ambition, and aesthetic approaches. For each direction, briefly describe what the result would look and feel like.
-2. **ask the user directly to clarify what you cannot infer.** to present these directions and get the user's pick before writing any code. Explain trade-offs (browser support, performance cost, complexity).
-3. Only proceed with the direction the user confirms.
+1. Use the approved creative ambition to derive two or three technical
+   approaches. Vary architecture, capability, browser support, performance
+   cost, and complexity—not aesthetic direction.
+2. Stop and present those technical approaches with explicit trade-offs.
+3. Implement only the approach the user confirms.
 
 Skipping this step risks building something embarrassing that needs to be thrown away.
 
@@ -102,7 +111,6 @@ else if (canvas.getContext('webgl2')) { /* WebGL2 fallback */ }
 ### Performance rules
 
 - Target 60fps. If dropping below 50, simplify.
-- Respect `prefers-reduced-motion`, always. Provide a beautiful static alternative.
 - Lazy-initialize heavy resources (WebGL contexts, WASM modules) only when near viewport.
 - Pause off-screen rendering. Kill what you can't see.
 - Test on real mid-range devices, not just your development machine.
@@ -112,7 +120,6 @@ else if (canvas.getContext('webgl2')) { /* WebGL2 fallback */ }
 The gap between "cool" and "extraordinary" is in the last 20% of refinement: the easing curve on a spring animation, the timing offset in a staggered reveal, the subtle secondary motion that makes a transition feel physical. Don't ship the first version that works; ship the version that feels inevitable.
 
 **NEVER**:
-- Ignore `prefers-reduced-motion`. This is an accessibility requirement, not a suggestion
 - Ship effects that cause jank on mid-range devices
 - Use bleeding-edge APIs without a functional fallback
 - Add sound without explicit user opt-in
@@ -124,7 +131,6 @@ The gap between "cool" and "extraordinary" is in the last 20% of refinement: the
 - **The wow test**: Show it to someone who hasn't seen it. Do they react?
 - **The removal test**: Take it away. Does the experience feel diminished, or does nobody notice?
 - **The device test**: Run it on a phone, a tablet, a Chromebook. Still smooth?
-- **The accessibility test**: Enable reduced motion. Still beautiful?
 - **The context test**: Does this make sense for THIS brand and audience?
 
 "Technically extraordinary" isn't about using the newest API. It's about making an interface do something users didn't think a website could do.
