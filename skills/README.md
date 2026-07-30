@@ -44,7 +44,7 @@ which skill to read.
 | `frontend-design` | Creative direction, visual identity, palette and typography taste, composition, imagery, motion character, and brand voice for frontend interfaces. | [`SKILL.md`](frontend-design/SKILL.md) |
 | `impeccable` | Production implementation and technical frontend quality: accessibility, responsive behavior, interaction states, performance, maintainability, and validation. | [`SKILL.md`](impeccable/SKILL.md) |
 | `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
-| `seo-optimizer` | Auditing and implementing technical SEO, metadata, structured data, and indexing improvements. | [`SKILL.md`](seo-optimizer/SKILL.md) |
+| `seo-optimizer` | Auditing, diagnosing, implementing, and verifying technical, on-page, international, content, indexing, structured-data, and performance SEO work. | [`SKILL.md`](seo-optimizer/SKILL.md) |
 
 ## Developer memory
 
