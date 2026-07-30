@@ -1,6 +1,6 @@
 ---
 name: css-standards
-description: Enforce reusable, brand-aware CSS architecture for public web apps by owning shared tokens in a common stylesheet, importing page entrypoints first, keeping component partials scoped, and using consistent media-query and color-token conventions.
+description: Enforce reusable, brand-aware CSS architecture for public web apps by owning shared tokens in a common stylesheet, importing page entrypoints first, keeping component partials scoped, using native CSS nesting consistently, and following media-query and color-token conventions.
 ---
 
 # CSS Standards
@@ -45,6 +45,43 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 - On phone layouts, prefer flush section shells when they improve readability: outer wrappers may drop to `padding: 0`, large sections/panels/modals may tighten to a smaller radius, and the breathing room should move into inner headers, bodies, facts, and action rows instead of staying on the outer shell.
 - Restore the roomier framed-card treatment at the first upward breakpoint used by the project rather than preserving desktop gutters on narrow screens.
 
+## Selector Nesting
+
+- Prefer native CSS nesting for a component's pseudo-elements, states, descendants, and component-local parts. Keep the component root as the outer rule so related selectors stay colocated.
+- Use `&` when the nested selector changes the same element: `&:hover`, `&:focus-visible`, `&::before`, `&::backdrop`, `&[open]`, and `&.is-active`.
+- Use a bare nested selector for a descendant: `.modal-dialog {}` inside `.modal {}` means `.modal .modal-dialog`.
+- Nest state rules inside the element they modify. Write `.modal-close { &:hover { ... } }`, not a separate `.modal-close:hover` block at the component root.
+- Keep nesting shallow. A component root, its local part, and that part's state is a useful default; avoid deep selector chains and nesting unrelated component roots.
+- Keep global rules, shared structural classes, and independently reusable component roots flat. Use nesting for ownership and colocation, not as a replacement for clear class names.
+
+Preferred shape:
+
+```css
+.modal {
+    /* Root styles */
+
+    &::backdrop {
+        /* Pseudo-element of .modal */
+    }
+
+    &:not([open]) {
+        /* State of .modal */
+    }
+
+    .modal-dialog {
+        /* Descendant owned by .modal */
+    }
+
+    .modal-close {
+        /* Descendant owned by .modal */
+
+        &:hover {
+            /* State of .modal-close */
+        }
+    }
+}
+```
+
 ## Core Rules
 
 1. `web/src/css/tokens.css` owns shared CSS variables, font imports, and global browser chrome such as scrollbar styling.
@@ -60,7 +97,7 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 11. If a page-specific component is only a contextual variant of a reusable component, keep the shared visual primitive in the reusable component file and limit the page-specific file to contextual overrides and container-specific states.
 12. If multiple page-scoped components share the same visual primitive and there is no reusable base component yet, extract a small shared partial or shared structural class instead of duplicating rules or pushing them back into the entry file.
 13. Prefer multiple classes on the same element when structure and meaning are different concerns: semantic classes for purpose and JS hooks, structural classes for reusable shells and spacing contracts. Do not use `data-*` attributes. Never store domain data (IDs, values, lookup mappings) in data attributes — that data belongs in JavaScript structures resolved at interaction time.
-14. Prefer nested selectors within each component file so styles stay colocated and scoped.
+14. Prefer native CSS nesting within each component file: nest pseudo-elements, same-element states with `&`, and component-owned descendants under their root selector. Follow the `&` versus descendant rules in the Selector Nesting section.
 15. Keep responsive overrides in the same component file as the base styles they modify.
 16. Keep component styles in their existing partials such as `modal.css`, `menu.css`, `toast.css`, etc., rather than creating new ones for one-off treatments. If a new reusable visual primitive emerges, give it its own CSS partial instead of burying it in an unrelated page file.
 17. Prefer CSS class toggles over inline styles. Dynamic asset URLs or one-off image backgrounds are the exception, not the default.

@@ -24,6 +24,36 @@ web/src/css/
 - Keep semantic classes responsible for internals, states, and product meaning; keep structural classes responsible for reusable surface behavior.
 - Keep transitions, colors, and spacing consistent.
 
+## Selector Nesting
+
+- Prefer native CSS nesting for a component's internals, pseudo-elements, states, and descendants. Keep the component root as the outer rule.
+- Use `&` when the nested selector targets the same element: `&:hover`, `&:focus-visible`, `&::backdrop`, `&[open]`, or `&.is-active`.
+- Use a bare nested selector for a descendant: `.modal-dialog {}` inside `.modal {}` means `.modal .modal-dialog`.
+- Nest a state inside the element it modifies, such as `.modal-close { &:hover { ... } }`.
+- Keep nesting shallow and do not nest unrelated component roots. Global rules, shared structural classes, and independently reusable component roots can remain flat.
+
+```css
+.modal {
+    /* Root styles */
+
+    &::backdrop {
+        /* Pseudo-element of .modal */
+    }
+
+    .modal-dialog {
+        /* Descendant owned by .modal */
+    }
+
+    .modal-close {
+        /* Descendant owned by .modal */
+
+        &:hover {
+            /* State of .modal-close */
+        }
+    }
+}
+```
+
 ## Responsive Strategy
 
 - Write the base layout first.

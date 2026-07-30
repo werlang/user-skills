@@ -8,18 +8,18 @@
     background-color: var(--main-color-light);
     box-shadow: var(--shadow-soft);
     transition: transform var(--fade-time), box-shadow var(--fade-time);
-}
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgb(from var(--main-color) r g b / 0.22);
-}
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgb(from var(--main-color) r g b / 0.22);
+    }
 
-.card__title {
-    margin: 0;
-    color: var(--main-color-dark);
-}
+    .card__title {
+        margin: 0;
+        color: var(--main-color-dark);
+    }
 
-.card__meta {
-    color: rgb(from var(--text-color) r g b / 0.75);
+    .card__meta {
+        color: rgb(from var(--text-color) r g b / 0.75);
+    }
 }
