@@ -115,6 +115,7 @@ Preferred shape:
 ## Guardrails
 
 - Do not import a new design system or generic admin theme.
+- Never use `!important`; resolve cascade conflicts with component ownership, selector specificity, source order, or a structural class.
 - Do not migrate the visual language toward a source project's unrelated palette.
 - Do not add dark-mode-only treatments unless explicitly requested.
 - Do not mix `max-width` and `min-width` strategies in the same stylesheet by default.
@@ -135,6 +136,7 @@ Preferred shape:
 - On phones, do outer shells use the available width efficiently, with breathing room pushed inward instead of trapped in desktop wrapper padding?
 - Do icon treatments follow the shared icon setup instead of introducing a second icon system or version-pinned font-family names?
 - Are new visual states driven by classes rather than DOM style mutation?
+- Does the CSS contain no `!important` declarations?
 - Does the result still feel like the existing site rather than a new theme?
 
 ## References
