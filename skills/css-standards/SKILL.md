@@ -102,6 +102,7 @@ Preferred shape:
 16. Keep component styles in their existing partials such as `modal.css`, `menu.css`, `toast.css`, etc., rather than creating new ones for one-off treatments. If a new reusable visual primitive emerges, give it its own CSS partial instead of burying it in an unrelated page file.
 17. Prefer CSS class toggles over inline styles. Dynamic asset URLs or one-off image backgrounds are the exception, not the default.
 18. Keep interactions visually controlled: subtle lift, border shifts, and shadow changes are usually better than aggressive transforms or high-contrast effects.
+19. Scope `&[hidden] { display: none; }` inside component selectors (or use higher-hierarchy `[hidden]` selectors) whenever a component rule sets an explicit `display` property, ensuring `[hidden]` takes effect without needing `!important`.
 
 ## Structural Classes
 
@@ -115,7 +116,8 @@ Preferred shape:
 ## Guardrails
 
 - Do not import a new design system or generic admin theme.
-- Never use `!important`; resolve cascade conflicts with component ownership, selector specificity, source order, or a structural class.
+- **Absolute prohibition: never use `!important` under any circumstances.** It is a dirty quickfix that breaks the cascade and is forbidden in all new and modified CSS. Resolve cascade conflicts with component ownership, selector specificity, source order, or a structural class. If a conflict cannot be resolved without `!important`, refactor the conflicting rules instead.
+- When using the HTML `hidden` attribute on an element whose component CSS sets explicit `display` values (e.g. `display: flex`, `display: grid`, `display: block`), nest `&[hidden] { display: none; }` inside the component root selector or use higher-hierarchy selectors. Generic base `[hidden] { display: none; }` rules have single attribute specificity `(0, 1, 0)` and lower cascade priority than component selectors setting `display`, so they will be overridden unless component specificity is specified.
 - Do not migrate the visual language toward a source project's unrelated palette.
 - Do not add dark-mode-only treatments unless explicitly requested.
 - Do not mix `max-width` and `min-width` strategies in the same stylesheet by default.
@@ -136,7 +138,7 @@ Preferred shape:
 - On phones, do outer shells use the available width efficiently, with breathing room pushed inward instead of trapped in desktop wrapper padding?
 - Do icon treatments follow the shared icon setup instead of introducing a second icon system or version-pinned font-family names?
 - Are new visual states driven by classes rather than DOM style mutation?
-- Does the CSS contain no `!important` declarations?
+- Does the change introduce zero `!important` declarations (it must — `!important` is absolutely prohibited)?
 - Does the result still feel like the existing site rather than a new theme?
 
 ## References
