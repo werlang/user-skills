@@ -1,0 +1,7 @@
+interface:
+  display_name: "Lesson Learned"
+  short_description: "Promote project-local lessons from refactors"
+  default_prompt: "Use $lesson-learned to capture and promote a project-local lesson from this refactor."
+
+policy:
+  allow_implicit_invocation: true
