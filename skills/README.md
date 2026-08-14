@@ -1,8 +1,17 @@
 # Skill definitions
 
-Each directory in this folder is a reusable Codex skill. The `SKILL.md` file
-is the authoritative definition; this catalog is an index for people choosing
-which skill to read.
+Each checked-in skill directory in this folder has a `SKILL.md` entrypoint. The
+entrypoint is the authoritative definition; this catalog is an index for people
+choosing which skill to read.
+
+## Browser, discovery, and tooling
+
+| Skill | Use it for | Definition |
+| --- | --- | --- |
+| `agent-browser` | Browser automation CLI workflows, including web pages, Electron apps, exploratory testing, and QA. The entrypoint is a discovery stub; load the installed CLI's current workflow before running commands. | [`SKILL.md`](agent-browser/SKILL.md) |
+| `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
+| `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
+| `socraticode` | Searching code structure, symbols, dependencies, impact, execution flows, and non-code context. | [`SKILL.md`](socraticode/SKILL.md) |
 
 ## API and application structure
 
@@ -19,8 +28,10 @@ which skill to read.
 | --- | --- | --- |
 | `audit-project-context` | Auditing README files, prompts, skills, agents, and instructions against the actual codebase. | [`SKILL.md`](audit-project-context/SKILL.md) |
 | `backend-bug-review-generalized` | Reviewing backend, API, worker, and data-layer logic, contracts, authorization, and state transitions. | [`SKILL.md`](backend-bug-review-generalized/SKILL.md) |
+| `code-review` | Reviewing a diff against repository standards and the originating specification or request. | [`SKILL.md`](code-review/SKILL.md) |
 | `frontend-bug-review-generalized` | Reviewing frontend rendering, interaction, URL/auth state, accessibility, and browser behavior. | [`SKILL.md`](frontend-bug-review-generalized/SKILL.md) |
 | `git-change-workflow` | Choosing current-branch fast tracks or dedicated branches with small, focused, atomic commits for larger work. | [`SKILL.md`](git-change-workflow/SKILL.md) |
+| `tdd` | Building features or fixing bugs with test-first red-green-refactor development and integration tests. | [`SKILL.md`](tdd/SKILL.md) |
 | `test-first-delivery-generalized` | Choosing tests, preparing regression coverage, validating behavior changes, and documenting testing gaps. | [`SKILL.md`](test-first-delivery-generalized/SKILL.md) |
 | `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |
 
@@ -30,11 +41,19 @@ which skill to read.
 | --- | --- | --- |
 | `document-touched-code` | Adding focused JSDoc, docstrings, method comments, and maintainability comments to changed code. | [`SKILL.md`](document-touched-code/SKILL.md) |
 | `documentation-maintenance` | Keeping documentation, agent guidance, comments, and validation instructions synchronized with implementation. | [`SKILL.md`](documentation-maintenance/SKILL.md) |
+| `lesson-learned` | Inferring reusable project lessons from refactors and promoting them only through project-local guidance. | [`SKILL.md`](lesson-learned/SKILL.md) |
 | `migrate-project-context` | Porting project docs, prompts, skills, and agent instructions into a different repository. | [`SKILL.md`](migrate-project-context/SKILL.md) |
 | `skill-creator` | Designing and scaffolding new Codex skills. | [`SKILL.md`](skill-creator/SKILL.md) |
 | `skill-optimizer` | Evolving an existing skill using evaluation results and mutation memory. | [`SKILL.md`](skill-optimizer/SKILL.md) |
 | `skill-updater` | Detecting reusable workflows and updating durable docs, prompts, or skill guidance. | [`SKILL.md`](skill-updater/SKILL.md) |
-| `socraticode` | Searching code structure, symbols, dependencies, impact, and non-code context. | [`SKILL.md`](socraticode/SKILL.md) |
+
+## Communication and decision support
+
+| Skill | Use it for | Definition |
+| --- | --- | --- |
+| `caveman` | Compressing responses into a terse, technically accurate communication style with selectable intensity levels. | [`SKILL.md`](caveman/SKILL.md) |
+| `grill-me` | Running a manually invoked relentless interview to sharpen a plan or design. | [`SKILL.md`](grill-me/SKILL.md) |
+| `grilling` | Stress-testing a plan, decision, or idea through a recommended-answer interview. | [`SKILL.md`](grilling/SKILL.md) |
 
 ## Product quality and security
 
@@ -56,6 +75,7 @@ which skill to read.
 
 1. Choose the narrowest skill matching the request.
 2. Read its complete `SKILL.md` before taking action.
-3. Follow links to `references/` or `scripts/` when the skill requires them.
+3. Follow links to skill-local `reference/`, `references/`, or `scripts/`
+   directories when the skill requires them.
 4. Use the repository code and configuration as the source of truth when the
    skill is applied to a project.

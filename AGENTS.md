@@ -24,8 +24,9 @@ reference projects or scripts that accompany it.
 - Resolve relative references from the skill directory.
 - Keep examples minimal and executable. Do not document a command that is not
   defined by the referenced project or script.
-- Put reusable checklists, templates, and examples in `references/`; put
-  executable helpers in `scripts/`.
+- Put reusable checklists, templates, and examples in a skill-local
+  `references/` directory. Preserve an established `reference/` layout when a
+  skill already uses it; put executable helpers in `scripts/`.
 - Keep [`skills/README.md`](skills/README.md) synchronized with the skill
   directories and their `SKILL.md` descriptions.
 - When updating `obsidian-dev-brain`, keep its in-vault protocol note and the
@@ -63,6 +64,7 @@ documentation-only change, run targeted checks such as:
 
 ```sh
 rg --files skills agents
+rg -n "^name:" skills/*/SKILL.md
 rg -n "path|command|agent name|skill name" README.md AGENTS.md agents skills
 ```
 

@@ -68,7 +68,9 @@ Convert stable lessons from the current task into the smallest correct documenta
 4. Update that guide with concise, directive wording.
 5. Only create a new skill when no existing skill is the right long-term owner.
 6. If the rule is repository-wide, also update `.github/copilot-instructions.md`.
-7. If the request is a documentation audit, also check `README.md`, `.github/skills/README.md`, and any prompts or references that repeat the stale claim.
+7. If the request is a documentation audit, also check `README.md`, the
+   repository's skill catalog (for this repository, `skills/README.md`), and any
+   prompts or references that repeat the stale claim.
 8. If the rule is useful beyond the current diff and likely to remain true, store a repository memory with citations.
 
 ## Ownership Rules
