@@ -56,8 +56,11 @@ You are checking for:
 - broken behavior, obvious regressions, or integration issues
 - insufficient validation for the task
 - missing tester-owned prep or validation evidence when the workflow should have used it
-- sensitive data exposure in code, logs, tests, docs, prompts, or output channels
 - exploitable behaviors such as injection vectors, unsafe command execution, path traversal, unsafe file writes, auth or permission gaps, insecure defaults, or untrusted-content handling issues that humans or other agents could abuse
+- overengineering and maintainability flaws violating KISS, YAGNI, or DRY:
+  - **KISS**: unnecessary complexity, convoluted architectures, or confusing indirections where simple, readable code suffices
+  - **YAGNI**: speculative abstractions, premature helper/wrapper classes, single-use classes, or extra parameters created for unrequested future needs
+  - **DRY vs YAGNI/KISS**: premature extraction of abstractions before repetitive patterns emerge (Rule of Three), or bad/forced abstractions that harm readability (a little duplication is better than a confusing abstraction)
 - role overlap where coder or reviewer took over tester responsibilities, or tester took over code-authoring responsibilities
 - code quality issues that would make the task not actually done
 
