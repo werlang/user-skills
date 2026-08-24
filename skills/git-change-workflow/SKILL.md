@@ -49,8 +49,12 @@ Before every commit:
 1. Stage only the completed unit with explicit paths, for example `git add -- path/to/file-a path/to/file-b`. Never use `git add .` or `git add -A` when unrelated work may exist.
 2. Inspect the staged file list and diff: `git diff --cached --name-only`, `git diff --cached --stat`, and `git diff --cached` as needed.
 3. Run `git diff --cached --check` and the targeted tests or validation for the unit.
-4. Use a concise conventional message with an optional scope. If the repository
-   provides its own commit contract, follow it as the authority. Fall back to this inline format:
+4. Use a concise conventional message with an optional scope. Always defer to
+   the repository's own commit contract as the authority when present — in
+   practice this is usually [`.github/COMMIT-v2.md`](../../.github/COMMIT-v2.md).
+   Follow its required `<type>(<scope>): <short summary>` format, type/scope
+   selection order, scope inference rules, and staged-diff inspection. Fall back
+   to this inline format only when no repository contract exists:
    - `feat(scope): add ...`
    - `fix(scope): correct ...`
    - `refactor(scope): reorganize ...`
