@@ -24,6 +24,8 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 Also ask one calibration question if the answer isn't already known: **has any of this diff already run outside local development?** (deployed, migrated, sent real traffic/email/data). Findings on stateful artifacts — persisted data, external effects, configuration — change severity completely depending on the answer: pre-production means risky shapes can simply be edited, shipped means they need forward-compatible treatment. Carry the answer into both sub-agents' briefs.
 
+**Unreleased code & legacy retention policy:** When deciding whether to keep legacy methods, deprecated routes, fallback mechanisms, or dual-writes during a feature or refactor on development branches (e.g. `dev`), check whether the `main` branch has already merged the legacy code. If `main` has never merged or released it, there is no need to keep legacy methods or compatibility shims — make the new canonical implementation the only way (YAGNI/KISS). Reviewers must not flag the removal of unreleased legacy paths as a breaking change or defect.
+
 ### 2. Identify the spec source
 
 Look for the originating spec, in this order:
@@ -90,7 +92,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 **Overengineering (the direction most reviews under-flag)**
 
-- **Speculative Generality** — abstraction, parameters, single-use hooks for needs nothing in the spec has. → delete; inline back until a real need shows.
+- **Speculative Generality / Premature Compatibility** — abstraction, parameters, single-use hooks, or preserving legacy methods/fallbacks for code that was never merged into `main` or released. If `main` has not merged the legacy code, delete the legacy paths and keep only the canonical implementation. → delete; inline back until a real need shows.
 - **Premature Abstraction (Forced DRY)** — an abstraction introduced below the Rule-of-Three count, or one that adds confusing indirection. → inline it; KISS wins over premature DRY.
 - **Middle Man** — a class or function that mostly forwards onward. **Counterweight:** forwarding-only wrappers are debt, but wrappers that add vocabulary, a boundary, error translation, or transactional meaning are *design* — flag only the former, and say which the wrapper lacks.
 
@@ -144,6 +146,10 @@ Before presenting, do three passes over the raw reports:
 End with a one-line summary per axis: total findings (verified/unverified), and the worst issue _within each axis_. Don't pick a single winner across axes.
 
 State explicitly anything material that was **not** verifiable statically (runtime behaviour, visual output, integration points) so the reader knows the review's edges.
+
+### 6. Report-first gate (mandatory)
+
+Deliver the aggregated report and **stop**. Never implement fixes in the same turn unless the user explicitly asked for fixes in the original request. Findings are proposals for the owner to accept, reject, or re-scope — auto-fixing them collapses that review into an unreviewable diff and destroys the report's value as a decision artifact. When the user later approves fixes, route the work through `verify-fixes` mode (re-review the fix diff with the added lens: *did the fix introduce what it was fixing?*).
 
 ## Verify-fixes mode
 
