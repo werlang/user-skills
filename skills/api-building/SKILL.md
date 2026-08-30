@@ -72,4 +72,4 @@ Include a stable, machine-readable `code` string in all 4xx/5xx responses so fro
 
 - Read `references/architecture.md` for the generic architecture rules.
 - Read `references/mini-project/` for a small starter API that follows this structure.
-- Pair this with the `mysql-helper`, `entity-models`, and `web-frontend` skills when needed.
+- Pair this with the [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), `mysql-helper`, `entity-models`, and `web-frontend` skills when needed.

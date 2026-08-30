@@ -54,4 +54,4 @@ web/
 
 - Read `references/frontend-structure.md` for the generic structure.
 - Read `references/mini-project/` for a small starter frontend.
-- Pair this with `css-standards` when styling the UI.
+- Pair this with [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) and `css-standards` when designing components and styling the UI.

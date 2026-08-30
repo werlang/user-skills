@@ -60,16 +60,9 @@ Prefer investigating these patterns early:
 - source asset changes that were not propagated to the build output the project ships
 - tests that assert markup exists but never prove the interaction, failure, or empty-state branch that can regress
 
-## Output Expectations
-
-When the user asked for a review, findings come first.
-
-Each finding should include:
-
-- severity
-- the affected frontend file or user flow
-- why it is a real bug or likely runtime defect
-- whether deterministic coverage exists, was added, or is still missing
-- whether a browser pass is still needed
-
 Keep summaries brief. The value of this skill is in concrete frontend bug finding plus executable regression coverage.
+
+## Related Skills
+
+- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Apply component encapsulation, state hygiene, and clean refactoring patterns to UI bug fixes.
+- [`test-first-delivery-generalized`](../test-first-delivery-generalized/SKILL.md) — Test selection and validation workflow.

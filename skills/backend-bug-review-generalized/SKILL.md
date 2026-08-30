@@ -53,15 +53,9 @@ Prefer investigating these patterns early:
 - startup or background code that imports optional dependencies without isolating failures
 - tests that only prove happy paths while state transitions have multiple branches
 
-## Output Expectations
-
-When the user asked for a review, findings come first.
-
-Each finding should include:
-
-- severity
-- the affected backend file, module, or behavior
-- why it is a real bug or likely runtime defect
-- whether a regression test exists, was added, or is still missing
-
 Keep summaries brief. The value of this skill is in precise bug finding plus executable regression coverage.
+
+## Related Skills
+
+- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Apply clean architecture, OOP domain models, and safe refactoring when implementing bug fixes.
+- [`test-first-delivery-generalized`](../test-first-delivery-generalized/SKILL.md) — Test-driven validation and regression enforcement.

@@ -155,11 +155,11 @@ Deliver the aggregated report and **stop**. Never implement fixes in the same tu
 
 When the user has applied fixes in response to a review, re-review **the fix diff itself** (`review-point..HEAD`, or uncommitted changes): defect-first, same methodology, with one added lens — *did the fix introduce what it was fixing?* Fixes routinely overshoot (loosening a validator beyond need), undershoot (fixing one of several duplicate sites), or break neighbours (renamed identifiers still queried elsewhere). The fix diff is statistically the most error-prone artifact in the cycle; treat it as a first-class review target, not a footnote.
 
-## Why two axes
-
-A change can pass one axis and fail the other:
-
-- Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
-- Code that does exactly the issue asked but breaks the project's conventions → **Spec pass, Standards fail.**
-
 Reporting them separately stops one axis from masking the other.
+
+## Related Skills
+
+- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Authoritative engineering standards for Clean Code, OOP architecture, and safe refactoring.
+- [`backend-bug-review-generalized`](../backend-bug-review-generalized/SKILL.md) — Backend defect and regression auditing.
+- [`frontend-bug-review-generalized`](../frontend-bug-review-generalized/SKILL.md) — Frontend rendering, state, and interaction auditing.
+- [`document-touched-code`](../document-touched-code/SKILL.md) — JSDoc contracts and interface documentation.

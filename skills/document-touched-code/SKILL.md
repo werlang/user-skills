@@ -61,3 +61,4 @@ Do not:
 ## Reference
 
 See [references/comment-patterns.md](references/comment-patterns.md) for short examples of strong doc comments and section comments.
+Pair with [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) to keep function interfaces, class contracts, and types clean and self-describing.
