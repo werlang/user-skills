@@ -9,8 +9,11 @@ choosing which skill to read.
 | Skill | Use it for | Definition |
 | --- | --- | --- |
 | `agent-browser` | Browser automation CLI workflows, including web pages, Electron apps, exploratory testing, and QA. The entrypoint is a discovery stub; load the installed CLI's current workflow before running commands. | [`SKILL.md`](agent-browser/SKILL.md) |
+| `computer-use` | Inspecting and operating local desktop app windows via Orca computer-use CLI (accessibility trees, screenshots, UI actions). | [`SKILL.md`](computer-use/SKILL.md) |
 | `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
+| `orca-cli` | Operating Orca-managed worktrees, terminals, repos, automations, artifacts, and the embedded browser via the public `orca` CLI. | [`SKILL.md`](orca-cli/SKILL.md) |
+| `orchestration` | Structured multi-agent coordination via Orca orchestration (threads, task DAGs, coordinator loops, decision gates). | [`SKILL.md`](orchestration/SKILL.md) |
 | `socraticode` | Searching code structure, symbols, dependencies, impact, execution flows, and non-code context. | [`SKILL.md`](socraticode/SKILL.md) |
 
 ## API and application structure
@@ -39,6 +42,7 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
+| `clean-code-and-oop` | Writing Clean Code, OOP architectures, SOLID principles, and safe refactoring. | [`SKILL.md`](clean-code-and-oop/SKILL.md) |
 | `document-touched-code` | Adding focused JSDoc, docstrings, method comments, and maintainability comments to changed code. | [`SKILL.md`](document-touched-code/SKILL.md) |
 | `documentation-maintenance` | Keeping documentation, agent guidance, comments, and validation instructions synchronized with implementation. | [`SKILL.md`](documentation-maintenance/SKILL.md) |
 | `lesson-learned` | Capturing durable lessons from refactors as `LESSONS.md` checkbox items and promoting them to project-local docs/specs/skills/prompts (auto-invokes on `refactor`, `restructure`, `clean up`, `capture lesson`, `LESSONS.md`). | [`SKILL.md`](lesson-learned/SKILL.md) |
@@ -54,6 +58,7 @@ choosing which skill to read.
 | `caveman` | Compressing responses into a terse, technically accurate communication style with selectable intensity levels. | [`SKILL.md`](caveman/SKILL.md) |
 | `grill-me` | Running a manually invoked relentless interview to sharpen a plan or design. | [`SKILL.md`](grill-me/SKILL.md) |
 | `grilling` | Stress-testing a plan, decision, or idea through a recommended-answer interview. | [`SKILL.md`](grilling/SKILL.md) |
+| `use-spark` | Accessing Spark email, calendar, contacts, and team data via the `spark` CLI. | [`SKILL.md`](use-spark/SKILL.md) |
 
 ## Product quality and security
 
