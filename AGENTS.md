@@ -63,10 +63,12 @@ This repository has no root package manifest or application runtime. For a
 documentation-only change, run targeted checks such as:
 
 ```sh
-rg --files skills agents
-rg -n "^name:" skills/*/SKILL.md
-rg -n "path|command|agent name|skill name" README.md AGENTS.md agents skills
+rg --files skills agents 2>/dev/null || find skills agents -type f | sort
+rg -n "^name:" skills/*/SKILL.md 2>/dev/null || grep -rn "^name:" skills/*/SKILL.md
+rg -n "path|command|agent name|skill name" README.md AGENTS.md agents skills 2>/dev/null || grep -rn "path\|command\|agent name\|skill name" README.md AGENTS.md agents skills
 ```
+
+`rg` is preferred when installed; `find`/`grep` are the portable fallback.
 
 When changing a skill with a shipped script, use that script's documented
 command. Report environment failures separately from content or contract

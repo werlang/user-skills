@@ -7,6 +7,7 @@ argument-hint: "[shape · audit|critique · animate|bolder|colorize|delight|layo
 license: Apache 2.0
 allowed-tools:
   - Bash(npx impeccable *)
+  - Bash(node skills/impeccable/scripts/*)
   - Bash(node .claude/skills/impeccable/scripts/*)
 ---
 
@@ -39,7 +40,7 @@ critique. Do not create a parallel visual direction inside this skill.
 
 ## Setup
 
-1. Run `node .claude/skills/impeccable/scripts/context.mjs` once per session
+1. Run `node skills/impeccable/scripts/context.mjs` (or `node .claude/skills/impeccable/scripts/context.mjs` when installed as a Codex skill) once per session
    from the user's project. If the runtime reports another loaded skill base,
    use that base. Pass a named source file or route with `--target <path>`.
    Follow the script's directives and do not rerun it.
@@ -141,7 +142,7 @@ the same decision between them.
 After `init` writes PRODUCT.md, resume without rerunning `context.mjs`.
 
 **Pin / Unpin:** run
-`node .claude/skills/impeccable/scripts/pin.mjs <pin|unpin> <command>`.
+`node skills/impeccable/scripts/pin.mjs <pin|unpin> <command>` (or `.claude/skills/impeccable/scripts/pin.mjs` when installed).
 
 **Hooks:** load [reference/hooks.md](reference/hooks.md) for
 `/impeccable hooks <on|off|status|ignore-rule|ignore-file|ignore-value|reset>`.
