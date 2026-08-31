@@ -1,6 +1,6 @@
 ---
 name: lesson-learned
-description: Capture durable, project-specific lessons from refactors by answering why the change happened, what project behavior it should affect, and whether the rule is reusable beyond a punctual refactor; record only evidence-backed lessons as checkbox items in the active project's lessons.md and promote them only into project-local documentation, specs, skills, prompts, or agent guidance, never global skills or agents. Use whenever the user asks to refactor code, a refactor exposes a repeatable project rule, or the user asks to update documentation, specs, prompts, skills, or agent guidance.
+description: Use when refactoring, restructuring, cleaning up, or simplifying code to capture durable project lessons as checkbox items in the active project's LESSONS.md and promote them to project-local docs, specs, skills, prompts, or agent guidance. Auto-invoke on refactor, restructure, clean up, simplify, capture lesson, record lesson, lessons learned, or LESSONS.md. Complements clean-code-and-oop — this skill records the lesson, the other implements the refactor.
 ---
 
 # Lesson Learned
@@ -9,9 +9,37 @@ description: Capture durable, project-specific lessons from refactors by answeri
 
 Treat a refactor request as evidence about the project, not only as a code-editing task. Capture a lesson when the request corrects a repeatable mistake, restores a documented or established project standard, or exposes a rule that future agents should follow. Keep the record in the active project's `LESSONS.md`, never in this global skill directory.
 
-Run a lesson check for every user request to refactor code, even when the final conclusion is that no durable lesson exists.
+Run a lesson check for every user request to refactor code, even when the final conclusion is that no durable lesson exists. This skill complements `clean-code-and-oop` and `skill-updater`: those apply the code or doc change, this decides whether the change warrants a durable `LESSONS.md` entry and where to promote it.
 
 This global installation supplies only the workflow. Every lesson and every file changed to promote it belongs to the active project. Treat `~/.agents/skills/` and other machine-global guidance as out of scope for project lessons; change those only when the user explicitly asks to maintain a global artifact itself.
+
+## When to Use It
+
+Use this skill when the request is about any of these:
+
+- refactoring, restructuring, cleaning up, simplifying, or modernizing existing code
+- a corrective refactor that fixes a repeated mistake, restores a project standard, or enforces a contract/boundary
+- deciding whether a refactor exposes a reusable project rule worth recording
+- updating project documentation, specs, prompts, project-local skills, `AGENTS.md`, or agent guidance after a refactor
+- explicitly capturing, recording, or promoting a lesson (`capture lesson`, `record lesson`, `lessons learned`, `LESSONS.md`)
+
+Do not use for a punctual one-off cleanup, personal preference, or temporary workaround with no evidence of broader adoption — run the inference gate and report `no durable lesson` instead.
+
+## Discovery Note
+
+The frontmatter `description` is the discovery surface. It must start with the trigger verbs and list the exact phrases the router matches: `refactor`, `restructure`, `clean up`, `simplify`, `capture lesson`, `record lesson`, `lessons learned`, `LESSONS.md`, and `update docs/specs/skills/prompts`. Keep those phrases in the description so implicit invocation works even when the `agents/openai.yaml` policy is ignored.
+
+## Auto-Invocation (agent-enabled)
+
+This skill should be auto-invoked when any of these conditions match — even if the user did not type `$lesson-learned`:
+
+- User prompt contains `refactor`, `restructure`, `clean up`, `cleanup`, `simplify`, `modernize`, `tech debt`, `code quality`, or `boy scout` in a refactor context.
+- User prompt contains `lesson`, `lessons learned`, `capture lesson`, `record lesson`, or `LESSONS.md`.
+- User prompt asks to update project docs, specs, project-local skills, prompts, `AGENTS.md`, or agent guidance as part of or after a refactor.
+- Agent output is about to perform or has just performed a refactor (extract method/class, decompose conditional, parameter object, composition over inheritance) — run the inference gate alongside `clean-code-and-oop` instead of deferring.
+- The same corrective pattern appears in multiple files or has appeared in prior turns.
+
+When auto-invoked, apply the inference gate immediately, report the classification (`durable correction` vs `intentional preference` vs `unconfirmed` vs `punctual`), and only write `LESSONS.md` when the adoption threshold is met. Never compete with `clean-code-and-oop` for implementation — run in parallel and own only the lesson decision and `LESSONS.md` promotion.
 
 ## Inference gate
 

@@ -1,7 +1,7 @@
 interface:
   display_name: "Lesson Learned"
-  short_description: "Promote project-local lessons from refactors"
-  default_prompt: "Use $lesson-learned to capture and promote a project-local lesson from this refactor."
+  short_description: "Capture LESSONS.md lessons from refactors (auto-invokes on refactor)"
+  default_prompt: "Use $lesson-learned when refactoring, restructuring, cleaning up, or simplifying code — or on capture lesson, record lesson, lessons learned, LESSONS.md — to capture a durable lesson in LESSONS.md and promote it to project-local docs/specs/skills/prompts."
 
 policy:
   allow_implicit_invocation: true

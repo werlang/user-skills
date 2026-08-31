@@ -41,7 +41,7 @@ choosing which skill to read.
 | --- | --- | --- |
 | `document-touched-code` | Adding focused JSDoc, docstrings, method comments, and maintainability comments to changed code. | [`SKILL.md`](document-touched-code/SKILL.md) |
 | `documentation-maintenance` | Keeping documentation, agent guidance, comments, and validation instructions synchronized with implementation. | [`SKILL.md`](documentation-maintenance/SKILL.md) |
-| `lesson-learned` | Inferring reusable project lessons from refactors and promoting them only through project-local guidance. | [`SKILL.md`](lesson-learned/SKILL.md) |
+| `lesson-learned` | Capturing durable lessons from refactors as `LESSONS.md` checkbox items and promoting them to project-local docs/specs/skills/prompts (auto-invokes on `refactor`, `restructure`, `clean up`, `capture lesson`, `LESSONS.md`). | [`SKILL.md`](lesson-learned/SKILL.md) |
 | `migrate-project-context` | Porting project docs, prompts, skills, and agent instructions into a different repository. | [`SKILL.md`](migrate-project-context/SKILL.md) |
 | `skill-creator` | Designing and scaffolding new Codex skills. | [`SKILL.md`](skill-creator/SKILL.md) |
 | `skill-optimizer` | Evolving an existing skill using evaluation results and mutation memory. | [`SKILL.md`](skill-optimizer/SKILL.md) |
