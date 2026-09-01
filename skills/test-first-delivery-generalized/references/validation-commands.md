@@ -28,6 +28,24 @@ docker compose run --rm api npx vitest run path/to/file.test.js
 docker compose run --rm api npm run test:coverage
 ```
 
+### Run authoritative vs work suites separately (IV-TDD):
+```bash
+docker compose run --rm api npx vitest run tests/authoritative
+docker compose run --rm api npx vitest run tests/work
+docker compose run --rm api npx vitest run tests/authoritative --coverage
+```
+
+### Run mutation testing (quality gate, not just coverage):
+```bash
+docker compose run --rm api npx stryker run
+# check verification report for mutation_score = killed / total (gate >= 0.90)
+```
+
+### Guard: implementer did not touch authoritative tests:
+```bash
+git diff --name-only HEAD | grep -q "tests/authoritative" && echo "DENIED: authoritative touched by implementer" && exit 1
+```
+
 ---
 
 ## 2. Web UI / Playwright (Web Container)
