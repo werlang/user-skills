@@ -91,3 +91,79 @@ Avoid dynamic file path construction using raw user parameters.
       die("Access Denied");
   }
   ```
+
+---
+
+## 6. Safe File Upload Handling
+
+Accepting user file uploads introduces risks of remote code execution (uploading `.php`, `.js`, or executable files), Stored XSS (via SVGs or HTML attachments), Denial of Service (unbounded file sizes), and server directory overwrites.
+
+### Secure File Upload Checklist:
+1. **Never Trust User Filenames or MIME Types**:
+   - Attackers spoof `Content-Type: image/jpeg` when sending PHP scripts.
+   - Never use the original filename directly. Always generate a random UUID on the server:
+     ```javascript
+     const safeFilename = `${crypto.randomUUID()}.${allowedExtension}`;
+     ```
+2. **Magic Byte / File Signature Validation**:
+   - Inspect the file buffer's initial bytes to verify its true binary signature, rather than trusting the extension or client MIME type:
+     ```javascript
+     // Node.js example using file-type
+     import { fileTypeFromBuffer } from 'file-type';
+
+     const type = await fileTypeFromBuffer(fileBuffer);
+     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
+     if (!type || !allowedMimes.includes(type.mime)) {
+       throw new Error('Invalid file format');
+     }
+     ```
+3. **Store Files Outside the Webroot**:
+   - Never store uploads in a directory directly served by the web server (e.g. `public/uploads`). Storing an executable file in a web-accessible directory allows direct execution via URL navigation (`https://example.com/uploads/shell.php`).
+   - Store files in dedicated private cloud storage (AWS S3, Cloudflare R2) and serve them via pre-signed temporary URLs or through a streaming download controller.
+4. **SVG File Warning (Stored XSS Risk)**:
+   - SVGs are XML documents that can embed `<script>` tags. If a user opens an SVG directly in a browser, embedded JavaScript executes in the user's session!
+   - If SVGs must be supported:
+     - Sanitize SVG contents using a dedicated sanitizer (e.g., `DOMPurify` with SVG profile).
+     - Or serve SVGs with `Content-Disposition: attachment; filename="..."` and `Content-Type: application/octet-stream` so browsers force a download rather than inline rendering.
+5. **Strict Size Limits**:
+   - Enforce maximum upload size at both the reverse proxy (e.g., `client_max_body_size 10M;` in Nginx) and in application middleware (e.g., `multer({ limits: { fileSize: 10 * 1024 * 1024 } })`) to prevent memory exhaustion DoS.
+
+---
+
+## 7. Unsafe Code Execution & Prototype Pollution (JS/Node)
+
+JavaScript applications are particularly vulnerable to prototype pollution and dynamic code evaluation.
+
+### 1. Ban Dynamic Code Evaluation
+Never pass untrusted user strings into dynamic evaluators:
+- **Forbidden**: `eval()`, `new Function()`, `setTimeout(string)`, `setInterval(string)`.
+- **Why**: Allows arbitrary code execution in the application context.
+
+### 2. Prototype Pollution Mitigation
+Prototype pollution occurs when user-controlled properties (such as `__proto__`, `constructor`, or `prototype`) are recursively merged into target objects, modifying the base JavaScript `Object.prototype` and affecting all objects across the Node.js process.
+
+- **Vulnerable Pattern**:
+  ```javascript
+  // BAD: Naive recursive merge functions that process untrusted keys
+  function naiveMerge(target, source) {
+    for (let key in source) {
+      if (typeof source[key] === 'object') {
+        if (!target[key]) target[key] = {};
+        naiveMerge(target[key], source[key]);
+      } else {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+  ```
+- **Defense Standards**:
+  - Filter dangerous keys before merging: Reject keys named `__proto__`, `constructor`, and `prototype`.
+  - Use `Object.create(null)` for key-value dictionary maps that do not inherit from `Object.prototype`.
+  - Freeze base prototypes in security-critical workers: `Object.freeze(Object.prototype)`.
+  - Use modern, patched utility libraries (e.g., Lodash >= 4.17.21) or language-native shallow copy (`Object.assign({}, ...)` with whitelisted DTOs).
+
+### 3. Safe JSON Handling
+Always wrap `JSON.parse()` in a `try/catch` block to handle malformed JSON gracefully without crashing the server thread. Avoid custom reviver functions that perform dynamic function instantiation.
+

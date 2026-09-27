@@ -65,3 +65,55 @@ Email confirmation and password reset flows rely on unique tokens.
 - **Expirable**: Tokens must have a strict expiration timestamp (e.g., 1-2 hours) stored in the database.
 - **Single-Use**: Invalidate or delete the token immediately once it has been verified.
 - **Confirm Actions via POST**: Never trigger a state change (like confirming an email or resetting a password) via a GET request (e.g., direct link click). The email link should point to a landing page with a confirmation form/button that submits via **POST**, preventing web browsers or email scanners from pre-fetching the link and accidentally confirming/resetting the action.
+
+---
+
+## 6. Sensitive Data in Logs & Redaction
+
+Developers often write `console.log(req.body)` or `console.error(err)` when debugging, inadvertently streaming cleartext passwords, session tokens, and PII into cloud log aggregators (CloudWatch, Datadog, Papertrail, Elastic).
+
+### 1. Blacklist Sensitive Fields
+Configure application loggers (e.g., Pino, Winston, Morgan) with automatic serializers/redactors that mask sensitive keys:
+- **Keys to redact**: `password`, `passwordConfirmation`, `token`, `refreshToken`, `authorization`, `cookie`, `creditCard`, `cvv`, `secret`, `apiKey`, `ssn`, `cpf`.
+- **Example Pattern**:
+  ```javascript
+  // Express middleware redacting sensitive keys before logging
+  function sanitizeForLog(obj) {
+    if (!obj || typeof obj !== 'object') return obj;
+    const redacted = Array.isArray(obj) ? [...obj] : { ...obj };
+    const sensitiveKeys = ['password', 'token', 'authorization', 'secret', 'creditCard', 'cvv'];
+
+    for (const key of Object.keys(redacted)) {
+      if (sensitiveKeys.some(s => key.toLowerCase().includes(s))) {
+        redacted[key] = '[REDACTED]';
+      } else if (typeof redacted[key] === 'object') {
+        redacted[key] = sanitizeForLog(redacted[key]);
+      }
+    }
+    return redacted;
+  }
+  ```
+
+### 2. Sanitize Database Connection Strings
+Database connection errors frequently output the raw connection URI (`postgres://app_user:s3cr3tP@ss@db-host:5432/app`). Strip or redact credentials before logging error objects.
+
+---
+
+## 7. Log Injection (CRLF Injection)
+
+When untrusted user input is written into plain text logs without sanitization, an attacker can submit values containing carriage returns and line feeds (`\r\n`). This allows the attacker to forge fake log entries or confuse automated log parsers:
+
+```text
+// User submits username: "admin\r\n[2026-09-27 12:00:00] [INFO] User admin elevated to superuser"
+```
+
+### Prevention:
+Strip or URL-encode newline characters before writing user-controlled strings to logs:
+```javascript
+function safeLogString(input) {
+  if (typeof input !== 'string') return input;
+  return input.replace(/[\r\n]/g, '_');
+}
+```
+Prefer structured JSON logging (e.g., Pino) over plain-text string formatting, as JSON serializers automatically escape newlines into `\n` literals.
+
