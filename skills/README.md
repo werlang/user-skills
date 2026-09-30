@@ -65,7 +65,7 @@ choosing which skill to read.
 | Skill | Use it for | Definition |
 | --- | --- | --- |
 | `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, and responsive conventions. | [`SKILL.md`](css-standards/SKILL.md) |
-| `frontend-design` | Creative direction, visual identity, palette and typography taste, composition, imagery, motion character, and brand voice for frontend interfaces. | [`SKILL.md`](frontend-design/SKILL.md) |
+| `frontend-design` | Creative direction, visual identity, palette and typography taste, composition, imagery, motion character, and brand voice for frontend interfaces. Works inside the project's existing design system, establishes one from existing project elements when absent, and grills the user on brand-defining calls it cannot infer. | [`SKILL.md`](frontend-design/SKILL.md) |
 | `impeccable` | Production implementation and technical frontend quality: accessibility, responsive behavior, interaction states, performance, maintainability, and validation. | [`SKILL.md`](impeccable/SKILL.md) |
 | `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
 | `seo-optimizer` | Auditing, diagnosing, implementing, and verifying technical, on-page, international, content, indexing, structured-data, and performance SEO work. | [`SKILL.md`](seo-optimizer/SKILL.md) |
