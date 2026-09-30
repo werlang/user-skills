@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
+description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults. Designs within the project's existing design system, or establishes one from the project's existing elements when none exists.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -11,6 +11,14 @@ Approach this as the design lead at a small studio known for giving every client
 ## Ground it in the subject
 
 If the brief does not pin down what the product or subject is, pin it yourself before designing: name one concrete subject, its audience, and the page's single job, and state your choice. If there's any information in your memory about the human's preferences, context about what they're building, or designs you've made before – use that as a hint. The subject's own world, its materials, instruments, artifacts, and vernacular, is where distinctive choices come from. Build with the brief's real content and subject matter throughout.
+
+## Work inside the project's design system
+
+Before making any visual choice, detect whether the project already has a design system: a design-system or DESIGN doc, a token source (`tokens.css`, theme config, `tokens.json`), a component library with documented APIs, and governance rules in AGENTS/README/lint config. The full decision tree is in `references/design-system.md`; the obligations are:
+
+- **If the project has a design system, use it.** It is a constraint, not raw material. Map every value to an existing token, reuse existing components, respect the documented voice, signature, and anti-goals, keep theme/locale/motion/focus parity, and extend the single token source when a role is missing — never invent a parallel value or scale. Distinctiveness comes from composing the existing vocabulary, not from breaking the contract.
+- **If the project has none, create one from what the project already has.** Inventory the recurring tokens and reusable components, codify them in the project's idiom (token file plus a compact catalog doc: token tables, component inventory with variants/states/a11y, ownership map, governance, known gaps), fill real gaps like motion, z-index, and focus with semantic tokens, and fix stale documentation while there. Consolidation, not redesign — do not migrate the project toward another product's palette or a generic admin theme.
+- **If you are not confident, grill the user first.** Interactive questions with concrete options, before guessing anything brand-defining: competing palette or type sources, aspirational docs that contradict the code, inconsistent values with no canonical answer, choices needing brand or licensing approval, ambiguous scope (docs only vs token gap-fill vs full refactor), or unspecified theme defaults and naming. Ask about direction, not implementation details, then follow the answers literally.
 
 ## Design principles
 
@@ -30,7 +38,7 @@ Consider written content carefully. Often a design brief may not contain real co
 
 For calibration: AI-generated design right now clusters around three looks: (1) a warm cream background (near #F4F1EA) with a high-contrast serif display and a terracotta accent; (2) a near-black background with a single bright acid-green or vermilion accent; (3) a broadsheet-style layout with hairline rules, zero border-radius, and dense newspaper-like columns. All three are legitimate for some briefs, but they are defaults rather than choices, and they appear regardless of subject. Where the brief pins down a visual direction, follow it exactly — the brief's own words always win, including when it asks for one of these looks. Where it leaves an axis free, don't spend that freedom on one of these defaults. Just like a human designer who's hired, there's often a careful balance between doing what you're good at and taking each project as a chance to experiment and learn.
 
-Work in two passes. First, brainstorm a short design plan based on the human's design brief: create a compact token system with color, type, layout, and signature. Color: describe the palette as 4–6 named hex values. Type: the typefaces for 2+ roles (a characterful display face that's used with restraint, a complementary body face, and a utility face for captions or data if needed). Layout: a layout concept, using one-sentence prose descriptions and ASCII wireframes to ideate and compare. Signature: the single unique element this page will be remembered by that embodies the brief in an appropriate way.
+Work in two passes. First, brainstorm a short design plan based on the human's design brief: create a compact token system with color, type, layout, and signature. Where a project design system already exists, these axes are given: name the tokens you will use for each instead of inventing new ones, and confine the plan to composition and signature within the contract. Otherwise: Color: describe the palette as 4–6 named hex values. Type: the typefaces for 2+ roles (a characterful display face that's used with restraint, a complementary body face, and a utility face for captions or data if needed). Layout: a layout concept, using one-sentence prose descriptions and ASCII wireframes to ideate and compare. Signature: the single unique element this page will be remembered by that embodies the brief in an appropriate way.
 
 Then review that plan against the brief before building: if any part of it reads like the generic default you would produce for any similar page (work through a similar prompt to see if you arrive somewhere similar) rather than a choice made for this specific brief — revise that part, say what you changed and why. Only after you've confirmed the relative uniqueness of your design plan should you start to write the code, following the revised plan exactly and deriving every color and type decision from it.
 
