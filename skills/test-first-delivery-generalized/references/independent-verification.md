@@ -59,6 +59,8 @@ Log the request in `verification/test-change-requests.md` or the PR description.
 
 Reviewer receives `requirement + tests` (no implementation) and answers:
 
+- Is the full **Falsification Triad** present for each seam (Golden Happy Path with independent literal, Boundary/Edge transition, Negative/Rejection)?
+- Are there shallow existential assertions (`toBeDefined()`, `toBeTruthy()`) or assertions on mock call counts alone? If so, reject.
 - Could the suite pass if the feature always succeeds / always fails?
 - Could it pass with an off-by-one boundary (e.g., `>` vs `>=`, `30*24h` vs calendar days)?
 - Could it pass if idempotency, auth, or validation were missing?
@@ -67,9 +69,11 @@ Reviewer receives `requirement + tests` (no implementation) and answers:
 
 Send back to Designer once if needed; do not loop indefinitely.
 
-## 5. Mutation Testing
+## 5. Mutation Testing & Fast Sabotage
 
-After authoritative is green:
+After authoritative is green, test the tests to ensure they actually detect defects.
+
+### 5.1 Automated Mutation Testing (Preferred)
 
 ```bash
 # example with StrykerJS (Vitest/Jest)
@@ -89,6 +93,15 @@ verification:
 ```
 
 Gate: `mutation_score >= 0.90`. If lower, treat as insufficient suite — Designer adds tests, re-freeze. Coverage 100% with low mutation score is still a gap.
+
+### 5.2 Fast Sabotage Litmus Test (Lightweight Alternative)
+
+When full mutation suites are unconfigured or slow in containerized environments:
+1. Identify 2–3 core invariants in the implementation (e.g. boundary comparison `>=` vs `>`, validation/auth guard, return shape).
+2. Manually mutate one invariant at a time in the code.
+3. Run the authoritative test suite against each mutation.
+4. **Litmus Invariant:** Every single mutation MUST produce a failing test. If any mutation passes silently, the suite is toothless and must be hardened before acceptance.
+5. Restore production code once verified.
 
 ## 6. Adversarial Verifier (optional)
 

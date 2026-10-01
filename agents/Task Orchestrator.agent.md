@@ -167,7 +167,9 @@ Repeat until all tasks are `Complete`:
    - If failure is `Test Change Request` (authoritative wrong): route to `Task Tester` (Designer) for reviewed update → re-freeze → re-run Coder, without counting as implementation fault if reviewer approves. Log request in `verification/test-change-requests.md` or PR notes.
    - **Hard Circuit Breaker**: If `Retry Count == 3`, **STOP execution immediately** and escalate to the human with the exact failure diff and reviewer notes. Do not enter an infinite loop.
    - If `Retry Count < 3` and no TCR, loop back to `Task Coder` with the updated context.
-7. **Step F - Atomic Commit**: Once the task is fully verified (`Complete` — authoritative green + mutation gate + reviewer `[IV-TDD] Pass`), create an atomic semantic commit following `git-change-workflow` and record the commit hash in `PLAN.md`.
+7. **Step F - Atomic Commit**: Once the task is fully verified (`Complete` — authoritative green + mutation/sabotage gate + reviewer `[IV-TDD] Pass`):
+   - **Human Escalation Check**: If `Reviewer Findings` contains an active `escalate_to_human: REQUIRED` block (Trunk blast radius or architectural risk), **hold the commit** and require interactive user sign-off before proceeding.
+   - Once cleared, create an atomic semantic commit following `git-change-workflow` and record the commit hash in `PLAN.md`.
 
 ### Phase 3: Final Verification & Memory Sync
 1. **Browser / Manual Validation**: If requested, exercise routes/UI using available browser/terminal tools without modifying code.

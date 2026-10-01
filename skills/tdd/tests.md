@@ -75,3 +75,69 @@ test("calculateTotal sums line items", () => {
   expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
 });
 ```
+
+**Shallow / Existential tests**: Asserts mere presence or shape rather than correctness.
+
+```typescript
+// BAD: Passes even if data is corrupted, empty, or defaulted
+test("fetchUserProfile returns profile", async () => {
+  const profile = await fetchUserProfile("usr_123");
+  expect(profile).toBeDefined();
+  expect(typeof profile.email).toBe("string");
+});
+
+// GOOD: Asserts exact contract and observable state against known literals
+test("fetchUserProfile returns verified user attributes", async () => {
+  const profile = await fetchUserProfile("usr_123");
+  expect(profile).toEqual({
+    id: "usr_123",
+    email: "alice@example.com",
+    tier: "premium",
+    isActive: true,
+  });
+});
+```
+
+## The Falsification Triad Example
+
+Every seam should feature the triad to prevent single-path confirmation bias:
+
+```typescript
+describe("applyDiscountCoupon", () => {
+  // 1. Golden Happy Path: independent literal from spec
+  test("applies 20% discount on eligible subtotal", () => {
+    const order = { subtotal: 100, coupon: "SAVE20" };
+    expect(applyDiscount(order)).toEqual({ subtotal: 100, discount: 20, total: 80 });
+  });
+
+  // 2. Boundary / Edge Case: exact threshold transition
+  test("does not apply discount when subtotal is strictly below threshold ($99.99)", () => {
+    const order = { subtotal: 99.99, coupon: "SAVE20" };
+    expect(applyDiscount(order)).toEqual({ subtotal: 99.99, discount: 0, total: 99.99 });
+  });
+
+  // 3. Negative / Rejection Case: invalid or forbidden input
+  test("throws InvalidCouponError when coupon is expired", () => {
+    const order = { subtotal: 150, coupon: "EXPIRED20" };
+    expect(() => applyDiscount(order)).toThrow(InvalidCouponError);
+  });
+});
+```
+
+## The Sabotage (Mutation) Litmus Test Example
+
+Before committing tests, deliberately sabotage the implementation to verify your tests catch real defects:
+
+```typescript
+// 1. Invert the boundary in production:
+//    From: if (subtotal >= 100)
+//    To:   if (subtotal > 100)
+//    Result: Test "applies 20% discount on eligible subtotal" ($100) MUST FAIL.
+
+// 2. Remove the rejection branch:
+//    From: if (coupon.isExpired) throw new InvalidCouponError()
+//    To:   // omitted
+//    Result: Test "throws InvalidCouponError when coupon is expired" MUST FAIL.
+
+// If tests stay GREEN during sabotage, the test suite is toothless.
+```

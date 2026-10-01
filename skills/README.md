@@ -31,7 +31,7 @@ choosing which skill to read.
 | --- | --- | --- |
 | `audit-project-context` | Auditing README files, prompts, skills, agents, and instructions against the actual codebase. | [`SKILL.md`](audit-project-context/SKILL.md) |
 | `backend-bug-review-generalized` | Reviewing backend, API, worker, and data-layer logic, contracts, authorization, and state transitions. | [`SKILL.md`](backend-bug-review-generalized/SKILL.md) |
-| `code-review` | Reviewing a diff against repository standards and the originating specification or request. | [`SKILL.md`](code-review/SKILL.md) |
+| `code-review` | Risk-calibrated review of a diff (Trunk vs Leaf) on standards, spec, evidence, and launch-readiness. | [`SKILL.md`](code-review/SKILL.md) |
 | `frontend-bug-review-generalized` | Reviewing frontend rendering, interaction, URL/auth state, accessibility, and browser behavior. | [`SKILL.md`](frontend-bug-review-generalized/SKILL.md) |
 | `git-change-workflow` | Choosing current-branch fast tracks or dedicated branches with small, focused, atomic commits for larger work. | [`SKILL.md`](git-change-workflow/SKILL.md) |
 | `tdd` | Building features or fixing bugs with test-first red-green-refactor development and integration tests. | [`SKILL.md`](tdd/SKILL.md) |
@@ -48,8 +48,8 @@ choosing which skill to read.
 | `lesson-learned` | Capturing durable lessons from refactors as `LESSONS.md` checkbox items and promoting them to project-local docs/specs/skills/prompts (auto-invokes on `refactor`, `restructure`, `clean up`, `capture lesson`, `LESSONS.md`). | [`SKILL.md`](lesson-learned/SKILL.md) |
 | `migrate-project-context` | Porting project docs, prompts, skills, and agent instructions into a different repository. | [`SKILL.md`](migrate-project-context/SKILL.md) |
 | `skill-creator` | Designing and scaffolding new Codex skills. | [`SKILL.md`](skill-creator/SKILL.md) |
-| `skill-optimizer` | Evolving an existing skill using evaluation results and mutation memory. | [`SKILL.md`](skill-optimizer/SKILL.md) |
-| `skill-updater` | Detecting reusable workflows and updating durable docs, prompts, or skill guidance. | [`SKILL.md`](skill-updater/SKILL.md) |
+| `skill-optimizer` | Iteratively improving, updating, and hardening skills using multi-round adversarial review loops. | [`SKILL.md`](skill-optimizer/SKILL.md) |
+
 
 ## Communication and decision support
 

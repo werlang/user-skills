@@ -48,14 +48,15 @@ Leverage your repository's global testing skills:
 
 1. **Independent Verification TDD (`tdd` & `test-first-delivery-generalized` + `references/independent-verification.md`)**:
    - In `prep` mode:
-     - Write tests that distinguish correct behavior from plausible incorrect implementations (not "tests for this function"). Cover boundaries, idempotency, auth/validation, and the examples in the contract.
-     - Keep each test at a public seam, one logical assertion, expected value is an independent literal from the spec.
-     - Run the Reviewer checklist before freezing: could the suite pass if the feature always/never succeeds, off-by-one boundary, missing validation? If so, add tests.
+     - Write tests that distinguish correct behavior from plausible incorrect implementations (not "tests for this function").
+     - **Mandate the Falsification Triad:** For every seam, author (1) Golden Happy Path with independent literal from the spec, (2) Boundary/Edge case (off-by-one, empty state, max/min limit), and (3) Negative/Rejection case (invalid input, auth failure, invariant violation).
+     - **Ban shallow assertions:** Forbid `toBeDefined()`, `toBeTruthy()`, or mock invocation checks alone. Assert exact values, shapes, and observable side effects.
+     - Run the Reviewer checklist before freezing: could the suite pass if the feature always/never succeeds, off-by-one boundary, missing validation?
      - Verify the test fails for the expected reason, then **freeze**: authoritative files become immutable. Record freeze in `Tester Prep Context`.
      - Write authoritative to `tests/authoritative/<feature>.test.*`, not to `tests/work/**`.
    - In `validation` mode:
      - Run `tests/authoritative/**` and `tests/work/**` **separately** via containers (see `references/validation-commands.md`).
-     - Run mutation testing (`npx stryker run` or equivalent) and report `mutation_score = killed / total`. Gate is `>= 0.90`; survive mutations → gap, not a pass.
+     - Run mutation testing (`npx stryker run` or equivalent) or execute the **Fast Sabotage Litmus Test** (deliberately perturb 2–3 production invariants; confirm all fail). Report `mutation_score` or sabotage results. Survive mutations → gap, not a pass.
      - Optionally run adversarial verifier: `Find a spec violation not detected by authoritative tests` → write `verification/findings.md` if finding exists. Findings go back to you (Designer) for a new frozen test, never to `Task Coder` directly.
      - If no automated test command is possible or relevant, record: `No automated test command identified — manual verification required.` Do not guess commands.
 2. **Assertion Diagnostics**:

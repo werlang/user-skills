@@ -53,6 +53,14 @@ requirement + contract + public interfaces + existing authoritative tests
 
 Not the implementation. Task: `Construct tests that distinguish correct behavior from plausible incorrect implementations.` Ask for properties capable of falsifying violations, not "write tests for this function."
 
+**Core authoring mandates:**
+- **The Falsification Triad:** For every seam, author at least:
+  1. *Golden Happy Path:* Verified against an independent, hardcoded literal from the contract.
+  2. *Boundary / Edge Case:* Off-by-one boundary, empty state, max/min limit, or cutoff point.
+  3. *Negative / Rejection Case:* Forbidden state, invalid parameter, or missing permission that must explicitly reject.
+- **Ban shallow assertions:** Forbid `toBeDefined()`, `toBeTruthy()`, or sole `toHaveBeenCalled()` checks. Assert exact return values, schemas, or observable state changes.
+- **No derivative expected values:** Never calculate expected values using code logic/loops that duplicate the implementation.
+
 Output: `tests/authoritative/<feature>.test.*`
 
 ### Phase 2 — Test Review (Reviewer subagent)
@@ -60,7 +68,9 @@ Output: `tests/authoritative/<feature>.test.*`
 Spawn a second subagent with `requirement + tests` (no implementation). It checks:
 
 - missing edge/boundary cases, redundant tests, coupling to implementation details
-- tests that merely reproduce requirement examples
+- presence of the full **Falsification Triad** per seam
+- absence of shallow existential assertions (`toBeDefined()`, `toBeTruthy()`) or sole call-count assertions
+- whether expected values are independent literals rather than recomputed or tautological values
 - whether the suite could still pass for an obviously incorrect implementation (`always allows`, `never allows`, `wrong boundary`, `not idempotent`)
 - ambiguous assertions
 
@@ -110,7 +120,9 @@ write impl → test fails → modify impl OR test → green
 ### Phase 5 — Verification
 
 1. **Authoritative suite** must be green.
-2. **Mutation testing** — mutate the implementation (`>=`→`>`, remove condition, invert boolean, alter boundary) and run authoritative tests. If mutations survive, the suite is insufficient.
+2. **Mutation testing & Fast Sabotage**:
+   - *Full automated mutation:* Run mutation tool (`npx stryker run` or equivalent) and report `mutation_score = killed / total`. Treat `mutation_score < 0.90` as a gap even if coverage is 100%.
+   - *Fast Sabotage Litmus Test (when Stryker is unconfigured or impractical):* Deliberately perturb 2–3 critical production invariants (invert a comparison `>=` to `>`, omit a guard or auth check, or return a dummy value). Run authoritative tests against each perturbation. **Every mutation MUST fail the tests.** If any mutation passes unnoticed, the tests are toothless and must be hardened.
 
    ```yaml
    verification:
@@ -119,9 +131,8 @@ write impl → test fails → modify impl OR test → green
      killed: 79
      survived: 4
      mutation_score: 0.95
+     sabotage_checks: ["inverting boundary fails", "omitting auth guard fails"]
    ```
-
-   Treat `mutation_score < 0.90` as a gap even if coverage is 100%.
 
 3. **Adversarial verifier** (optional but recommended for complex logic) — subagent with `requirement + implementation + authoritative tests`, asked `Find a spec violation not detected by the tests`. It writes `verification/findings.md`. Findings go back to the Test Designer for a new frozen test, never to the implementer directly.
 
@@ -197,7 +208,7 @@ A task is complete only when:
 - The implementation code is in place and `tests/authoritative/**` was **not** modified by the implementer (verified via permission guard or `git diff`).
 - Touched code has JSDoc comments and high-signal inline intent comments.
 - `tests/work/**` probes (if any) are separated from authoritative tests and documented.
-- Authoritative automated tests were run successfully in the Docker container; mutation testing was run and `mutation_score` is reported (≥0.90 or gaps acknowledged); adversarial findings (if run) are triaged.
+- Authoritative automated tests were run successfully in the Docker container; the suite enforces the Falsification Triad without shallow or tautological assertions; mutation testing or the Fast Sabotage Litmus Test was executed and verified; adversarial findings (if run) are triaged.
 - Manual browser validation was executed and logged for UI/UX changes.
 - A final validation report highlights what was tested (authoritative vs work), what commands were run, mutation/adversarial results, and any remaining gaps.
 

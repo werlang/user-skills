@@ -1,165 +1,209 @@
 ---
 name: code-review
-description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Also supports a verify-fixes mode - re-review the diff produced by fixes made in response to a prior review. Use when the user wants to review a branch, a PR, work-in-progress changes, asks to "review since X", or wants fixes from a previous review double-checked.
+description: Review changes since a fixed point (commit, branch, tag, or merge-base) along a risk-calibrated gradient (Trunk vs Leaf code) across Standards, Spec, and Machine Evidence. Runs parallel adversarial sub-agents to eliminate confirmation bias, enforces automated hardening and feature-flag gating, escalates architectural risk to humans, and supports verify-fixes mode for PR babysitting loops. Use when reviewing a branch, PR, or work-in-progress changes, when the user asks to "review since X", or wants fixes from a previous review double-checked.
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
+Review the diff between `HEAD` and a fixed point along a **risk-calibrated gradient** across three complementary axes:
 
-- **Standards** — does the code conform to this repo's documented coding standards?
-- **Spec** — does the code faithfully implement the originating issue / PRD / spec?
+- **Standards** — does the code conform to repository standards, clean code, and the simplicity triad (KISS/YAGNI/DRY)?
+- **Spec** — does the code faithfully implement the originating issue / PRD / spec without omissions or scope creep?
+- **Machine Evidence & Blast Radius** — does the change supply verifiable, machine-executable proof (active test passes, mutation / Fast Sabotage results, typechecks, headless DOM/a11y trees, AST feature-flag checks) commensurate with its blast radius on the code tree?
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+All three axes run as **parallel adversarial sub-agents** with clean contexts, eliminating confirmation bias and correlated hallucinations from the original generation prompt.
 
-The issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if `docs/agents/issue-tracker.md` is missing.
+```mermaid
+flowchart TD
+    FixedPoint["1. Pin Fixed Point & Calibrate Tree Gradient<br/>(Trunk vs Branch vs Leaf · Identify Agent Traps)"]
+    SpecSource["2. Identify Spec & Enforce Machine Evidence<br/>(Active Test Runs, Mutation / Sabotage, Headless DOM/a11y)"]
+    Standards["3. Check Standards, Tooling & Simplicity Triad<br/>(KISS, YAGNI, DRY Rule of Three, Smell Baseline)"]
+    Adversarial["4. Run 3 Adversarial Sub-Agents in Parallel<br/>(Standards + Spec + Machine Evidence)"]
+    Aggregate["5. Aggregate, Deduplicate & Verify Findings<br/>(Per-Axis Accounting: Totals & Worst Issues)"]
+    Final20["6. Evaluate The Final 20%<br/>(Agent Hardening + ESCALATE_TO_HUMAN Contract)"]
+    ReportGate["7. Deliver Report-First Gate & Stop"]
+    Babysit["8. PR Babysitting Loop & Verify-Fixes Mode"]
+
+    FixedPoint --> SpecSource --> Standards --> Adversarial --> Aggregate --> Final20 --> ReportGate
+    ReportGate -.-> Babysit
+```
+
+---
 
 ## Process
 
-### 1. Pin the fixed point and calibrate stakes
+### 1. Pin the fixed point and calibrate the risk gradient (The Tree Concept)
 
-Whatever the user said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc. If they didn't specify one, ask for it.
+1. **Resolve the fixed point and comparison refs**:
+   - Capture the fixed point (`main`, commit SHA, branch name, tag, etc.). If omitted, prompt the user.
+   - Run `git rev-parse <fixed-point>` and confirm the diff is non-empty.
+   - Capture comparison commands:
+     ```sh
+     git diff <fixed-point>...HEAD
+     git log <fixed-point>..HEAD --oneline
+     ```
+   - Note the base ref as the initial `<review-point>`. When later running subsequent verify-fixes passes, the comparison ref is `<review-point>..HEAD` (or uncommitted changes), where `review-point` is the commit SHA evaluated during the prior review pass.
 
-Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
+2. **Model the codebase as a tree & calibrate agent review posture**:
+   Human reviewers skim Leaf code to save time and manually inspect Trunk code. Agent reviewers must take the opposite posture to guard against LLM failure modes:
+   - **Trunk Code (High Blast Radius — The Agent Trap)**: Core infrastructure, networking, authentication/authorization engines, database schemas and migrations, global state managers, base framework lifecycles, and shared foundational utility packages.
+     - *Agent Failure Mode*: An LLM reviewer is easily tricked by Trunk code that looks syntactically clean and idiomatic, missing subtle concurrency races, distributed deadlocks, schema lock contention, or caching edge cases.
+     - *Agent Review Posture*: Do not trust syntax alone. Demand independent verification ([IV-TDD](../test-first-delivery-generalized/SKILL.md)), require mutation falsification (`mutation_score >= 0.90` or documented pass of the Fast Sabotage Litmus Test), audit strict backwards compatibility, and **route to the Human Escalation Gate** for architectural sign-off.
+   - **Branch Code (Moderate Blast Radius)**: Domain business logic, bounded feature services, API controllers, worker processors, and shared component modules.
+     - *Agent Review Posture*: Dual-axis Standards + Spec review with active execution of automated unit/integration test suites.
+   - **Leaf Code (Low / Zero Blast Radius — The Agent Strength)**: Isolated UI views, leaf endpoints, standalone scripts, or feature-gated components that can be safely disabled without collateral impact.
+     - *Agent Review Posture*: High-velocity, exhaustive mechanical audit. Verify 100% of types, prop contracts, linter constraints, and headless DOM/a11y trees. Perform an **AST feature-flag check** to prove the feature is wrapped in a dynamic toggle with a working fallback.
+   *(See [references/tree-concept-gradient.md](references/tree-concept-gradient.md) for detailed classification).*
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here — not inside parallel sub-agents.
+3. **Calibrate operational exposure**:
+   - Ask: **has any of this diff already run outside local development?** (deployed, migrated, sent real traffic/email/data). Pre-production code can be directly restructured; shipped code requires non-destructive, forward-compatible migrations.
 
-Also ask one calibration question if the answer isn't already known: **has any of this diff already run outside local development?** (deployed, migrated, sent real traffic/email/data). Findings on stateful artifacts — persisted data, external effects, configuration — change severity completely depending on the answer: pre-production means risky shapes can simply be edited, shipped means they need forward-compatible treatment. Carry the answer into both sub-agents' briefs.
+4. **Unreleased code & legacy retention policy**:
+   - When deciding whether to keep legacy methods, deprecated routes, fallback mechanisms, or dual-writes on development branches, check if `main` has already merged the legacy code. If `main` has never merged or released it, delete the legacy code and keep only the canonical implementation (YAGNI/KISS). Reviewers must not flag the removal of unreleased legacy paths as a breaking change.
 
-**Unreleased code & legacy retention policy:** When deciding whether to keep legacy methods, deprecated routes, fallback mechanisms, or dual-writes during a feature or refactor on development branches (e.g. `dev`), check whether the `main` branch has already merged the legacy code. If `main` has never merged or released it, there is no need to keep legacy methods or compatibility shims — make the new canonical implementation the only way (YAGNI/KISS). Reviewers must not flag the removal of unreleased legacy paths as a breaking change or defect.
+---
 
-### 2. Identify the spec source
+### 2. Identify the spec source and demand machine-verifiable evidence
 
-Look for the originating spec, in this order:
+1. **Locate the originating spec** in order:
+   - Issue tracker references in commits (`#123`, `Closes #45`, GitLab `!67`) — fetch via `docs/agents/issue-tracker.md` (run `/setup-matt-pocock-skills` if `docs/agents/issue-tracker.md` is missing).
+   - A path passed by the user.
+   - PRD or spec file under `docs/`, `specs/`, or `.scratch/` matching the branch or feature.
+   - If missing, ask the user for the spec.
+   - If no spec exists, run in **degraded mode**: treat commit messages as a weak spec and verify self-consistency (flagging commit claims not honored or unmentioned diff behavior). Mark as `Spec (degraded — self-consistency vs commit messages)`.
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
-2. A path the user passed as an argument.
-3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
-4. If nothing is found, ask the user where the spec is.
+2. **Machine-Verifiable Evidence Gate**:
+   An agent reviewer requires active, reproducible proof rather than passive text claims. Summary scorecards and detailed protocol live in [references/evidence-and-launch-checklist.md](references/evidence-and-launch-checklist.md):
+   - **Active Execution**: The reviewer executes the test suite, confirming exit code `0` and clean stderr without unhandled rejections or memory warnings.
+   - **Logic Falsification**: Require mutation testing (`mutation_score >= 0.90`) **or** a documented pass of the Fast Sabotage Litmus Test.
+   - **Static & Structural Validation**: Confirm clean typecheck passes (`tsc --noEmit`), headless DOM/a11y tree structures for UI components, and AST proof of feature-flag wrapping.
 
-If there genuinely is no spec, do **not** skip the Spec axis — run it in **degraded mode**: treat the branch's own commit messages as a weak spec and have the Spec agent check self-consistency — does the diff actually do what its commits claim? Half-done work and scope creep are visible without a formal spec. Mark the section "Spec (degraded — self-consistency vs commit messages)" in the final report.
+---
 
-### 3. Identify the standards sources
+### 3. Identify standards sources and the simplicity triad
 
-Anything in the repo that documents how code should be written. Look beyond the obvious: `CONTRIBUTING.md`, `CODING_STANDARDS.md`, agent/AI instruction files (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `.agents/**`), architecture docs, README conventions sections.
+1. **Survey standards**:
+   - Check `CONTRIBUTING.md`, `CODING_STANDARDS.md`, agent instructions (`AGENTS.md`, `CLAUDE.md`, `.agents/**`), architecture docs, and README files.
+   - **Check what tooling enforces first**: Lint configs, formatters, type-checkers, CI gates. Anything tooling already enforces is **out of scope** for agent review; focus strictly on logic, design, security, and maintainability.
 
-**Check what tooling enforces first** — lint configs, formatters, type-checkers, CI gates. Anything those already catch is out of scope for reviewers; saying so up front keeps them focused on what humans and agents can uniquely see.
+2. **The methodology test**:
+   Every finding must demonstrate harm to one of three outcomes: **changeable**, **readable**, or **testable**. State the concrete maintenance cost, not just stylistic preferences.
 
-#### The point of the methodology
+3. **KISS, YAGNI, and DRY Simplicity Triad**:
+   - **KISS (Keep It Simple, Stupid)**: Favor the most straightforward, readable solution for every line. Extreme readability over cleverness.
+   - **YAGNI (You Aren't Gonna Need It)**: Code only for current, proven requirements. Reject speculative helpers, single-use classes, extra parameters, or premature generalizations.
+   - **DRY vs. YAGNI (The Tension)**: Enforce the **Rule of Three** — abstract only on the third occurrence. Duplication predates the diff; grep codebase-wide to confirm the true count before suggesting extraction.
+   - **DRY vs. KISS (The Balance)**: A little duplication is far better than a bad, confusing abstraction (**KISS wins**).
 
-Every principle below exists for exactly three outcomes: the code stays **changeable**, **readable**, and **testable**. A finding that cannot say which of those three suffers — and roughly what it costs to change later — is trivia, not a finding. State the cost, not just the shape.
+4. **Code Smell Baseline**:
+   Apply the smell baseline (Naming & Structure, Duplication & Coupling, Overengineering, Bigness, Error Flow, Tests as Review Surface) as defined in [references/code-smell-baseline.md](references/code-smell-baseline.md).
 
-#### KISS, YAGNI, and DRY Triad
+---
 
-On top of repo standards, evaluate every change against the core simplicity triad:
+### 4. Run the reviews (Adversarial Agentic Topology)
 
-- **KISS (Keep It Simple, Stupid)** — Choose the most straightforward, readable solution. Every line of code should prioritize extreme readability.
-- **YAGNI (You Aren't Gonna Need It)** — Only code for current, actual requirements, never future guesses. Avoid writing premature helpers, single-use wrapper classes, extra parameters, or speculative abstractions.
-- **DRY (Don't Repeat Yourself)** — Business logic should have a single, unambiguous representation. Apply DRY *after* repetition is real.
+1. **Topology & Adversarial Isolation**:
+   - Launch **three parallel sub-agents** with clean, isolated contexts:
+     1. **Standards Sub-agent**
+     2. **Spec Sub-agent**
+     3. **Machine Evidence Sub-agent**
+   - **Adversarial Mandate**: Sub-agents must run in fresh contexts without access to the author agent's prompt history. This breaks **confirmation bias** and prevents **correlated LLM hallucinations**.
+   - **Hunt Correlated LLM Blind Spots**: Challenge plausible-looking syntax, check boundary edge cases, verify error propagation, and ensure tests assert independent contract values rather than tautologies.
 
-**Interactions & Balancing Rules:**
+2. **Partitioning Large Diffs**:
+   - For large diffs (>2,000 lines or >40 files), partition the **Standards** axis by architectural area (e.g., `api/`, `web/`, `infra/`, `tests/`) into additional parallel sub-agents. Give every partition identical methodology text; partition coverage, not judgment.
+   - The Spec agent and Evidence agent always evaluate the whole diff.
 
-- **KISS + YAGNI (Protection)**: YAGNI stops unnecessary code from being written; KISS ensures necessary code stays simple and direct.
-- **DRY vs. YAGNI (The Tension)**: Follow the **Rule of Three** — abstract on the third occurrence. Count occurrences **across the whole codebase, not just the diff**: duplication usually predates the change; `grep` for the pattern to get the true count. The diff is where a finding surfaces, not the boundary of what counts.
-- **DRY vs. KISS (The Balance)**: Forcing code to be DRY can create convoluted, unreadable architectures. A little duplication is far better than a bad, confusing abstraction (**KISS wins**).
+3. **Interface & Boundary Checks**:
+   - When diffs cross boundaries (API ↔ client, schema ↔ model, template ↔ CSS, docs ↔ code), assign an explicit cross-surface pass to verify contract alignment.
 
-#### Code Smell Baseline
+4. **Investigative Authority**:
+   - Review sub-agents may run **read-only** commands (`git grep`, running test runners, reading quoted files) to turn hypotheses into verified evidence. They must not modify working tree files.
 
-The Standards axis carries the **smell baseline** below — a fixed set of code smells (after _Refactoring_, ch.3, plus a few from the wider clean-code canon) that applies even when a repo documents nothing. Rules that bind it:
+5. **Sub-agent Briefs (Methodology Inlining Rule)**:
+   Because sub-agents run in isolated contexts, **paste the methodology, the simplicity triad, and the code smell baseline in full into the brief** — the sub-agent has no other access to it:
+   - **Standards Sub-agent Brief**: Include diff command, commit list, operational exposure, tree classification, standards files, exclusions, **the full simplicity triad**, and **the code smell baseline from [references/code-smell-baseline.md](references/code-smell-baseline.md)** pasted in full. Brief: "Report findings in this exact schema: `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high | medium | low) · confidence (verified | reported) · evidence (quote code) · cost (stated maintenance impact)`. Skip tooling-enforced checks. Order by severity; cap detailed findings at ~10."
+   - **Spec Sub-agent Brief**: Include diff command, commit list, and spec source (or commit list in degraded mode). Brief: "Report: (a) missing/partial requirements, (b) unrequested behavior (scope creep), (c) incorrect implementations. Quote the spec line for each finding."
+   - **Machine Evidence Sub-agent Brief**: Include test commands, container runtime instructions, and tree tier. Brief: "Actively execute test suites and linters. Report: (a) test suite pass/fail status and exit codes, (b) mutation score or Fast Sabotage results, (c) typecheck results, (d) headless DOM/a11y tree verification for UI components, (e) AST feature-flag gating proof."
 
-- **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
-- **Always a judgement call.** Each smell is a labelled heuristic, never a hard violation — and skip anything tooling already enforces.
-- **Size is a proxy, never a threshold.** Where a smell concerns bigness, report it only with a cost symptom (below). Never recommend splitting on line counts.
+---
 
-Each smell reads *what it is* → *how to fix*; match it against the diff:
+### 5. Aggregate and verify
 
-**Naming & structure**
+1. **Verify**: Open every high-severity finding and a sample of the rest at its quoted location. Mark findings `verified` or `unverified`; drop invalid findings. Require proof of non-use (including dynamic reference patterns) before publishing deletion-class findings.
+2. **Dedup with attribution**: Merge identical issues reported by multiple agents, crediting both.
+3. **Keep axes separate**: Present findings under `## Standards`, `## Spec`, and `## Machine Evidence & Blast Radius`. Do not merge or rerank across axes.
+4. **Per-Axis Accounting**: Conclude the report with a one-line summary per axis: total verified/unverified findings and the worst issue within each axis. Do not pick a single winner across axes.
+5. **State static review limits**: Explicitly declare anything not verifiable statically or via headless test tools.
 
-- **Mysterious Name** — a name that doesn't reveal what it does or holds; includes query-named functions that mutate or validate as a side effect (a Command–Query Separation breach). → rename; if no honest name comes, the design's murky.
-- **Long Parameter List / Data Clumps** — the same few arguments travelling together call after call. → bundle into one type and pass that.
-- **Primitive Obsession** — a primitive or string standing in for a domain concept that deserves its own type. → give the concept its own small type.
-- **Global Data / Mutable Data** — shared mutable state poked from multiple sites in the diff. → scope it down or make ownership explicit.
-- **Lazy Element** — a class or function that once earned its keep and now barely does anything. → inline it.
-- **Comments narrating bad code** — comments compensating for unclear code ("this resets the flag because…") or narrating deleted code. Good intent/why comments are fine. → fix the code, keep the why.
+---
 
-**Duplication & coupling**
+### 6. The Final 20%: Automated Hardening vs. Human Escalation Gate
 
-- **Duplicated Code** — the same logic shape appears in multiple places. Count occurrences **codebase-wide** per the Rule of Three above before recommending extraction. → extract the shared shape past the third occurrence; call it from all sites.
-- **Feature Envy** — a method that reaches into another object's data more than its own. → move the method onto the data it envies.
-- **Insider Trading** — modules exchanging internals no third party should see. → reintroduce a boundary both can speak.
-- **Message Chains** — long `a.b().c().d()` navigation the caller shouldn't depend on. → hide the walk behind one method on the first object.
-- **Repeated Switches** — the same `switch`/`if`-cascade on the same type recurs across the change. → polymorphism, or one map both sites share.
-- **Shotgun Surgery** — one logical change forces scattered edits across many files. → gather what changes together into one module.
-- **Divergent Change** — one file or module is edited for several unrelated reasons. → split so each module changes for one reason.
+The review evaluates the Final 20% along two explicit paths:
 
-**Overengineering (the direction most reviews under-flag)**
+1. **Agent-Owned Hardening**:
+   - **Hygiene & Dead Code**: Confirm removal of temporary debug logs, exploratory probes, and unreleased legacy shims.
+   - **Security Audit**: Confirm input sanitization, parameter escaping, authentication guards, and absence of exposed secrets.
+   - **Performance Patterns**: Flag queries in loops (N+1), un-indexed query filters, or unbounded memory allocations.
+   - **Feature-Flag AST Verification**: Confirm that new leaf code is conditionally guarded by a dynamic toggle and that the fallback path executes cleanly.
 
-- **Speculative Generality / Premature Compatibility** — abstraction, parameters, single-use hooks, or preserving legacy methods/fallbacks for code that was never merged into `main` or released. If `main` has not merged the legacy code, delete the legacy paths and keep only the canonical implementation. → delete; inline back until a real need shows.
-- **Premature Abstraction (Forced DRY)** — an abstraction introduced below the Rule-of-Three count, or one that adds confusing indirection. → inline it; KISS wins over premature DRY.
-- **Middle Man** — a class or function that mostly forwards onward. **Counterweight:** forwarding-only wrappers are debt, but wrappers that add vocabulary, a boundary, error translation, or transactional meaning are *design* — flag only the former, and say which the wrapper lacks.
+2. **Human Escalation Gate (`ESCALATE_TO_HUMAN`)**:
+   When Trunk code is modified, public API ergonomics are altered, or launch safety requires business risk appraisal, output an explicit machine-actionable escalation block (canonical schema defined in [references/evidence-and-launch-checklist.md](references/evidence-and-launch-checklist.md)):
 
-**Bigness (evidence-gated — report only with a cost symptom)**
+```yaml
+escalate_to_human:
+  status: REQUIRED  # REQUIRED | NOT_APPLICABLE
+  tier: TRUNK       # TRUNK | BRANCH | LEAF
+  blast_radius: "Core auth token issuance and session persistence"
+  invariants_verified:
+    - "Backwards compatibility verified across existing schema"
+    - "Authoritative test suite passed; Fast Sabotage killed 3/3 mutants"
+  human_signoff_items:
+    - item: "Architectural concurrence on token expiry lifecycle"
+    - item: "Visual & UX verification of login redirect flow"
+    - item: "Canary rollout staged at 1% traffic"
+```
 
-- **Long Function / Large Class** — report only when you can point at one of: mixed abstraction levels in one unit; a fragment that cannot be honestly named; duplicated logic trapped inside; or a history of unrelated edits repeatedly landing in the same unit. Never line counts. Before recommending any split, run the **extraction test**: is the piece nameable and cohesive, and does extracting make the parent *easier* to read without callers juggling more interface? If the result is shallow fragments and pass-through plumbing, recommend against splitting — fewer, deeper units beat many shallow ones.
-- **Refused Bequest** — a subclass that ignores or overrides most of what it inherits. → composition over inheritance.
+Autonomous orchestrators (`Task Orchestrator`) must not auto-merge or auto-commit tasks bearing an active `escalate_to_human: REQUIRED` block without interactive user sign-off.
 
-**Error flow**
+---
 
-- **Exceptions as Control Flow** — `try/catch` used to route expected cases (miss → fallback, empty → default) while swallowing real failures in the same net. → narrow the catch to the specific expected condition; let everything else propagate.
-- **Swallowed Errors** — empty catch blocks, errors logged-and-dropped where the caller needed to know. → propagate, wrap in a domain error, or document loudly why silence is correct.
+### 7. Report-first gate (mandatory)
 
-**Tests are review surface too**
+Deliver the aggregated report and **stop**.
 
-- Duplicated fixtures re-declaring the same objects across files past the Rule of Three; divergent mocks of the same concept (same name, different shapes); assertions coupled to implementation instead of behaviour; tests that can't fail. Same baselines apply — tests are code.
+Never implement code fixes in the same turn unless the user explicitly requested fixes in the initial prompt. Findings are decision artifacts for the owner to accept, reject, or re-scope. Auto-fixing collapses review into an unreviewable mutation.
 
-### 4. Run the reviews
+---
 
-**Topology.** Default: send a single message with two `Agent` tool calls (`general-purpose` subagent) — Standards + Spec — so their contexts stay independent.
+## PR Babysitting & Verify-Fixes Mode
 
-For large diffs (rough guide: >2,000 changed lines or >40 files, or clearly separable areas), partition the **Standards** axis by area (e.g., api/, web/, css/, tests/) into additional parallel agents. Give every partition the *identical* methodology text and the same finding schema; partition coverage, not judgment. The Spec agent always reads the whole diff — spec mapping needs global context.
+When iterating on review feedback or running automated feedback resolution, follow the **PR Babysitting Protocol**:
 
-**Boundary check.** Whenever the diff touches both sides of an interface — API↔client, schema↔code, template/module↔importer, docs↔behaviour, class names↔CSS — assign one agent (or handle at aggregation) an explicit cross-surface pass: do both sides agree? Partitioned reviews otherwise let each half look clean while the contract drifts.
+1. **Triage Findings**: Address High-severity issues and missing machine evidence first.
+2. **Apply Minimal Surgical Fixes**: Fix only the flagged defect adhering strictly to KISS/YAGNI. Do not introduce wide secondary refactors that expand the diff.
+3. **Re-Validate & Refresh Evidence**: Run automated tests in the appropriate container/runtime, verify exit code `0`, and update headless DOM/runtime traces.
+4. **Run `verify-fixes` Review**:
+   - Re-review the exact fix diff between the prior review point and current HEAD:
+     ```sh
+     git diff <review-point>..HEAD
+     ```
+   - Apply the fix lens: *Did the fix introduce what it was fixing? Did it loosen validation too far? Did it break adjacent callers?*
+   - Update `<review-point>` to current HEAD.
+5. **Iterate until Clean**: Continue until all blocking findings and evidence gaps are resolved.
 
-**Reviewers may investigate.** Sub-agents may run **read-only** commands — `git grep`, targeted test runs, opening quoted locations — to turn speculation into evidence. They must not modify anything.
+---
 
-**Standards sub-agent prompt** — include:
+## References & Checklists
 
-- The full diff command and commit list, the partition scope if applicable, and the operational-exposure answer from step 1.
-- The list of standards-source files found in step 3, plus the enforced-by-tooling exclusions, **plus the methodology from step 3 pasted in full** — the sub-agent has no other access to it.
-- Permission to run read-only commands.
-- The brief: "Report findings in this exact shape — `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high = hurts maintainers or users after merge; medium = should fix soon; low = nit) · confidence (verified = you opened and confirmed the evidence; reported = plausible but unchecked) · evidence (quote the actual code)`. Cover (a) documented-standard violations — cite standard file + rule; (b) KISS/YAGNI/DRY breaches; (c) baseline smells — name it, quote it, state the maintenance cost. A finding without stated cost is trivia; leave it out. Skip anything tooling enforces. Order by severity; cap detailed findings at ~10 per partition and list the rest one-line."
-
-**Spec sub-agent prompt** — include:
-
-- The diff command and commit list (whole diff, always).
-- The path or fetched contents of the spec — or, in degraded mode, the commit-message list and the self-consistency brief.
-- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding." In degraded mode: "(a) commits whose claims the diff doesn't fully honour; (b) diff behaviour no commit message mentions."
-
-If the spec is missing entirely and the user confirms there is none, degraded mode still runs — only skip when the diff is purely mechanical (formatting, renames).
-
-### 5. Aggregate
-
-Before presenting, do three passes over the raw reports:
-
-1. **Verify.** Open every high-severity finding and a sample of the rest at its quoted location. Mark each finding `verified` or `unverified`; drop any whose quoted evidence doesn't hold (and say what was dropped). **Deletion-class findings** ("dead code/key/file") publish as high-severity only with proof of non-use — including dynamic reference patterns (constructed key names, string-built imports), not just literal greps.
-2. **Dedup with attribution.** Two agents reporting the same issue in different words ship once, crediting both.
-3. **Keep the axes separate.** Present under `## Standards` and `## Spec`, preserving each finding's location/severity/confidence/evidence shape. Do **not** merge or rerank across axes (see _Why two axes_).
-
-End with a one-line summary per axis: total findings (verified/unverified), and the worst issue _within each axis_. Don't pick a single winner across axes.
-
-State explicitly anything material that was **not** verifiable statically (runtime behaviour, visual output, integration points) so the reader knows the review's edges.
-
-### 6. Report-first gate (mandatory)
-
-Deliver the aggregated report and **stop**. Never implement fixes in the same turn unless the user explicitly asked for fixes in the original request. Findings are proposals for the owner to accept, reject, or re-scope — auto-fixing them collapses that review into an unreviewable diff and destroys the report's value as a decision artifact. When the user later approves fixes, route the work through `verify-fixes` mode (re-review the fix diff with the added lens: *did the fix introduce what it was fixing?*).
-
-## Verify-fixes mode
-
-When the user has applied fixes in response to a review, re-review **the fix diff itself** (`review-point..HEAD`, or uncommitted changes): defect-first, same methodology, with one added lens — *did the fix introduce what it was fixing?* Fixes routinely overshoot (loosening a validator beyond need), undershoot (fixing one of several duplicate sites), or break neighbours (renamed identifiers still queried elsewhere). The fix diff is statistically the most error-prone artifact in the cycle; treat it as a first-class review target, not a footnote.
-
-Reporting them separately stops one axis from masking the other.
+- [references/code-smell-baseline.md](references/code-smell-baseline.md) — Comprehensive code smell catalog with mechanical detection cues, grep patterns, cost symptoms, and test review standards.
+- [references/tree-concept-gradient.md](references/tree-concept-gradient.md) — Code classification (Trunk vs Leaf), blast radius diagnostic questions, and scrutiny gradient matrix from an agent reviewer perspective.
+- [references/evidence-and-launch-checklist.md](references/evidence-and-launch-checklist.md) — Agent-verifiable evidence protocols, automated hardening checklist, ESCALATE_TO_HUMAN machine contract, and PR babysitting workflow.
 
 ## Related Skills
 
-- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Authoritative engineering standards for Clean Code, OOP architecture, and safe refactoring.
+- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Authoritative standards for Clean Code, OOP architecture, and safe refactoring.
 - [`backend-bug-review-generalized`](../backend-bug-review-generalized/SKILL.md) — Backend defect and regression auditing.
 - [`frontend-bug-review-generalized`](../frontend-bug-review-generalized/SKILL.md) — Frontend rendering, state, and interaction auditing.
+- [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) — Security vector, injection, and authorization auditing.
+- [`test-first-delivery-generalized`](../test-first-delivery-generalized/SKILL.md) — Independent verification and authoritative test freezing.
 - [`document-touched-code`](../document-touched-code/SKILL.md) — JSDoc contracts and interface documentation.

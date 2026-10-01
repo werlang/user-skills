@@ -27,7 +27,27 @@ Ask: "What's the public interface, and which seams should we test?"
 
 - **Implementation-coupled** — mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
 - **Tautological** — the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec.
+- **Shallow / Existential assertions** — asserting mere existence or status codes instead of verifying data integrity (`expect(res).toBeDefined()`, `expect(res.status).toBe(200)` without asserting payload values or side effects). If a broken implementation returns `{}` or the wrong user, the test still passes.
+- **Sycophantic / Mirror assertions** — adjusting expected values post-hoc to match whatever the code emitted, or relying solely on mock invocation checks (`expect(mock).toHaveBeenCalled()`) rather than asserting external state changes.
 - **Horizontal slicing** — writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead — one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
+
+## The Falsification Requirement & The Triad
+
+A test suite must be capable of *falsifying* incorrect implementations, not just proving that good code executes without throwing.
+For every agreed seam, write the **Falsification Triad**:
+
+1. **Golden Happy Path** — Exercises the primary business rule using an independent, hardcoded literal derived directly from the spec (never computed dynamically).
+2. **Boundary / Edge Case** — Tests the precise perimeter where behavior shifts: off-by-one, empty state, max/min limits, boundary - 1, boundary + 1, timezone cutoffs.
+3. **Negative / Rejection Case** — Verifies that invalid inputs, missing authorization, or invariant violations explicitly fail or reject with the expected error, status, or message.
+
+## The Sabotage (Mutation) Litmus Test
+
+Before accepting any test as an authoritative verification oracle, perform a deliberate sabotage check:
+- Invert a boolean or comparison (`>` vs `>=`, `===` vs `!==`).
+- Omit a critical guard clause or validation check.
+- Return a dummy or empty value from the business logic.
+
+**The Litmus Rule:** If the test suite remains green when the business logic is sabotaged, the test is toothless or tautological and MUST be rewritten.
 
 ## Independent Verification Boundary
 
@@ -62,6 +82,9 @@ See `test-first-delivery-generalized` for the operational loop that enforces thi
 ## Rules of the loop
 
 - **Red before green, and red is owned by the Test Designer.** The failing test is written before implementation, by a role/context that has not seen the implementation. The implementer may create `tests/work/**` probes, but the authoritative red comes from the frozen suite.
+- **Author the Falsification Triad for every seam.** Cover the independent-literal happy path, the boundary/edge condition, and negative rejection. Single-path tests are incomplete.
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
+- **Verify test efficacy with the Sabotage Litmus Test.** Before declaring green, deliberately perturb the business logic (flip an operator, omit a guard). The test must turn RED; if it stays green, rewrite the test.
+- **Ban shallow assertions in authoritative tests.** Never rely solely on `toBeDefined()`, `toBeTruthy()`, or mock invocation counts. Assert exact values, shapes, or state changes against independent literals.
 - **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
 - **Never resolve an authoritative failure by editing the authoritative test.** Fix the implementation, or file a Test Change Request.
