@@ -1,306 +1,145 @@
 ---
 name: skill-optimizer
-description: "Optimizes, refactors, and updates an existing agent skill (SKILL.md) using a production prompt, candidate mutations, evaluator verdicts, and skill-local mutation memory. You MUST trigger this skill whenever the user requests to optimize a skill, run a skill evolution/optimization loop, improve a skill's performance on previous prompts, or update/apply mutation results and mutation memory files, even if they do not explicitly name this skill."
+description: "Iteratively improve, update, refactor, and harden agent skills or durable guidance using adversarial review rounds. Acts as an orchestrator launching sub-agents across review rounds until findings converge, or applies targeted lessons learned into the narrowest owning skill. Trigger when updating, optimizing, hardening, or creating skills, or when asked to 'update the skill', 'optimize skill', 'harden skill', 'run adversarial review on skill', 'improve skill', 'update docs', 'document recurring pattern', or 'capture reusable workflow'."
 ---
 
-# Skill: Skill Optimizer
+# Skill Optimizer
 
-## Purpose
-
-You are responsible for improving a single agent skill through iterative evolution.
-
-Your objective is **not** to rewrite the skill from scratch. Your objective is to update one already-evaluated candidate mutation, its skill-local memory, and the canonical skill.
-
-You optimize **only one target skill**.
+Harden skills and durable repository guidance through bounded adversarial review rounds until findings converge.
 
 ---
 
-# Single-Conversation Orchestration
+## 1. Orchestration Model & User Customization
 
-When the user asks to optimize a skill from the previous prompt, act as the parent orchestrator. Do not ask the user to manually create candidate or evaluation files.
+### Default Orchestration Role
+Unless the user specifies otherwise, **act as the parent orchestrator**. The orchestrator manages the lifecycle:
+1. Bounds the target skill and captures baseline commit references.
+2. Coordinates improvement drafts.
+3. Dispatches clean-context adversarial review rounds via the dispatch contract below.
+4. Triages findings with technical counters or surgical patches.
+5. Manages round iteration and enforces circuit breakers.
 
-1. Identify the target skill from the request and current conversation. If no single skill is unambiguous, ask the user to name it.
-2. Treat the preceding real user request, its supplied context, and the target skill's response as the optimization input. Never optimize an invented or summarized replacement prompt.
-3. Run `scripts/prepare-optimization-run.mjs` to initialize the target's local memory when absent and create an immutable run manifest.
-4. Launch exactly three independent subagents in parallel. Give each the manifest, baseline skill, local memory, preceding prompt, context, and baseline response. Do not provide a candidate subagent with another candidate's result.
-5. Collect the three candidate JSON objects. Randomize their order and assign neutral slots such as `option-1`, `option-2`, and `option-3`. Launch one evaluator subagent only after all candidates return. Give it the baseline response, prompt, context, and slot-labelled candidate responses. Do not give it mutation ids, mutation memory, or candidate skills.
-6. Map the evaluator's slot-level verdict back to candidate ids, then assemble the evaluation JSON from the manifest, candidates, and verdict. Run `scripts/apply-optimization-result.mjs` to validate the run, update local memory, and promote only when authorized.
-7. Report the target skill, candidate ids, evaluator winner, and whether promotion occurred. Do not expose hidden reasoning from subagents.
-
-Subagents must return JSON only. The parent agent owns all file reads, writes, evaluation assembly, and promotion. Scripts do not invoke subagents; they only create and validate local artifacts.
-
-## Subagent Orchestration Templates
-
-To ensure strict schema compliance, the parent orchestrator must instruct subagents with the exact instructions below.
-
-### Candidate Subagent Instructions
-
-When launching the three parallel candidate subagents, provide each with the run manifest, the baseline skill, the target skill's local mutation memory, the preceding prompt, the supplied context, and the baseline response. Instruct each subagent as follows:
-
-```text
-Create one candidate mutation of the supplied baseline skill.
-
-Modify exactly one idea. Do not rewrite unrelated instructions.
-Use the supplied skill-local mutation memory to avoid locally unsuccessful or
-already-tested ideas. Do not inspect another candidate.
-
-Return JSON only:
-{
-  "id": "stable-kebab-case-id",
-  "summary": "One reusable sentence.",
-  "tags": ["one-or-more-tags"],
-  "candidateSkill": "Complete mutated SKILL.md content",
-  "response": "Answer to the supplied prompt using candidateSkill"
-}
-```
-
-### Evaluator Subagent Instructions
-
-When launching the evaluator subagent (after all three candidates have returned), randomize the candidate responses into neutral slots (`option-1`, `option-2`, and `option-3`). Provide the evaluator with the preceding prompt, context, baseline response, and the slot-labelled candidate responses. Instruct it as follows:
-
-```text
-Compare each candidate response against the baseline for the supplied prompt and context.
-
-For every candidate, set improved to true only if it is better than the baseline.
-Select winnerId as the single best promotable candidate, or null when none should be promoted.
-Return JSON only:
-{
-  "outcomes": [
-    { "slot": "option-1", "improved": true },
-    { "slot": "option-2", "improved": false },
-    { "slot": "option-3", "improved": true }
-  ],
-  "winnerSlot": "option-1"
-}
-```
+### User Customization Points
+The user may override or guide any part of the review loop:
+- **Designated Review Execution**: The user can specify how review rounds are executed according to their active environment—such as an external orchestrator (e.g. Orca), specific sub-agents, or alternative models.
+- **Custom Orchestration Method**: The user can mandate a specific evaluation protocol (e.g., single-turn triage, tournament rounds between competing proposals, or multi-round adversarial verification).
+- **Default Method**: When not specified, default to the **Iterative Adversarial Review Loop** below.
 
 ---
 
-# Inputs
+## 2. The Adversarial Multi-Round Methodology
 
-You will receive:
-
-- The current skill.
-- A real user prompt.
-- The context supplied to the target agent.
-- The baseline response produced by the current skill.
-- Three candidate artifacts, generated independently from the same current skill. Each artifact must contain a unique mutation id, one atomic mutation idea, the complete candidate skill, and its response to the same prompt and context.
-- An evaluator verdict comparing the baseline and all three candidate responses. The verdict must identify exactly one winner, or declare that no candidate wins, and must record whether each candidate improved on the baseline.
-- The complete mutation memory for this target skill, using `mutation-memory.template.json` as its schema.
-
-All candidates are evaluated against the same immutable baseline. Do not generate, execute, or reevaluate candidates.
+### Phase 1: Input Analysis, Baseline Pinning & Guide Discovery
+1. **Intake the Goal**: Extract the improvement objective from the user request, recent session context, observed failure mode, or durable lesson.
+2. **Pin the Starting Baseline**:
+   - Capture the baseline commit and persist it in the review header:
+     ```sh
+     BASE_SHA=$(git rev-parse HEAD)
+     ```
+   - All subsequent review diffs evaluate against `BASE_SHA` (for Round 1) or `ROUND_SHA` of the previous round (for Round 2+). Fail closed if baseline is not recorded.
+3. **Find the Narrowest Owning Guide (Dynamic Discovery)**:
+   - Search existing skill frontmatter rather than relying on a hardcoded list:
+     ```sh
+     grep -rn "^name:\|^description:" skills/*/SKILL.md
+     ```
+   - Inspect [`skills/README.md`](../README.md) to locate the closest domain owner (e.g. `code-review` for review criteria, `clean-code-and-oop` for coding standards, `tdd` for testing).
+   - Prefer updating an existing guide over creating a new one. If repository-wide root conventions change, update [`AGENTS.md`](../../AGENTS.md).
+   - Only create a new skill when no existing skill is a viable long-term owner.
 
 ---
 
-# Strict Exchange Format
+### Phase 2: Mutation & Proposal (Round 1..N)
+1. **Formulate Bounded Hypothesis**: Modify one clear architectural concept or set of related rules. Avoid "rewrite everything" or vague "improve clarity" churn.
+2. **Apply Directive Writing Standards**:
+   - **Rules over Narratives**: Write direct, imperative instructions. Omit conversational filler.
+   - **Context Economy**: Every paragraph must justify its token cost in the LLM's context window. Assume the agent is smart; do not explain generic syntax or standard programming concepts.
+   - **Progressive Disclosure**: Keep `SKILL.md` focused on operational workflows and decision trees. Offload comprehensive catalogs, reference tables, and checklists to skill-local `references/`.
+   - **Set Explicit Degrees of Freedom**:
+     - *High freedom*: Text heuristics for open-ended design choices.
+     - *Low freedom / Strict contracts*: Concrete machine contracts (e.g., structured schemas in [references/finding-contract.md](references/finding-contract.md), exact commands, immutable file seams) for fragile operations.
+3. **Capture Mutation Diff**:
+   - Run `git diff BASE_SHA..HEAD` to inspect the exact diff before initiating review.
 
-Use `references/evaluation.json` as the required shape for candidate artifacts and the evaluator verdict. It contains exactly three entries in `candidates`, the target `skillId`, a unique `evaluationId`, SHA-256 digests of the current skill and mutation memory, a `winnerId` that is either one candidate id or `null`, and one baseline-relative outcome per candidate.
+---
 
-Each candidate must include:
+### Phase 3: Adversarial Review Round (Dispatch Contract)
+To execute the review round, follow this 3-tier dispatch contract:
+1. **User-Designated Harness**: If the user specified a harness or review mechanism:
+   - Validate target availability (e.g. `which orca` or environment presence).
+   - Dispatch to that harness with the checklist path and diff. If the designated target is missing, stop and ask the user rather than guessing.
+2. **Sub-Agent Invocation (Default Automated)**: If a subagent tool is available:
+   - Launch an independent sub-agent with a clean context. Provide the diff (`git diff BASE_SHA..HEAD`) and instruct it to audit using [references/adversarial-review-checklist.md](references/adversarial-review-checklist.md) and emit findings conforming to [references/finding-contract.md](references/finding-contract.md).
+3. **Self-Review Fallback (Degraded)**: If no subagent tool or external harness is available:
+   - Perform an adversarial self-audit in a separate reasoning block, explicitly labeling all findings as `[SELF-REVIEW-DEGRADED]`.
 
-- `id`: a stable, unique mutation id.
-- `summary`: a short, reusable statement of one idea.
-- `tags`: one or more concise categorization strings.
-- `candidateSkill`: the complete mutated skill, generated directly from the current skill.
-- `response`: the candidate's answer to the same prompt and context as the baseline.
+The reviewer audits against:
+- **Plausibility & Grounding**: Real commands, valid paths, and environment constraints.
+- **Mechanical Enforceability**: Grep-able cues, AST checks, concrete cost symptoms.
+- **Token Economy**: No narrative fluff, progressive disclosure honored.
+- **Degree of Freedom Calibration**: Strict contracts for fragile boundaries vs heuristics.
+- **Failure Modes & Degradation**: Fallbacks for missing tools or offline runs.
 
-Each `outcomes` entry must contain the candidate id and an `improved` boolean. `true` means the evaluator found that candidate better than the baseline; `false` means it did not. The selected `winnerId` chooses the best promotable candidate; it does not turn other baseline improvements into losses. The parent maps these fields from blinded evaluator slots; never ask the evaluator to produce mutation ids directly.
-
-Use `references/mutation-memory.json` and `references/updater-output.json` as the exact before-and-after reference. Copy `mutation-memory.template.json` to the target skill's directory before its first evaluation.
-
-> [!IMPORTANT]
-> **No Local Node Runtime**: Since the host environment has no local Node.js installed, all Node scripts must be executed within a Node Docker container.
-
-For deterministic bookkeeping, run:
-
-```sh
-docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/update-mutation-memory.mjs <memory.json> <evaluation.json> <current-skill.md>
-```
-
-The script verifies that `baseSkillSha256` matches `<current-skill.md>` before it updates memory. It writes JSON matching `references/updater-output.json` to standard output. It does not evaluate responses or edit a skill file. If its promotion action is `promote`, use the corresponding candidate's `candidateSkill` verbatim as the updated skill.
-
-For a complete orchestration run, run the scripts inside the Node container:
-
-```sh
-docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/prepare-optimization-run.mjs <target-skill.md> <run-directory>
-docker run --rm -v $(pwd):/app -w /app node:18-alpine node scripts/apply-optimization-result.mjs <target-skill.md> <memory.json> <evaluation.json>
+Findings must adhere to [references/finding-contract.md](references/finding-contract.md):
+```markdown
+### F1: [Category] Title
+- **Severity**: BLOCKER | MAJOR | MINOR
+- **Location**: `<target-file>#L<line>`
+- **Adversarial Challenge**: <Why this fails, exposes a blind spot, or creates overhead>
+- **Proposed Remediation**: <Surgical, concrete fix>
 ```
 
 ---
 
-# Mutation Memory
+### Phase 4: Triage & Counter-Proposals
+The orchestrator evaluates every reported finding against defined severities:
+- **`BLOCKER`**: Factually wrong, unexecutable, hallucinated commands/paths, or unbounded loops.
+- **`MAJOR`**: Mechanically unenforceable, uncalibrated degrees of freedom, severe token bloat, or missing fallbacks.
+- **`MINOR`**: Phrasing clarity, localized redundancy, formatting, or typos.
 
-The mutation memory is specific to this skill. Store its JSON file next to the target skill, rather than sharing it with other skills.
+Triage actions:
+- **`ACCEPT`**: Adopt the finding and apply the suggested surgical fix directly.
+- **`COUNTER`**: Propose a superior technical alternative that resolves the core risk while maintaining simpler architecture.
+- **`REJECT`**: Dismiss only with concrete technical evidence citing file/line proof and repository scope rules. **All rejected `BLOCKER` findings must re-enter the next review round for confirmation.**
 
-Never assume that mutations successful in other skills are beneficial here.
-
-The memory contains historical mutation ideas together with their performance.
-
-The memory contains `processedEvaluationIds` and mutation entries. Each mutation entry contains:
-
-- id
-- summary
-- tags
-- wins
-- losses
-- score
-- evaluations
-
-Use this memory to understand:
-
-- which ideas consistently improve the skill;
-- which ideas consistently make the skill worse;
-- which areas have not yet been explored.
-
-Candidate-generation systems should not repeat previous mutations unless they are deliberately retesting the same `id`. When retesting, update the existing entry rather than creating a duplicate.
-
-Avoid generating mutations that are semantically equivalent to unsuccessful ones.
-
-Prefer exploring new directions instead of repeatedly proposing "improve wording", "increase clarity", or similar generic edits.
+Apply accepted and countered edits to the target files.
 
 ---
 
-# Candidate Requirements
-
-Each candidate mutation must modify **one single idea only**. It must be generated independently from the immutable current skill, not from another candidate.
-
-Good mutations:
-
-- Add explicit constraints.
-- Introduce one concrete example.
-- Clarify priority order.
-- Remove redundant instructions.
-- Improve ambiguity handling.
-- Specify formatting rules.
-- Simplify exception handling.
-
-Bad mutations:
-
-- Improve clarity and formatting.
-- Rewrite everything.
-- Make the skill better.
-- Improve style.
-
-Every mutation must have one identifiable purpose.
-
-Candidate generation must favor unexplored ideas and avoid ideas semantically equivalent to locally unsuccessful entries. Historical scores are skill-local evidence, not universal rules.
+### Phase 5: Adversarial Verification & Circuit Breakers
+1. **Scoped Verification**:
+   - Capture the round commit ref: `ROUND_SHA=$(git rev-parse HEAD)` and persist it in the round header.
+   - The reviewer verifies the diff:
+     - If diff `< 200` lines: Read full diff (`git diff BASE_SHA..HEAD`) and touched files only (`SKILL.md` and edited reference files, not the transitive directory closure).
+     - If diff `>= 200` lines: Read diff hunks plus 50 lines of surrounding context to protect token budget.
+2. **Circuit Breakers & Convergence Gate**:
+   - **Max Rounds**: Maximum of 3 automated review rounds (`R1`, `R2`, `R3`).
+   - **Escalation Gate**: If `BLOCKER` or `MAJOR` findings remain unresolved after Round 3, halt automated looping, set verdict to `ESCALATE`, and escalate to the human user with an open issue list.
+   - **Convergence**: Declare **Settled & Converged (`CONVERGED`)** only when zero `BLOCKER` or `MAJOR` findings remain and both author and reviewer verify all claims. If open findings remain, declare `INCOMPLETE`.
 
 ---
 
-# Rules
-
-Accept only a verdict that names one of the supplied candidate mutation ids as the winner, or explicitly names no winner. Require exactly one baseline-relative outcome for every supplied candidate.
-
-Never apply an `evaluationId` already listed in `processedEvaluationIds`.
-
-Do not infer evaluator preferences, fabricate missing mutation metadata, or alter the evaluation outcome.
-
----
-
-# Evaluation
-
-The evaluator already decided which response performed best.
-
-Do not reevaluate responses.
-
-Your job is only to learn from the evaluation.
+### Phase 6: Settlement & Repository Synchronization
+1. **Synchronize Repository Catalogs**:
+   - If the skill description, scope, or triggers changed, update [`skills/README.md`](../README.md).
+   - If root guidance or global conventions changed, update [`AGENTS.md`](../../AGENTS.md).
+2. **Deliver Summary**:
+   - Report target skill, rounds completed, accepted/countered findings, and final settled diff summary.
 
 ---
 
-# Updating Memory
+## 3. Good vs. Poor Candidates for Skill Updates
 
-For every candidate mutation:
-
-If its baseline-relative outcome is `improved: true`:
-
-- increment wins
-- increment evaluations
-- increase score by 1
-
-If its baseline-relative outcome is `improved: false`:
-
-- increment losses
-- increment evaluations
-- decrease score by 1
-
-Use the candidate's mutation id to find an existing entry. If it exists, update its statistics while preserving the existing summary and tags.
-
-Otherwise create an entry with the candidate's id, summary, and tags, then apply its result.
-
-Keep `evaluations` equal to `wins + losses`. Scores are cumulative local evidence: `score = wins - losses`. Normalize a contradictory supplied score to that value.
-
-After applying all three outcomes, append the unique `evaluationId` to `processedEvaluationIds`.
-
-Keep mutation summaries short and reusable.
-
-Good summary examples:
-
-- Add explicit constraints.
-- Prioritize recent context.
-- Introduce one example.
-- Reduce unnecessary explanation.
-- Enforce output structure.
-- State assumptions explicitly.
-
-Bad examples:
-
-- Changed paragraph three.
-- Reworded the second sentence.
-
-The summary should describe the underlying idea, not its implementation.
+| Good Candidates | Poor Candidates |
+| :--- | :--- |
+| Newly established architectural boundary or machine contract | Renaming a local variable or function for style |
+| Reusable component, helper, or test pattern repeated >= 3 times | One-off bug fix with no broader application |
+| Validated execution or test verification command | Temporary workarounds, mocks, or development shims |
+| Concrete rule resolving a repeated agent failure mode | Assumptions not yet proven in real execution |
+| Mechanical code smell detection cues with cost symptoms | Vague aspirational guidelines ("write clean code") |
 
 ---
 
-# Promotion
+## 4. References & Assets
 
-Only the evaluator winner may be promoted.
-
-Promote it only if:
-
-- it is the winner of the evaluation;
-- it improved on the baseline in that evaluation;
-- its score is positive after the update.
-
-Otherwise the skill remains unchanged.
-
-Never combine multiple mutations into a single update. Promote the winning candidate's complete skill artifact verbatim; do not reconstruct or improve it further.
-
-Never promote losing mutations.
-
----
-
-# Output
-
-Return exactly three sections.
-
-## Updated Memory
-
-Return the complete updated mutation memory as valid JSON, matching `mutation-memory.template.json`. Its values must match the `updatedMemory` returned by the bookkeeping script.
-
----
-
-## Promotion Decision
-
-Either:
-
-- Promote mutation `<id>`
-
-or
-
-- No promotion
-
-Include a brief justification.
-
----
-
-## Updated Skill
-
-If a promotion occurred:
-
-Return the winning candidate's complete skill.
-
-Otherwise:
-
-Return the original skill unchanged.
-
-Do not include explanations, reasoning, or commentary outside these three sections.
+- [references/adversarial-review-checklist.md](references/adversarial-review-checklist.md) — Red-team audit checklist for plausibility, mechanical cues, token cost, and contracts.
+- [references/finding-contract.md](references/finding-contract.md) — Schema, severity definitions, and YAML machine contracts for review findings.
