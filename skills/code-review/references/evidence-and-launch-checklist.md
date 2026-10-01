@@ -31,7 +31,7 @@ An agent reviewer does not judge visual aesthetics or trust author claims. It re
 | **Branch** | Unit/integration test run (exit code 0) + Typecheck clean | **Reject Task**: Block until test suite passes |
 | **Leaf** | Component test + Headless DOM/a11y check + Feature-flag AST verification | **Reject Task**: Block until feature gate & tests pass |
 
-*Scope Note*: Scorecard actions govern task-based delivery flows (`Task Orchestrator` / `PLAN.md`). In ad-hoc reviews (e.g. plain PRs or `review since X` where no task runner exists), missing evidence is reported as a blocking **High-Severity finding** in the `## Machine Evidence & Blast Radius` section instead of triggering a task rejection.
+*Scope Note*: Scorecard actions govern task-based delivery flows (`PLAN.md`). In ad-hoc reviews (e.g. plain PRs or `review since X` where no task runner exists), missing evidence is reported as a blocking **High-Severity finding** in the `## Machine Evidence & Blast Radius` section instead of triggering a task rejection.
 
 ---
 
@@ -101,7 +101,7 @@ escalate_to_human:
     - item: "Canary rollout staged at 1% traffic"
 ```
 
-Autonomous orchestrators (`Task Orchestrator`) must not auto-merge or auto-commit tasks bearing an active `escalate_to_human: REQUIRED` block without interactive user sign-off.
+Autonomous orchestrators must not auto-merge or auto-commit tasks bearing an active `escalate_to_human: REQUIRED` block without interactive user sign-off.
 
 ---
 
@@ -111,8 +111,8 @@ In autonomous engineering teams, the PR babysitting loop resolves review finding
 
 ```mermaid
 sequenceDiagram
-    participant Reviewer as Task Reviewer (Adversarial Agent)
-    participant Coder as Task Coder (Iterative Fixer)
+    participant Reviewer as Adversarial Reviewer
+    participant Coder as Author / Fixer
     participant Environment as Test & Container Runner
 
     Reviewer->>Coder: Emit Structured Findings ([Security], [Correctness], [KISS/YAGNI], [Evidence])

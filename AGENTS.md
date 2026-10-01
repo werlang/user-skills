@@ -2,18 +2,18 @@
 
 ## Repository purpose
 
-This is a file-based collection of reusable Codex skills and task-agent
-definitions. The source of truth is the checked-in Markdown and the small
-reference projects or scripts that accompany it.
+This is a file-based collection of reusable Codex skills. The source of truth
+is the checked-in Markdown and the small reference projects or scripts that
+accompany it.
 
 ## Before editing
 
-- Read the target `skills/<name>/SKILL.md` or agent file completely.
+- Read the target `skills/<name>/SKILL.md` completely.
 - Inspect referenced files and confirm that paths, commands, and examples
   exist.
 - Check `git status --short` and preserve unrelated user changes.
-- Treat existing skill and agent contracts as intentional unless the request
-  explicitly changes them.
+- Treat existing skill contracts as intentional unless the request explicitly
+  changes them.
 
 ## Skill conventions
 
@@ -34,26 +34,12 @@ reference projects or scripts that accompany it.
   rules. Record contract, migration, and validation guidance as behavior-level
   changes rather than a file-by-file inventory.
 
-## Agent conventions
-
-- Agent definitions live in `agents/` and use the `.agent.md` suffix.
-- Keep role boundaries explicit. The orchestrator coordinates work; planner,
-  coder, reviewer, and tester do not silently take over one another's duties.
-- Preserve the canonical orchestration inputs `00-request.md` and `PLAN.md`
-  when an agent workflow refers to them.
-- Do not grant commit authority to worker agents when the orchestrator owns
-  commits.
-- Keep agent names, handoffs, and referenced files synchronized with the
-  actual files in this repository.
-
 ## Documentation rules
 
 - Keep `README.md` human-oriented: explain purpose, layout, available areas,
   and contribution expectations.
 - Keep this file agent-oriented: state source-of-truth rules, boundaries, and
   validation expectations.
-- Update [`agents/README.md`](agents/README.md) when the agent roster or
-  workflow changes.
 - Prefer precise claims over aspirational ones. If a validation path is not
   available, say so.
 
@@ -63,9 +49,9 @@ This repository has no root package manifest or application runtime. For a
 documentation-only change, run targeted checks such as:
 
 ```sh
-rg --files skills agents 2>/dev/null || find skills agents -type f | sort
+rg --files skills 2>/dev/null || find skills -type f | sort
 rg -n "^name:" skills/*/SKILL.md 2>/dev/null || grep -rn "^name:" skills/*/SKILL.md
-rg -n "path|command|agent name|skill name" README.md AGENTS.md agents skills 2>/dev/null || grep -rn "path\|command\|agent name\|skill name" README.md AGENTS.md agents skills
+rg -n "path|command|skill name" README.md AGENTS.md skills 2>/dev/null || grep -rn "path\|command\|skill name" README.md AGENTS.md skills
 ```
 
 `rg` is preferred when installed; `find`/`grep` are the portable fallback.

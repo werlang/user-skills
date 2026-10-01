@@ -163,7 +163,7 @@ escalate_to_human:
     - item: "Canary rollout staged at 1% traffic"
 ```
 
-Autonomous orchestrators (`Task Orchestrator`) must not auto-merge or auto-commit tasks bearing an active `escalate_to_human: REQUIRED` block without interactive user sign-off.
+Autonomous orchestrators must not auto-merge or auto-commit tasks bearing an active `escalate_to_human: REQUIRED` block without interactive user sign-off.
 
 ---
 
