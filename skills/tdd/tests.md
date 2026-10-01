@@ -5,12 +5,19 @@
 **Integration-style**: Test through real interfaces, not mocks of internal parts.
 
 ```typescript
-// GOOD: Tests observable behavior
+// GOOD: Tests observable behavior and verifies contract against independent literals
 test("user can checkout with valid cart", async () => {
   const cart = createCart();
-  cart.add(product);
+  cart.add({ id: "prod_1", price: 20 });
+  cart.add({ id: "prod_2", price: 25 });
   const result = await checkout(cart, paymentMethod);
-  expect(result.status).toBe("confirmed");
+  expect(result).toEqual({
+    status: "confirmed",
+    orderId: "ord_101",
+    subtotal: 45,
+    itemCount: 2,
+    chargeId: "ch_999",
+  });
 });
 ```
 
@@ -20,6 +27,7 @@ Characteristics:
 - Uses public API only
 - Survives internal refactors
 - Describes WHAT, not HOW
+- Verifies exact contract values against independent literals (rejects status/shape-only checks)
 - One logical assertion per test
 
 ## Bad Tests

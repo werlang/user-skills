@@ -20,12 +20,16 @@ Use this decision tree after establishing the behavioral contract. It assumes In
 - **Yes** → Use that framework to create the authoritative suite (Phase 1) and any scoped `tests/work/**` probes.
 - **No** → Continue to step 4.
 
-## 4) Repository default for this project
+## 4) Framework Discovery & Selection
 
-- **API**: Vitest infrastructure exists; create/update Vitest tests. Run only unit tests. Do not run integration or e2e tests.
-- **Web**: Playwright E2E infrastructure exists; create/update Playwright tests. Run only unit test from the `web` container. Do not run integration or e2e tests.
+Discover the test runner from project manifests:
 
-In both defaults, authoritative tests go in `tests/authoritative/` and work tests in `tests/work/`.
+- **Node/TypeScript**: Inspect `package.json`. If `vitest` or `jest` is present, use it. Run unit tests only; do not execute integration or browser tests unless explicitly requested.
+- **Python**: Inspect `pyproject.toml`, `setup.cfg`, or `requirements.txt`. If `pytest` is present, use it.
+- **Go / Rust / Other**: Use standard language test runners (`go test ./...`, `cargo test`).
+- **No framework configured**: Bootstrap a lightweight, conventional framework if permitted by Step 2, or provide a manual verification checklist.
+
+Authoritative tests go in `tests/authoritative/` and work tests in `tests/work/` (adapt to pre-existing directory layouts if already established).
 
 ## 5) Iteration rule
 
@@ -33,15 +37,14 @@ When authoritative tests are available and in scope:
 
 1. Run authoritative tests (`tests/authoritative/**`).
 2. Run work tests separately (`tests/work/**`) if any.
-3. Run coverage for the validated scope.
-4. Run mutation testing and compute `mutation_score = killed / total`.
-5. Fix **implementation** failures and gaps (never authoritative tests).
-6. Re-run authoritative + coverage + mutation.
+3. Run scoped mutation verification: Scoped Stryker (`mutation_score = killed / total`) or the Fast Sabotage Litmus Test (perturb 2–3 invariants; verify all fail).
+4. Fix **implementation** failures and gaps (never edit authoritative tests).
+5. Re-run authoritative + mutation/sabotage verification.
 
 Stop only when:
 - authoritative suite is green,
-- `mutation_score ≥ 0.90` (or gap is acknowledged in the validation report), and
-- coverage is 100% for the validated scope — or when a hard blocker is clearly documented.
+- `mutation_score >= 0.90` (or Fast Sabotage Litmus Test is verified and documented in the validation report), and
+- line coverage is verified for the narrowly touched seam (line coverage is informative; mutation/sabotage is the quality gate).
 
 Never achieve green by editing authoritative tests. If the suite is insufficient (survived mutants, adversarial finding), send the finding back to the Test Designer.
 

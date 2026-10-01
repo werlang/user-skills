@@ -16,25 +16,15 @@ tests/
 
 If the repo already uses a different convention, adapt paths but keep the two-suite invariant. Both suites run through the same runner; CI always runs `authoritative`.
 
-## 2. Permission Boundary (tool/file level)
+## 2. Permission Boundary
 
-```text
-Test Designer / Reviewer:
-  READ:  requirement, contract, public interfaces, existing authoritative tests
-  WRITE: tests/authoritative/**
+The implementer does not own or modify authoritative tests. Because agent tools lack native filesystem-level write denial, the orchestrator enforces this boundary before accepting any implementer work:
 
-Implementer:
-  READ:  src/** , tests/authoritative/** , requirement, contract
-  WRITE: src/** , tests/work/**
-  DENY:  tests/authoritative/**
-  RUN:   tests/authoritative/** , tests/work/**
+```bash
+git diff --name-only HEAD -- tests/authoritative | grep -q . && echo "DENIED: authoritative touched by implementer" && exit 1
 ```
 
-Prompt-only guards fail. Enforce one of:
-
-- Filesystem deny (subagent `write_file` tool without `tests/authoritative/**`).
-- Orchestrator wrapper that rejects `write_file("tests/authoritative/...")`.
-- Pre-commit / pre-run guard: `git diff --name-only | grep -q "tests/authoritative" && echo "DENIED: implementer touched authoritative" && exit 1`.
+If an implementer touches `tests/authoritative/**`, the orchestrator immediately rejects the diff.
 
 ## 3. Test Change Request (controlled mutability)
 
@@ -61,10 +51,11 @@ Reviewer receives `requirement + tests` (no implementation) and answers:
 
 - Is the full **Falsification Triad** present for each seam (Golden Happy Path with independent literal, Boundary/Edge transition, Negative/Rejection)?
 - Are there shallow existential assertions (`toBeDefined()`, `toBeTruthy()`) or assertions on mock call counts alone? If so, reject.
+- Are expected values independent literals from the spec, or recomputed like the implementation? (Reject `const expected = items.reduce(...)`).
+- **Are snapshot tests present?** Reject `toMatchSnapshot()`, `toMatchInlineSnapshot()`, or `-u` / `--updateSnapshot`. All authoritative expectations must be explicit literals.
 - Could the suite pass if the feature always succeeds / always fails?
 - Could it pass with an off-by-one boundary (e.g., `>` vs `>=`, `30*24h` vs calendar days)?
 - Could it pass if idempotency, auth, or validation were missing?
-- Are expected values independent literals from the spec, or recomputed like the implementation?
 - Are seams public? Any mocking of internal collaborators?
 
 Send back to Designer once if needed; do not loop indefinitely.
@@ -73,12 +64,15 @@ Send back to Designer once if needed; do not loop indefinitely.
 
 After authoritative is green, test the tests to ensure they actually detect defects.
 
-### 5.1 Automated Mutation Testing (Preferred)
+### 5.1 Automated Mutation Testing (Preferred when Configured)
+
+Run only if `stryker.conf` exists or after explicit configuration; scope strictly with `--mutate <touched-files>` (never run unconstrained on the entire repository):
 
 ```bash
 # example with StrykerJS (Vitest/Jest)
-docker compose run --rm api npx stryker run
-# or vitest coverage + custom mutation step
+npx stryker run --mutate "src/features/order-cancellation/**/*.ts"
+# or containerized if runtime is container-based
+docker compose run --rm <service> npx stryker run --mutate "src/features/order-cancellation/**/*.ts"
 ```
 
 Mutations: `>=`→`>`, `===`→`!==`, remove guard, invert boolean, alter boundary, drop validation.
@@ -94,7 +88,7 @@ verification:
 
 Gate: `mutation_score >= 0.90`. If lower, treat as insufficient suite — Designer adds tests, re-freeze. Coverage 100% with low mutation score is still a gap.
 
-### 5.2 Fast Sabotage Litmus Test (Lightweight Alternative)
+### 5.2 Fast Sabotage Litmus Test (Lightweight Required Gate when Stryker Unconfigured)
 
 When full mutation suites are unconfigured or slow in containerized environments:
 1. Identify 2–3 core invariants in the implementation (e.g. boundary comparison `>=` vs `>`, validation/auth guard, return shape).
@@ -131,12 +125,11 @@ tests/authoritative/hidden/**  → only CI runs it
 
 Like an AutoJudge: contestant sees sample tests, judge runs hidden tests. Useful for high-risk utilities, billing, and date/time logic.
 
-## 8. Single-Agent Fallback
+## 8. Single-Agent Fallback (Degraded)
 
-When subagents are not available:
+When subagents or multiple sessions are unavailable, single-agent execution cannot provide true information-flow isolation. Apply these compensatory controls:
 
-1. Create contract.
-2. In an isolated turn, hide `src/**` implementation files, generate authoritative tests, commit them.
-3. Start a new turn as implementer with `tests/authoritative/**` write-denied.
-
-The isolation matters more than the number of models.
+1. Mark all test suites and the validation report as `[SELF-REVIEW-DEGRADED]`.
+2. Do Phase 1–3 in an isolated turn with implementation code hidden, create authoritative tests, and commit them.
+3. **Mandate the Hidden-Tests Split**: Split tests into `tests/authoritative/public/**` (implementer runs) and `tests/authoritative/hidden/**` (CI-only, withheld from implementer turn).
+4. Execute the Fast Sabotage Litmus Test (perturb 2–3 invariants). Do not claim IV-TDD independence; report as `authoritative-unverified, mutation-gated only`.

@@ -26,9 +26,12 @@ Ask: "What's the public interface, and which seams should we test?"
 ## Anti-patterns
 
 - **Implementation-coupled** — mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
-- **Tautological** — the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec.
+- **Tautological** — the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec.
+  - *Mechanical cues:* Reject `const expected = items.reduce(...)`, `expect(fn(a, b)).toBe(a + b)`.
+  - *Snapshot sycophancy:* **Ban `toMatchSnapshot()` and `toMatchInlineSnapshot()`** in authoritative suites. Ban `-u` / `--updateSnapshot` unconditionally. Snapshots automatically ratify whatever the implementation emits; changes to authoritative expectations require an explicit Test Change Request.
 - **Shallow / Existential assertions** — asserting mere existence or status codes instead of verifying data integrity (`expect(res).toBeDefined()`, `expect(res.status).toBe(200)` without asserting payload values or side effects). If a broken implementation returns `{}` or the wrong user, the test still passes.
-- **Sycophantic / Mirror assertions** — adjusting expected values post-hoc to match whatever the code emitted, or relying solely on mock invocation checks (`expect(mock).toHaveBeenCalled()`) rather than asserting external state changes.
+  - *Mechanical cues:* Reject `expect(res).toBeDefined()`, `expect(val).toBeTruthy()`, or mock invocation counts (`expect(mock).toHaveBeenCalled()`) as the sole assertion of business correctness.
+- **Sycophantic / Mirror assertions** — adjusting expected values post-hoc to match whatever the code emitted, or relying solely on mock invocation checks rather than asserting external state changes.
 - **Horizontal slicing** — writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead — one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
 
 ## The Falsification Requirement & The Triad
@@ -60,18 +63,16 @@ The agent that searches for the implementation must not control the oracle that 
 
 Treat "tests" as two distinct artifacts:
 
-- **Authoritative (verification) tests** — `tests/authoritative/**` (or `tests/**/authoritative/**`). System-owned, spec-derived, frozen after review. Created only by Test Designer / Reviewer subagents. This suite is the correctness oracle and feeds CI. Purpose: correctness, regression detection, acceptance.
-- **Development (work) tests** — `tests/work/**` (or `__tests__/work/**`, `tests/work-*` if the repo prefers). Agent-owned, mutable, for fast feedback, exploration, and tracer-bullet debugging. Purpose: feedback loop `modify → run → observe → modify`.
+- **Authoritative (verification) tests** — `tests/authoritative/**` (or adapt to pre-existing repo conventions if established). System-owned, spec-derived, frozen after review. Created only by Test Designer / Reviewer roles. This suite is the correctness oracle and feeds CI. Purpose: correctness, regression detection, acceptance.
+- **Development (work) tests** — `tests/work/**`. Implementer-owned, mutable, for fast feedback, exploration, and tracer-bullet debugging. Purpose: feedback loop `modify → run → observe → modify`.
 
-**Freeze rule (enforce at tool/filesystem level, not just prompt):**
+**Freeze rule (orchestrator-enforced boundary + post-run guard):**
 
-```text
-READ:  src/** , tests/authoritative/**
-WRITE: src/** , tests/work/**
-WRITE tests/authoritative/** = DENIED for Implementer
+The implementer does not own or modify authoritative tests. Because agent runtimes lack native path-scoped write deny primitives, the orchestrator enforces this boundary before accepting any implementer diff:
+
+```bash
+git diff --name-only HEAD -- tests/authoritative | grep -q . && echo "DENIED: authoritative touched by implementer" && exit 1
 ```
-
-`Don't modify tests` in a prompt is not a boundary. `write_file("tests/authoritative/foo.test.js") → DENIED` is.
 
 If an authoritative failure suggests the test is wrong, the implementer must not edit it. Instead file a **Test Change Request** (`reason + requirement change + expected behavior + affected tests`) to an independent reviewer. Reviewer approves → Test Designer updates → re-freeze.
 
@@ -86,5 +87,6 @@ See `test-first-delivery-generalized` for the operational loop that enforces thi
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle.
 - **Verify test efficacy with the Sabotage Litmus Test.** Before declaring green, deliberately perturb the business logic (flip an operator, omit a guard). The test must turn RED; if it stays green, rewrite the test.
 - **Ban shallow assertions in authoritative tests.** Never rely solely on `toBeDefined()`, `toBeTruthy()`, or mock invocation counts. Assert exact values, shapes, or state changes against independent literals.
+- **Ban snapshot testing in authoritative suites.** Never use `toMatchSnapshot()` or `-u` to automatically ratify implementation output; expected values must be independent literals.
 - **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
 - **Never resolve an authoritative failure by editing the authoritative test.** Fix the implementation, or file a Test Change Request.

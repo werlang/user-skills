@@ -1,102 +1,90 @@
 # Validation Commands Reference
 
-This reference documents standard commands to run tests, check coverage, and validate builds.
+This reference documents standard commands to run tests, check coverage, and validate builds across native and containerized environments.
 
 > [!IMPORTANT]
-> **No Local Runtimes**: Since the host environment lacks local Python or Node.js runtimes, all verification commands must be executed using Docker containers.
+> **Runtime Discovery Rule**:
+> 1. Check for project manifests (`package.json`, `pyproject.toml`, `Cargo.toml`, `docker-compose.yml`).
+> 2. If native runtimes are present (`node`, `python`, `cargo`), prefer running the project's native runner.
+> 3. If the host environment lacks local runtimes or the project uses Docker Compose, discover service names with `docker compose config --services` and substitute `<service>` below (e.g. `api`, `web`, `app`).
 
-## 1. Node.js & Vitest / Jest (API Container)
+---
 
-To run backend tests and check code coverage:
+## 1. Node.js / TypeScript (Vitest / Jest)
 
-### Run unit tests in the container:
+### Native Execution (when Node is present)
 ```bash
-docker compose run --rm api npm run test
-```
-*Alternative (direct Docker run):*
-```bash
-docker run --rm -v $(pwd):/app -w /app node:18-alpine npm run test
-```
-
-### Run specific test files:
-```bash
-docker compose run --rm api npx vitest run path/to/file.test.js
-```
-
-### Run tests with coverage:
-```bash
-docker compose run --rm api npm run test:coverage
+# Run authoritative unit tests only
+npx vitest run tests/authoritative
+# Run development work probes
+npx vitest run tests/work
+# Run with coverage on touched seam
+npx vitest run tests/authoritative --coverage
 ```
 
-### Run authoritative vs work suites separately (IV-TDD):
+### Containerized Execution (when Compose or container is declared)
 ```bash
-docker compose run --rm api npx vitest run tests/authoritative
-docker compose run --rm api npx vitest run tests/work
-docker compose run --rm api npx vitest run tests/authoritative --coverage
+# Discover services first:
+docker compose config --services
+
+# Run authoritative tests:
+docker compose run --rm <service> npm test -- tests/authoritative
+# or with direct vitest:
+docker compose run --rm <service> npx vitest run tests/authoritative
 ```
 
-### Run mutation testing (quality gate, not just coverage):
+### Scoped Mutation Verification (Stryker)
+> Run only if `stryker.conf` exists or after configuration. Always scope to touched files:
 ```bash
-docker compose run --rm api npx stryker run
-# check verification report for mutation_score = killed / total (gate >= 0.90)
+# Native:
+npx stryker run --mutate "src/features/order-cancellation/**/*.ts"
+
+# Containerized:
+docker compose run --rm <service> npx stryker run --mutate "src/features/order-cancellation/**/*.ts"
+```
+*If Stryker is unconfigured, perform the Fast Sabotage Litmus Test (perturb 2–3 invariants by hand; verify every mutation fails the test).*
+
+---
+
+## 2. Python (Pytest)
+
+### Native Execution (when Python is present)
+```bash
+# Run authoritative unit tests
+pytest tests/authoritative/
+# Run work tests
+pytest tests/work/
+# Run with seam coverage
+pytest tests/authoritative/ --cov=src/touched_module
 ```
 
-### Guard: implementer did not touch authoritative tests:
+### Containerized Execution
 ```bash
-git diff --name-only HEAD | grep -q "tests/authoritative" && echo "DENIED: authoritative touched by implementer" && exit 1
+docker compose run --rm <service> pytest tests/authoritative/
 ```
 
 ---
 
-## 2. Web UI / Playwright (Web Container)
+## 3. Authoritative Freeze Guard (Canonical)
 
-To run frontend components or integration tests:
+The orchestrator executes this single, authoritative check before accepting any implementer output:
 
-### Run unit tests from the web container:
 ```bash
-docker compose run --rm web npm run test:unit
-```
-*Alternative (direct Docker run):*
-```bash
-docker run --rm -v $(pwd):/app -w /app node:18-alpine npm run test:unit
+git diff --name-only HEAD -- tests/authoritative | grep -q . && echo "DENIED: authoritative touched by implementer" && exit 1
 ```
 
-### Run Playwright E2E/Component tests (if configured):
-```bash
-docker compose run --rm web npx playwright test
-```
-
----
-
-## 3. Python Services & Pytest
-
-To run tests in Python environments:
-
-### Run all pytest tests:
-```bash
-docker compose run --rm service pytest
-```
-*Alternative (direct Docker run):*
-```bash
-docker run --rm -v $(pwd):/app -w /app python:3.10-slim pytest
-```
-
-### Run with coverage reporting:
-```bash
-docker compose run --rm service pytest --cov=.
-```
+If the repository uses an established alternative directory layout (e.g. `tests/**/authoritative/**`), adapt the path pattern in the guard accordingly.
 
 ---
 
 ## 4. Linting & Formatting Checks
 
-Ensure code style matches repository conventions:
+Verify code style without executing integration suites:
 
-### Run linter:
 ```bash
-docker compose run --rm api npm run lint
-```
-*Alternative:*
-```bash
-docker run --rm -v $(pwd):/app -w /app node:18-alpine npm run lint
+# Native:
+npm run lint
+
+# Containerized:
+docker compose run --rm <service> npm run lint
 ```

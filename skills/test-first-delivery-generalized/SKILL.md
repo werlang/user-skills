@@ -17,7 +17,7 @@ Unless explicitly directed otherwise:
 1. **Never Stop at Code Changes Alone**: Every behavior-changing task is incomplete without verification.
 2. **Follow Independent-Test TDD where practical**: authoritative tests are written first, from the specification, by a Test Designer that has not seen the implementation, frozen, then implemented against. The implementer may add `tests/work/**` probes but cannot modify `tests/authoritative/**`.
 3. **Leave Touched Code Easy to Understand**: Enforce JSDoc/docstrings on all touched functions, methods, and constructors. Include focused inline comments near complex or non-obvious logic.
-4. **Target 100% Coverage for Validated Scope, but coverage is not a quality gate**: Run coverage, then run mutation testing. Quantity is a poor proxy for quality. Report `mutation_score = killed / total`.
+4. **Mutation/Falsification is the Quality Gate, not Line Coverage**: Run mutation testing (`mutation_score >= 0.90`) or verify via the Fast Sabotage Litmus Test. Line coverage is informative only; 100% is expected only for the narrowly touched seam, never the entire repository.
 5. **State What Was Verified**: Conclude with a clear report detailing the authoritative vs work tests run, mutation results, adversarial findings, manual validation, and any remaining gaps.
 
 ---
@@ -43,9 +43,9 @@ rules:
 
 This is the source of truth. The implementer never gets to redefine it because an implementation is inconvenient.
 
-### Phase 1 — Independent Test Generation (Test Designer subagent)
+### Phase 1 — Independent Test Generation (Test Designer role/subagent)
 
-Spawn a dedicated **Test Designer** subagent with:
+Provide the Test Designer with:
 
 ```text
 requirement + contract + public interfaces + existing authoritative tests
@@ -60,21 +60,23 @@ Not the implementation. Task: `Construct tests that distinguish correct behavior
   3. *Negative / Rejection Case:* Forbidden state, invalid parameter, or missing permission that must explicitly reject.
 - **Ban shallow assertions:** Forbid `toBeDefined()`, `toBeTruthy()`, or sole `toHaveBeenCalled()` checks. Assert exact return values, schemas, or observable state changes.
 - **No derivative expected values:** Never calculate expected values using code logic/loops that duplicate the implementation.
+- **Ban snapshot testing:** Never use `toMatchSnapshot()` or `toMatchInlineSnapshot()` in authoritative tests; expected values must be explicit, independent literals.
 
 Output: `tests/authoritative/<feature>.test.*`
 
-### Phase 2 — Test Review (Reviewer subagent)
+### Phase 2 — Test Review (Reviewer role/subagent)
 
-Spawn a second subagent with `requirement + tests` (no implementation). It checks:
+Audit with `requirement + tests` (no implementation):
 
 - missing edge/boundary cases, redundant tests, coupling to implementation details
 - presence of the full **Falsification Triad** per seam
 - absence of shallow existential assertions (`toBeDefined()`, `toBeTruthy()`) or sole call-count assertions
-- whether expected values are independent literals rather than recomputed or tautological values
+- absence of recomputed or tautological expected values (e.g. `items.reduce(...)`)
+- **ban on snapshot sycophancy:** reject `toMatchSnapshot()`, `toMatchInlineSnapshot()`, and `-u` / `--updateSnapshot`
 - whether the suite could still pass for an obviously incorrect implementation (`always allows`, `never allows`, `wrong boundary`, `not idempotent`)
 - ambiguous assertions
 
-This is conceptual mutation testing before implementation exists. Reviewer may send back to Designer once.
+Reviewer may send back to Designer once.
 
 ### Phase 3 — Freeze (permission boundary)
 
@@ -85,17 +87,15 @@ tests/authoritative/** → FROZEN
 tests/work/**          → mutable (implementer scratch)
 ```
 
-Enforce at tool/filesystem level:
+Enforce via orchestrator boundary and post-run guard:
 
-```text
-Implementer READ:  src/** , tests/authoritative/**
-Implementer WRITE: src/** , tests/work/**
-Implementer WRITE tests/authoritative/** = DENIED
+```bash
+git diff --name-only HEAD -- tests/authoritative | grep -q . && echo "DENIED: authoritative touched by implementer" && exit 1
 ```
 
-A prompt saying "don't edit tests" is not a boundary.
+The orchestrator rejects any implementer diff modifying `tests/authoritative/**`.
 
-### Phase 4 — Implementation (Implementer subagent)
+### Phase 4 — Implementation (Implementer role/subagent)
 
 Give the implementer:
 
@@ -121,8 +121,8 @@ write impl → test fails → modify impl OR test → green
 
 1. **Authoritative suite** must be green.
 2. **Mutation testing & Fast Sabotage**:
-   - *Full automated mutation:* Run mutation tool (`npx stryker run` or equivalent) and report `mutation_score = killed / total`. Treat `mutation_score < 0.90` as a gap even if coverage is 100%.
-   - *Fast Sabotage Litmus Test (when Stryker is unconfigured or impractical):* Deliberately perturb 2–3 critical production invariants (invert a comparison `>=` to `>`, omit a guard or auth check, or return a dummy value). Run authoritative tests against each perturbation. **Every mutation MUST fail the tests.** If any mutation passes unnoticed, the tests are toothless and must be hardened.
+   - *Automated mutation (Stryker):* Run Stryker only when `stryker.conf` exists or after configuration. Scope strictly with `--mutate <touched-files>` (never run an unconstrained mutation pass across the entire repo). Gate: `mutation_score = killed / total >= 0.90`.
+   - *Fast Sabotage Litmus Test (required when Stryker is unconfigured):* Deliberately perturb 2–3 critical production invariants in the touched code (e.g. invert comparison `>=` to `>`, omit a guard or auth check, return empty/dummy value). Run authoritative tests against each mutation. **Every single mutation MUST produce a test failure.** If any mutation passes silently, the suite is toothless and must be hardened before acceptance.
 
    ```yaml
    verification:
@@ -134,7 +134,7 @@ write impl → test fails → modify impl OR test → green
      sabotage_checks: ["inverting boundary fails", "omitting auth guard fails"]
    ```
 
-3. **Adversarial verifier** (optional but recommended for complex logic) — subagent with `requirement + implementation + authoritative tests`, asked `Find a spec violation not detected by the tests`. It writes `verification/findings.md`. Findings go back to the Test Designer for a new frozen test, never to the implementer directly.
+3. **Adversarial verifier** (optional for complex logic) — role/subagent with `requirement + implementation + authoritative tests`, asked `Find a spec violation not detected by the tests`. It writes `verification/findings.md`. Findings go back to the Test Designer for a new frozen test, never to the implementer directly.
 
 ### Test Change Requests (controlled mutability)
 
@@ -147,31 +147,17 @@ failure → is test wrong? NO → fix impl
 
 Never edit authoritative tests to make the suite green.
 
-Example minimal (single-agent fallback when subagents are not available): do Phase 1-3 in a *separate model turn* with implementation files hidden, freeze, then continue as implementer with write-denied. The invariant matters more than the number of models.
-
 ---
 
-## 3. Testing Strategy & Decision Tree
+## 3. Testing Strategy & Decision Router
 
-Before executing tests, discover the project reality (e.g. check `package.json`, `pyproject.toml`, Docker Compose config, environment setups). Use the decision tree to determine the validation path:
+Before executing tests, discover the project reality (check `package.json`, `pyproject.toml`, `docker-compose.yml`, or build manifests):
 
-1. **Does the target area already have authoritative tests (`tests/authoritative/**`)?**
-   * **Yes** → Treat them as frozen. Implementer must not modify them. Run them. If a failure suggests the test is wrong, file a Test Change Request. Implementer may add `tests/work/**` probes only.
-   * **No authoritative suite, but area has legacy tests** → Treat legacy tests as non-authoritative. Do not mutate them to pass; add a new authoritative suite via Phase 1-3, then implement.
-   * **No tests at all** → Continue to step 2.
-2. **Did the user explicitly request no test framework changes?**
-   * **Yes** → Do not bootstrap. Provide a manual validation checklist and call out the automation gap.
-   * **No** → Continue to step 3.
-3. **Is there an approved, lightweight framework used in adjacent code?**
-   * **Yes** → Use that framework to write the authoritative suite (Phase 1) plus scoped work tests.
-   * **No** → Continue to step 4.
-4. **Fallback to Project Defaults**:
-   * *API (Backend)*: Use the existing Vitest/Jest runner to write unit tests.
-   * *Web (Frontend)*: Write unit/component tests. If Playwright infrastructure is present, update component specs.
-5. **Manual Verification Fallback**:
-   * If automation is impractical, document the manual verification checklist to prove the contract.
+1. **Existing Authoritative Suite (`tests/authoritative/**`)?** Treat as frozen. Implementer runs them; cannot edit them. File Test Change Request if test appears wrong.
+2. **Legacy Tests Exist?** Treat as non-authoritative. Do not modify legacy tests to get green; add new authoritative suite via Phase 1–3, then implement.
+3. **No Tests Exist?** Check for adjacent frameworks in the repository; if none, bootstrap a lightweight runner or provide a manual verification checklist.
 
-See [references/testing-decision-tree.md](references/testing-decision-tree.md) for details and [references/independent-verification.md](references/independent-verification.md) for the full freeze/mutation/adversarial reference.
+See [references/testing-decision-tree.md](references/testing-decision-tree.md) for detailed framework discovery, default paths, and fallback rules.
 
 ---
 
@@ -184,19 +170,19 @@ Maintain documentation as part of code delivery:
 
 ---
 
-## 5. Execution Workflow (Docker Environment)
+## 5. Execution Workflow
 
 > [!IMPORTANT]
-> **Host Isolation**: Since Python and Node are not installed on the host machine, run all test commands using Docker containers.
+> **Runtime & Container Discovery**: Derive execution commands from the project's declared manifests and available tools. If the project declares Docker Compose, discover services with `docker compose config --services` and run containerized; if native runtimes are present (`node`, `python`, `cargo`), run natively; if the host lacks declared runtimes, rely on containerized execution.
 > **Test Scope Rule**: Run **unit tests only** by default during AI tasks. Integration/functional tests and E2E/Playwright browser smoke tests are reserved for **explicit requests**.
-> **Permission Rule**: When an authoritative suite exists, enforce `WRITE tests/authoritative/** = DENIED` for the implementer before running tests. If the runtime cannot enforce filesystem deny, use a pre-run guard (e.g., `git diff --name-only | grep authoritative` → fail if implementer touched it, or a wrapper around `write_file`).
+> **Permission Rule**: The orchestrator enforces `git diff --name-only HEAD -- tests/authoritative | grep -q . && exit 1` before accepting implementer work.
 
-1. **Derive project commands** from the environment manifests and [references/validation-commands.md](references/validation-commands.md).
-2. **Run authoritative tests inside containers** (e.g., `docker compose run --rm api npm run test:authoritative` or `docker compose run --rm api npx vitest run tests/authoritative`).
-3. **Run work tests separately** (`docker compose run --rm api npx vitest run tests/work`) — these may be created/modified by the implementer.
+1. **Derive project commands** from environment manifests and [references/validation-commands.md](references/validation-commands.md).
+2. **Run authoritative tests** (e.g., `npm test tests/authoritative` or `docker compose run --rm <service> ...`).
+3. **Run work tests separately** (`tests/work/**`) if any were created by the implementer.
 4. **Run integration / E2E tests ONLY upon explicit request**.
-5. **Run mutation testing** (e.g., `npx stryker run` / `npx vitest --coverage` + mutation step) and report `mutation_score`.
-6. **Iterate until green on authoritative + mutation threshold met**, or a hard blocker is clearly documented. Never achieve green by editing authoritative tests.
+5. **Execute mutation verification**: Scoped Stryker (`--mutate <files>`) or the Fast Sabotage Litmus Test (2–3 hand mutations).
+6. **Iterate until green on authoritative + mutation/sabotage verified**. Never edit authoritative tests to achieve green.
 
 ---
 
@@ -204,13 +190,13 @@ Maintain documentation as part of code delivery:
 
 A task is complete only when:
 - The behavioral contract is captured (or linked to the originating issue/PRD).
-- The authoritative suite was created/reviewed independently (Designer + Reviewer) and frozen before implementation.
-- The implementation code is in place and `tests/authoritative/**` was **not** modified by the implementer (verified via permission guard or `git diff`).
-- Touched code has JSDoc comments and high-signal inline intent comments.
+- The authoritative suite was created/reviewed independently and frozen before implementation.
+- The implementation code is in place and `tests/authoritative/**` was **not** modified by the implementer (verified via orchestrator guard `git diff --name-only HEAD -- tests/authoritative`).
+- Touched code has doc comments and high-signal inline intent comments.
 - `tests/work/**` probes (if any) are separated from authoritative tests and documented.
-- Authoritative automated tests were run successfully in the Docker container; the suite enforces the Falsification Triad without shallow or tautological assertions; mutation testing or the Fast Sabotage Litmus Test was executed and verified; adversarial findings (if run) are triaged.
-- Manual browser validation was executed and logged for UI/UX changes.
-- A final validation report highlights what was tested (authoritative vs work), what commands were run, mutation/adversarial results, and any remaining gaps.
+- Authoritative automated tests passed; the suite enforces the Falsification Triad without shallow or tautological assertions; snapshot testing is not used to auto-bless outputs; scoped mutation testing (`mutation_score >= 0.90`) or Fast Sabotage Litmus Test was verified.
+- Manual browser validation was executed and logged only if UI/UX changes were explicitly requested.
+- A final validation report highlights what was tested (authoritative vs work), what commands were run, mutation/sabotage results, and any remaining gaps.
 
 ---
 
@@ -219,5 +205,5 @@ A task is complete only when:
 | Mode | How to keep independence |
 |------|--------------------------|
 | **Multi-agent (preferred)** | Designer and Implementer are separate subagents with different `READ/WRITE` tool scopes and disjoint context windows. Freeze enforced by orchestrator. |
-| **Single-agent fallback** | Do Phase 1-3 in an isolated turn with implementation hidden, commit `tests/authoritative/**`, then continue as implementer with a wrapper that denies writes to that path. Still file Test Change Requests for any authoritative edits. |
+| **Single-agent fallback (Degraded)** | When subagents are unavailable, mark suite as `[SELF-REVIEW-DEGRADED]`. Use two separate turns (isolated turn with implementation hidden to write authoritative tests, commit, then turn with tests write-denied). Mandate hidden-test split (`public` visible / `hidden` CI-only) to guard against self-consistent bias. Do not claim IV-TDD independence; report as `authoritative-unverified, mutation-gated only`. |
 | **Anti-pattern** | Single turn: `write impl → write tests → edit tests until green`. Treat as failed verification. |
