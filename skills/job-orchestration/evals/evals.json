@@ -1,0 +1,23 @@
+{
+  "skill_name": "job-orchestration",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Orchestrate the rebuild of the public web service using our reference project. Compatibility with unreleased code is not required. Delegate implementation, use TDD, and repeat adversarial reviews until the whole service is done. First show me the next step; don't start implementation yet.",
+      "expected_output": "Load job-orchestration and relevant discovery skills. Explore repository facts before asking questions or editing project files. Ask one unresolved decision question at a time with a recommendation, respecting the supplied compatibility decision. Wait for confirmation before planning/implementation. The subsequent job uses one dedicated worktree by default, a spec and resumable ledger, project-local context preparation, independent tests, review/fix loops, and atomic semantic local commits.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Orchestrate adding account settings and subscription controls. Skip grilling. All agents must work inside one worktree, and implementers must use mimo-v2.6-flash. Delegate work in parallel where safe, test first, and make atomic semantic commits. Explain your delegation safeguards before running anything.",
+      "expected_output": "Honor the explicit grilling opt-out and single-worktree constraint. Resolve the exact requested model from the catalog rather than inventing an ID or silently substituting it. Record bounded assumptions and block on unavailable required capabilities. Assign disjoint file ownership or serialize conflicting writers and shared artifacts. Pause relevant writers for reviews and commit gates; pin tracked/untracked candidate contents rather than HEAD alone. Freeze tests against the independently approved complete manifest, not a HEAD-relative attribution guard. Require committed prerequisites and validate/review the exact prospective staged commit tree without unrelated dirty dependencies. Keep commit/integration authority with the orchestrator and never require child-worktree cleanup.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Resume the orchestrated job from its Markdown ledger. It says every task is done, but one worker edited code after the last approval and the integrated test run now fails. The same defect survived three review/fix rounds without progress. Don't stop until no bugs are left; tell me the correct next steps without changing files yet.",
+      "expected_output": "Reconcile the ledger with actual worktree, commit/content snapshots, worker changes, and test evidence. Reopen affected tasks and invalidate stale reviews/checks rather than trusting done labels. Do not declare completion or guarantee bug absence. Mark the non-converging issue blocked, record attempted fixes and the exact needed user decision, and continue only safe independent tasks. After a decision, require independent regression coverage, delegated fixes, fresh task and integrated reviews, actual passing checks, and accounted-for atomic semantic commits.",
+      "files": []
+    }
+  ]
+}
