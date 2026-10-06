@@ -4,14 +4,6 @@ Use motion to explain state, relationship, and hierarchy, or to create one autho
 
 ---
 
-## Creative authority
-
-Load `frontend-design` when motion carries brand expression, atmosphere, or a
-signature moment. It chooses motion character and the intended emotional beat.
-This playbook owns runtime technique, timing feasibility, interruption,
-performance, reduced motion, and fallback behavior. Pure state-feedback motion
-does not require creative delegation.
-
 ## Visitor mode
 
 - **Persuade + Experience:** motion may carry the voice. Prefer one rehearsed focal sequence to repeated section reveals.
@@ -30,18 +22,16 @@ Inspect the existing motion language, interaction states, target devices, and pe
 
 Ask only when a material constraint cannot be inferred. Do not animate a static area merely because it exists.
 
-## Implement the motion thesis
+## Set the motion thesis
 
-Read the approved motion character when one exists, then write a technical plan:
+Write a short plan before implementation:
 
 - **Focal moment:** the one sequence or interaction that deserves authorship, if any.
 - **Continuity:** the state, layout, or navigation changes that need explanation.
 - **Feedback:** the controls and outcomes that need acknowledgment.
 - **Budget:** which effects may be expensive and how often they run.
 
-If a focal moment is required but creatively unresolved, return to
-`frontend-design`. Do not use a generic fade-and-rise, hover lift, parallax
-layer, or scroll reveal as a substitute.
+The focal moment must come from this product and surface concept. A generic fade-and-rise, hover lift, parallax layer, or scroll reveal is not a thesis.
 
 ## Choose material by meaning
 
@@ -84,12 +74,15 @@ Keep content visible in the default state so failed scripts do not hide the page
 
 Respect autoplay and sound preferences. Any nonessential loop must stop when offscreen or hidden.
 
+Every web animation needs a `prefers-reduced-motion` path with an intentional alternative. Remove or reduce spatial movement while preserving opacity, color, and state transitions that carry meaning. Reduced motion means fewer and gentler animations, not disabling all motion; feedback that confirms an action should remain legible.
+
 ## Verify
 
 - The focal motion is specific to the selected world and surface.
 - Every supporting animation explains feedback, state, or relationship.
 - Interruption and repeated use behave correctly.
 - Desktop, mobile, and keyboard paths remain usable.
+- The `prefers-reduced-motion` path reduces movement without erasing meaningful feedback or state changes.
 - Expensive effects stay smooth on the target device.
 - Removing an animation would lose meaning or authored character, not merely decoration.
 

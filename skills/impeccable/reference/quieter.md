@@ -2,13 +2,6 @@ Quiet design is harder than bold design. Subtlety needs precision. Reduce visual
 
 ---
 
-## Creative authority
-
-Load `frontend-design` and obtain a focused restraint contract before choosing
-which expressive elements recede and which must survive. This playbook
-implements the approved reduction and verifies usability, contrast, motion,
-scope, and responsive behavior.
-
 ## Visitor mode
 
 Persuade + Experience: "quieter" means more restrained palette, more whitespace, more typographic air. Drama is reduced, not eliminated; the POV stays intact.
@@ -35,7 +28,7 @@ Analyze what makes the design feel too intense:
    - What's working? (Don't throw away good ideas)
    - What's the core message? (Preserve what matters)
 
-If any of these are unclear from the codebase, STOP and call the AskUserQuestion tool to clarify.
+If any of these are unclear from the codebase, do not guess. STOP and call the AskUserQuestion tool to clarify.
 
 **CRITICAL**: "Quieter" doesn't mean boring or generic. It means refined and easier on the eyes. Think luxury, not laziness.
 

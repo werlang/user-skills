@@ -2,13 +2,6 @@
 
 Rewrite unclear interface text so users understand what happened, what matters, and what to do next. Preserve factual meaning, product terminology, and brand voice.
 
-## Authority split
-
-Impeccable owns comprehension, action naming, state explanation, recovery,
-accessibility, terminology consistency, and localization safety. When the task
-also changes expressive brand voice, load `frontend-design` for that voice
-direction and rewrite within these clarity constraints.
-
 ## Audit the language
 
 Read the entire interaction path, not isolated strings. Identify:

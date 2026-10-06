@@ -32,20 +32,11 @@ Run only for material unresolved decisions:
 - What must remain untouched? What would make the result feel wrong even if it looked polished?
 - Which platform, framework, performance, accessibility, localization, or delivery constraints are binding?
 
-Never ask for CSS values or canned aesthetic lanes. `frontend-design` owns
-visual-world and concept choices.
+Never ask for CSS values or canned aesthetic lanes. New-work owns visual-world and concept choices.
 
-## Phase 2: Resolve the creative direction
+## Phase 2: Resolve the design direction
 
-When visual direction is unresolved, follow
-[creative-handoff.md](creative-handoff.md) and load `frontend-design`. Pass the
-discovery facts, established visual authority, constraints, and anti-goals.
-Receive one creative direction contract; do not create a second concept inside
-Shape.
-
-Skip delegation when the user, DESIGN.md, or an already confirmed contract
-settles the direction. Shape still owns the task, state, interaction, and
-technical-constraint portions of the brief.
+For new surfaces, brand expansion, or replacement, follow [new-work.md](new-work.md) through visual authority, any world workshop, and concept choice. Reuse discovery, then return before its contract, persistence, or implementation. Inside an established world, use its concept process only when composition or interaction remains materially open.
 
 ## Phase 3: Write the brief
 
@@ -53,8 +44,7 @@ Write the smallest useful brief:
 
 1. **Job and audience:** who arrives, their context, need, and visitor mode.
 2. **Outcome and proof:** primary task/action, success, real evidence, and product-specific truth.
-3. **Creative direction:** reference or include the approved
-   `frontend-design` contract; do not reinterpret it.
+3. **Selected direction:** visual authority, structural/interaction thesis, sequence, focal moment, and implementation consequence.
 4. **Scope and boundaries:** fidelity, breadth, interactivity, named target, what remains untouched, and explicit anti-goals.
 5. **States and ranges:** realistic content/data ranges and material states.
 6. **Interaction and layout:** hierarchy, topology, responsiveness, affordances, feedback, and transitions; intent, not CSS.
@@ -64,9 +54,6 @@ Use three to five bullets when the task is settled; use the full structure only 
 
 ## Confirm and stop
 
-Present the combined brief for explicit confirmation or one correction round,
-then stop. Shape never writes code. `frontend-design` owns correction of the
-creative contract; Shape owns correction of task, states, interaction, scope,
-and constraints.
+Present the brief for explicit confirmation or one correction round, then stop: shape never writes code or a direction contract.
 
 When no human or structured answer mechanism exists, mark assumptions plainly, return the brief, and stop.

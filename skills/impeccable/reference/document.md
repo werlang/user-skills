@@ -1,13 +1,5 @@
 Generate a `DESIGN.md` file at the project root that captures the current visual design system, so AI agents generating new screens stay on-brand.
 
-## Authority split
-
-Impeccable owns extraction, token fidelity, schema correctness, component
-examples, sidecar generation, and validation. `frontend-design` owns
-qualitative creative interpretation, naming, and any new seed direction.
-Documenting an incumbent system must describe what exists rather than redesign
-it.
-
 DESIGN.md follows the [official DESIGN.md format spec](https://raw.githubusercontent.com/google-labs-code/design.md/main/docs/spec.md): optional YAML frontmatter carrying machine-readable design tokens, followed by up to eight markdown sections in a fixed order. **Tokens are normative; prose provides context for how to apply them.** Sections may be omitted when not relevant, but those present stay in the specified order. Use the canonical headings below so the file remains portable across DESIGN.md-aware tools.
 
 ## The frontmatter: token schema
@@ -76,21 +68,14 @@ Omit irrelevant sections rather than filling them with invented rules. Put respo
 - An existing `DESIGN.md` is stale (the design has drifted).
 - Before a large redesign, to capture the current state as a reference.
 
-If a `DESIGN.md` already exists, **do not silently overwrite it**. Show the user the existing file and STOP and call the AskUserQuestion tool to clarify. whether to refresh, overwrite, or merge.
+If a `DESIGN.md` already exists, **do not silently overwrite it**. Show the user the existing file first. STOP and call the AskUserQuestion tool to clarify. The choice is refresh, overwrite, or merge.
 
 ## Two paths
 
 - **Scan mode** (default): the project has design tokens, components, or rendered output. Extract, then confirm descriptive language. Use when there's code to analyze.
-- **Seed mode**: the project is pre-implementation. Ensure PRODUCT.md exists,
-  then obtain an approved creative direction contract from `frontend-design`
-  and write its directional DESIGN.md seed. Re-run in scan mode once there's
-  code.
+- **Seed mode**: the project is pre-implementation. Ensure PRODUCT.md exists, then reuse new-work's visual-world workshop and write its directional DESIGN.md seed. Re-run in scan mode once there's code.
 
-Decide by scanning first (Scan mode Step 1). If the scan finds no tokens, no
-component files, and no rendered site, offer seed mode; don't silently switch.
-`/impeccable document --seed` requests a `frontend-design` contract, but it does
-not authorize replacing coherent code. When an incumbent system exists, offer
-scan mode or route an explicit identity-replacement request through new-work.
+Decide by scanning first (Scan mode Step 1). If the scan finds no tokens, no component files, and no rendered site, offer seed mode; don't silently switch. `/impeccable document --seed` requests new-work's world workshop, but it does not authorize replacing coherent code: when an incumbent system exists, offer scan mode or route an explicit identity-replacement request through new-work.
 
 ## Scan mode (approach C: auto-extract, then confirm descriptive language)
 
@@ -128,11 +113,7 @@ From the auto-extracted tokens, draft the YAML frontmatter now (you'll write it 
 
 Skip anything the project doesn't have. Empty scale keys or fabricated tokens pollute the spec.
 
-### Step 3: Resolve qualitative language
-
-Load `frontend-design` for this interpretation pass. Give it the extracted
-system as evidence and require it to preserve the incumbent identity. It may
-name and explain existing choices; it may not replace them.
+### Step 3: Ask the user for qualitative language
 
 The following require creative input that cannot be auto-extracted. Ask them in two structured rounds of no more than three questions each (or the harness's lower limit), waiting between rounds:
 
@@ -370,19 +351,13 @@ Your own write is the freshest source; subsequent commands in this session don't
 
 For projects with no visual system to extract yet. Produces a user-chosen visual-world scaffold, not a fabricated token spec.
 
-### Step 1: Obtain the creative direction
+### Step 1: Route through new-work's workshop
 
 PRODUCT.md is the prerequisite. If it is missing, load [init.md](init.md) and complete its product interview first. Do not create a visual identity without durable product context.
 
-If PRODUCT.md exists, load [creative-handoff.md](creative-handoff.md) and
-`frontend-design`. Seed mode requires a concrete first surface: use the target
-the user named, or ask what they want to make first. Receive an approved
-creative direction contract, then write the directional DESIGN.md seed and
-surface brief. Stop before implementation. A structured simulated user counts
-as the user and must get the same confirmation.
+If PRODUCT.md exists, load [new-work.md](new-work.md) and resolve visual authority. Seed mode requires a concrete first surface: use the target the user named, or ask what they want to make first. Run new-work's **Create or replace the visual world** flow, then **Commit the world**, so the visual world and its first expression are chosen together. Stop after the directional DESIGN.md seed and surface brief; do not implement. A structured simulated user counts as the user and must get the same choice.
 
-If a creative contract was already approved in this session, use it directly.
-Do not ask again.
+If new-work already completed the workshop in this session, use its chosen direction directly. Do not ask again.
 
 ### Step 2: Write seed DESIGN.md
 
@@ -397,9 +372,7 @@ Lead the file with:
 Per-section guidance in seed mode:
 
 - **Overview**: the chosen design thesis, layout behavior, material character, imagery stance, motion grammar, and reusable signature. Keep the selected first-surface expression in its surface brief; do not promote its composition into the global world.
-- **Colors**: the selected palette strategy and roles. Include values only when
-  the user, an existing asset, or the `frontend-design` contract established
-  them; otherwise mark them `[to be resolved during implementation]`.
+- **Colors**: the selected palette strategy and roles. Include values only when the user, an existing asset, or new-work's exploration established them; otherwise mark them `[to be resolved during implementation]`.
 - **Typography**: the selected type character and role relationship. Include font names only when established; otherwise mark the pairing `[to be resolved during implementation]`.
 - **Layout**: the selected spatial grammar and responsive behavior, without pretending exact measurements are settled.
 - **Elevation & Depth**: the selected material and depth behavior, stated as an invariant rather than inferred from a generic preset.

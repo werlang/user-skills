@@ -2,14 +2,6 @@ Layout turns product priority into reading order, grouping, rhythm, and usable s
 
 ---
 
-## Creative authority
-
-For a material composition change, load `frontend-design` to choose the spatial
-thesis, hierarchy, density character, and signature composition. For a bounded
-layout defect, stay inside Impeccable. This playbook owns structural CSS,
-responsive adaptation, DOM/focus order, overflow, touch behavior, and
-verification.
-
 ## Visitor mode
 
 - **Persuade + Experience:** composition may be asymmetric, fluid, or intentionally disruptive when the selected world earns it.
@@ -33,14 +25,14 @@ When a sub-agent tool is available and permitted, run these independently; other
 2. **Mechanical scan:** run:
 
 ```bash
-node .claude/skills/impeccable/scripts/detect.mjs --json --scope layout [target files or dirs]
+.claude/skills/impeccable/scripts/impeccable detect --json --scope layout [target files or dirs]
 ```
 
 Also inspect arbitrary spacing, overflow, stacking, and container behavior the detector cannot resolve. Keep mechanical evidence out of the first assessment, then synthesize both passes before editing. A clean scan cannot prove hierarchy or rhythm.
 
-## Implement the spatial thesis
+## Set the spatial thesis
 
-Before editing, read or derive from the approved direction:
+Before editing, name:
 
 - the primary reading or task path;
 - what belongs together and what must separate;
@@ -48,11 +40,7 @@ Before editing, read or derive from the approved direction:
 - the intended density and spacing rhythm;
 - how the structure changes across containers, viewports, input modes, and content extremes.
 
-If the hierarchy, density character, or signature composition remains
-unresolved, return to `frontend-design`. Choose the simplest structural model
-that faithfully implements those relationships. Use layout primitives
-according to what they control, and name reusable spacing and container roles
-semantically.
+Choose the simplest structural model that expresses those relationships. Use layout primitives according to the relationships they control, and name reusable spacing and container roles semantically.
 
 ## Apply
 

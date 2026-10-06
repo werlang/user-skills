@@ -2,13 +2,6 @@ Typography carries information, hierarchy, and voice. Improve it inside the esta
 
 ---
 
-## Creative authority
-
-Load `frontend-design` to choose typographic personality, family roles, and
-expressive hierarchy unless DESIGN.md or an approved contract already settles
-them. This playbook owns font delivery, role consistency, responsive behavior,
-localization, accessibility, and technical verification.
-
 ## Visitor mode
 
 - **Persuade + Experience:** display type may carry the voice. Use decisive contrast and responsive scale when the composition benefits.
@@ -31,14 +24,14 @@ When a sub-agent tool is available and permitted, run these independently; other
 2. **Mechanical scan:** run:
 
 ```bash
-node .claude/skills/impeccable/scripts/detect.mjs --json --scope type [target files or dirs]
+.claude/skills/impeccable/scripts/impeccable detect --json --scope type [target files or dirs]
 ```
 
 Also inspect dynamic or arbitrary font values the detector cannot interpret. Synthesize both assessments before editing, noting what each caught alone. A clean scan is a floor, not proof of good typography.
 
-## Implement the approved system
+## Set the system
 
-Before editing, extract from the approved direction:
+Before editing, state:
 
 - the roles the interface needs;
 - the intended contrast between those roles;
@@ -46,10 +39,7 @@ Before editing, extract from the approved direction:
 - which existing faces and weights are authoritative;
 - any performance, localization, or accessibility constraints.
 
-If personality or family roles remain unresolved, return to `frontend-design`.
-Within the approved direction, use the fewest roles and families that make the
-hierarchy unmistakable. Role names and tokens should describe purpose rather
-than values.
+Use the fewest roles and families that make the hierarchy unmistakable. Combine size, weight, space, and tone deliberately instead of asking size alone to do all the work. Role names and tokens should describe purpose rather than values.
 
 ## Apply
 

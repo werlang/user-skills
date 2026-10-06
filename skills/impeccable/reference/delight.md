@@ -4,13 +4,6 @@ Make the experience memorable at moments that earn it. Delight is not a layer of
 
 ---
 
-## Creative authority
-
-Load `frontend-design` to choose the emotional thesis, expressive treatment, and
-brand-specific character unless an approved contract already defines them. This
-playbook owns timing in the user journey, accessibility, repetition,
-recoverability, performance, and implementation.
-
 ## Visitor mode
 
 - **Persuade + Experience:** personality may run through voice, composition, motion, and discovery, provided the artifact remains the focus.
@@ -29,11 +22,9 @@ Inspect the target, DESIGN.md, product voice, repeated-use frequency, and emotio
 
 Do not manufacture a celebration for an ordinary click. Ask only when the brand's emotional range or the stakes cannot be inferred.
 
-## Receive one delight thesis
+## Define one delight thesis
 
-Use the approved sentence describing what the user should feel and why that
-feeling belongs to this product. If it is missing, return to `frontend-design`.
-Then choose the smallest technically reliable system that can deliver it:
+State in one sentence what the user should feel and why that feeling belongs to this product. Then choose the smallest system that can deliver it:
 
 - a distinctive response to a meaningful action;
 - product-specific language that clarifies while carrying voice;

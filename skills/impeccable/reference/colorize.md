@@ -4,13 +4,6 @@ Introduce color as hierarchy, meaning, and atmosphere. Preserve confirmed brand 
 
 ---
 
-## Creative authority
-
-Load `frontend-design` to choose palette intent, emotional temperature, dominant
-relationships, and dosage unless those decisions already exist in DESIGN.md or
-an approved contract. This playbook owns tokenization, contrast, semantics,
-themes, perception, and technical verification.
-
 ## Visitor mode
 
 - **Persuade + Experience:** color may carry the voice and own large regions when the selected world calls for it.
@@ -29,13 +22,9 @@ Read DESIGN.md, tokens, assets, current themes, and representative states. Ident
 
 If a new identity is required, use [new-work.md](new-work.md). Ask only when a binding brand decision cannot be inferred.
 
-## Implement the approved strategy
+## Choose a strategy
 
-Read the approved emotional temperature, dominant relationship, contrast range,
-and color dosage before editing. If they are missing, return to
-`frontend-design`; do not invent them here. The implementation may be
-restrained or immersive, but it must follow the contract rather than a fixed
-percentage rule.
+Name the intended emotional temperature, dominant relationship, contrast range, and color dosage before editing. The strategy may be restrained or immersive; it must follow the brief and selected world rather than a fixed percentage rule.
 
 Build roles, not a bag of swatches:
 
@@ -46,10 +35,7 @@ Build roles, not a bag of swatches:
 - success, warning, error, and information;
 - data categories or scales when needed.
 
-Use the project's existing color space. For a new web palette, prefer OKLCH
-because lightness and chroma can be adjusted predictably. Preserve the approved
-hue relationships while making the smallest changes required for contrast,
-themes, and semantic roles.
+Use the project's existing color space. For a new web palette, prefer OKLCH because lightness and chroma can be adjusted predictably. Choose hue from product meaning and visual direction, never from a default category association.
 
 ## Apply at system scale
 
