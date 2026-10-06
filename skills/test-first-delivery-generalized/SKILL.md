@@ -18,7 +18,8 @@ Unless explicitly directed otherwise:
 2. **Follow Independent-Test TDD where practical**: authoritative tests are written first, from the specification, by a Test Designer that has not seen the implementation, frozen, then implemented against. The implementer may add `tests/work/**` probes but cannot modify `tests/authoritative/**`.
 3. **Leave Touched Code Easy to Understand**: Enforce JSDoc/docstrings on all touched functions, methods, and constructors. Include focused inline comments near complex or non-obvious logic.
 4. **Mutation/Falsification is the Quality Gate, not Line Coverage**: Run mutation testing (`mutation_score >= 0.90`) or verify via the Fast Sabotage Litmus Test. Line coverage is informative only; 100% is expected only for the narrowly touched seam, never the entire repository.
-5. **State What Was Verified**: Conclude with a clear report detailing the authoritative vs work tests run, mutation results, adversarial findings, manual validation, and any remaining gaps.
+5. **UI/UX Requires Visual Browser Proof**: For any frontend design, styling, layout, or UX task, automated unit or render tests alone are insufficient. Capturing real screenshots and visually inspecting them (`view_file`) across relevant viewports (mobile, tablet, desktop) and color themes (light/dark) is a mandatory delivery gate before declaring completion.
+6. **State What Was Verified**: Conclude with a clear report detailing the authoritative vs work tests run, mutation results, adversarial findings, visual inspection evidence, manual validation, and any remaining gaps.
 
 ---
 
