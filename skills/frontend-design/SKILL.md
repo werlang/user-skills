@@ -50,6 +50,12 @@ Try to do a lot of this planning and iteration in your thinking, and only show i
 
 Spend your boldness in one place. Let the signature element be the one memorable thing, keep everything around it quiet and disciplined, and cut any decoration that does not serve the brief. Not taking a risk can be a risk itself! Build to a quality floor without announcing it: responsive down to mobile, visible keyboard focus, reduced motion respected. Critique your own work as you build, taking screenshots if your environment supports it – a picture is worth 1000 tokens. Consider Chanel's advice: before leaving the house, take a look in the mirror and remove one accessory. Human creators have memory and always try to do something new, so if you have a space to quickly jot down notes about what you've tried, it can help you in future passes.
 
+## Mandatory Visual Validation
+Whenever designing or refining frontend UI:
+- **Visual proof is mandatory**: Automated tests (unit, render, or CSS checks) only verify code syntax and structure; they never verify visual aesthetics, text clipping, awkward wrapping, collision, or layout balance.
+- **Always capture and inspect screenshots**: Use browser automation (e.g. Playwright or Chrome DevTools) to navigate to the rendered page, capture screenshots across viewports (mobile, tablet, desktop) and color themes (dark and light), and actually inspect the images with `view_file`.
+- **Never declare design or UX tasks complete** without having viewed real visual evidence of the final rendered state in the browser.
+
 ## More on writing in design
 
 Words appear in a design for one reason: to make it easier to understand, and therefore easier to use. They are design material, not decoration. Bring the same intentionality to copy that you would bring to spacing and color. Before writing anything, ask what the design needs to say, and how it can best be said to help the person navigate the experience.
