@@ -47,11 +47,15 @@ npx stryker run --mutate "src/features/<slice>/**/*.ts"
 
 Unconfigured → Fast Sabotage per `verification.md`. Never unconstrained repo-wide mutation.
 
-## Scope rule
+## Scope rule — nearest suite first, full suite at integration
 
+- Per slice: run only the nearest suite covering the touched files (e.g. `css-contract.test.js` for token/CSS changes). Never the full suite per slice.
+- Full suite runs once at integration (all slices combined), not after every atomic commit.
+- Cross-service runs only when that service's files changed: `web/` changes never trigger `admin`/`api` suites; `api/` changes never trigger `web` full suite. Shared-contract changes (tokens, schemas, serializers) run the two directly coupled suites, not the whole stack.
 - Default: unit tests only during AI tasks.
-- Integration / E2E / Playwright smoke only on explicit request, or when the diff touches rendered UI, routes, redirects, storage, uploads, or auth flows.
+- Integration / E2E / Playwright smoke only on explicit request, or when the diff touches routes, redirects, storage, uploads, or auth flows. Visual-only changes (colors, hover, radius, copy) use browser proof below, not expanded automated suites.
 - Lint/typecheck (`npm run lint`, `tsc --noEmit`) are hygiene, not behavior proof.
+- Leaf tier never escalates to full-stack: nearest suite + browser spot-check is the ceiling unless a coupled contract broke.
 
 ## Browser proof (UI-affecting changes only)
 
