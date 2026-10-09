@@ -55,6 +55,7 @@ Whenever designing or refining frontend UI:
 - **Visual proof is mandatory**: Automated tests (unit, render, or CSS checks) only verify code syntax and structure; they never verify visual aesthetics, text clipping, awkward wrapping, collision, or layout balance.
 - **Always capture and inspect screenshots**: Use browser automation (e.g. Playwright or Chrome DevTools) to navigate to the rendered page, capture screenshots across viewports (mobile, tablet, desktop) and color themes (dark and light), and actually inspect the images with `view_file`.
 - **Never declare design or UX tasks complete** without having viewed real visual evidence of the final rendered state in the browser.
+- For journey validation beyond screenshots (flows, friction, affordances, recovery), run [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) as the independent audit pass.
 
 ## More on writing in design
 
