@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review changes since a fixed point (commit, branch, tag, or merge-base) along a risk-calibrated gradient (Trunk vs Leaf code) across Standards, Spec, and Machine Evidence. Runs parallel adversarial sub-agents to eliminate confirmation bias, enforces automated hardening and feature-flag gating, escalates architectural risk to humans, and supports verify-fixes mode for PR babysitting loops. Use when reviewing a branch, PR, or work-in-progress changes, when the user asks to "review since X", or wants fixes from a previous review double-checked.
+description: Review changes since a fixed point (commit, branch, tag, or merge-base) along a risk-calibrated gradient (Trunk vs Leaf code) across Standards, Spec, and Machine Evidence. Runs parallel adversarial sub-agents with independent discovery, red-team probes, cross-examination with rebuttal and third-agent adjudication, enforces automated hardening and feature-flag gating, escalates architectural risk to humans, and auto-fixes confirmed findings with regression tests then loops re-review until zero confirmed findings remain. Use when reviewing a branch, PR, or work-in-progress changes, when the user asks to "review since X", or wants fixes from a previous review double-checked.
 ---
 
 Review the diff between `HEAD` and a fixed point along a **risk-calibrated gradient** across three complementary axes:
@@ -16,14 +16,15 @@ flowchart TD
     FixedPoint["1. Pin Fixed Point & Calibrate Tree Gradient<br/>(Trunk vs Branch vs Leaf · Identify Agent Traps)"]
     SpecSource["2. Identify Spec & Enforce Machine Evidence<br/>(Active Test Runs, Mutation / Sabotage, Headless DOM/a11y)"]
     Standards["3. Check Standards, Tooling & Simplicity Triad<br/>(KISS, YAGNI, DRY Rule of Three, Smell Baseline)"]
-    Adversarial["4. Run 3 Adversarial Sub-Agents in Parallel<br/>(Standards + Spec + Machine Evidence)"]
-    Aggregate["5. Aggregate, Deduplicate & Verify Findings<br/>(Per-Axis Accounting: Totals & Worst Issues)"]
+    Adversarial["4. Independent Discovery in Parallel<br/>(Standards + Spec + Machine Evidence + Red-Team Probes)"]
+    Aggregate["5. Aggregate, Cross-Examine & Adjudicate<br/>(Attack Findings · Rebuttal · Confirmed/Rejected/Partial)"]
     Final20["6. Evaluate The Final 20%<br/>(Agent Hardening + ESCALATE_TO_HUMAN Contract)"]
-    ReportGate["7. Deliver Report-First Gate & Stop"]
-    Babysit["8. PR Babysitting Loop & Verify-Fixes Mode"]
+    AutoFix["7. Auto-Fix Confirmed Findings (No Stop)<br/>(Regression Test + Minimal Surgical Fix + Refresh Evidence)"]
+    Loop["8. Closed-Loop Re-Review Until Clean<br/>(Full Diff + Fix Diff + Prior Review Audit)"]
 
-    FixedPoint --> SpecSource --> Standards --> Adversarial --> Aggregate --> Final20 --> ReportGate
-    ReportGate -.-> Babysit
+    FixedPoint --> SpecSource --> Standards --> Adversarial --> Aggregate --> Final20 --> AutoFix --> Loop
+    Loop -->|confirmed findings remain| Adversarial
+    Loop -->|zero confirmed findings| Done["Done: Exit Loop"]
 ```
 
 ---
@@ -102,13 +103,19 @@ flowchart TD
 
 1. **Topology & Adversarial Isolation**:
    - Launch **three parallel sub-agents** with clean, isolated contexts:
-     1. **Standards Sub-agent**
-     2. **Spec Sub-agent**
-     3. **Machine Evidence Sub-agent**
-   - **Adversarial Mandate**: Sub-agents must run in fresh contexts without access to the author agent's prompt history. This breaks **confirmation bias** and prevents **correlated LLM hallucinations**.
-   - **Hunt Correlated LLM Blind Spots**: Challenge plausible-looking syntax, check boundary edge cases, verify error propagation, and ensure tests assert independent contract values rather than tautologies.
+     1. **Standards Sub-agent** (correctness / requirements / maintainability)
+     2. **Spec Sub-agent** (spec fidelity; attacks the spec too — implementation must satisfy actual requirements, not mere internal coherence)
+     3. **Machine Evidence Sub-agent** (security / edge cases / robustness + active execution)
+   - **Independent discovery first**: Reviewers do not see each other's findings during discovery. Sub-agents must run in fresh contexts without access to the author agent's prompt history or sibling findings. This breaks **confirmation bias** and prevents **correlated LLM hallucinations**.
+   - **Assume-broken mindset**: Each reviewer assumes the implementation is wrong, fragile, or exploitable and tries to prove it with a concrete counterexample.
 
-2. **Partitioning Large Diffs**:
+2. **Red-Team Probe Mandate (tiered)**:
+   - **Trunk**: concurrency/race, duplicate/non-idempotent requests, lying/malicious client, partial dependency outage, auth bypass, unbounded loop/allocation, cross-user data leak, 0/negative/empty/huge/malformed inputs.
+   - **Branch**: duplicate/idempotency, null/empty/boundary values, malformed dependency responses, cross-tenant leak, missing authorization on new paths.
+   - **Leaf**: prop/state extremes (empty/loading/error/populated), flag-off fallback, keyboard/a11y path only. No retry queues or speculative hardening.
+   - Every probe needs a runnable `input/state → actual vs expected` sketch. Hypotheticals without a realistic caller/path are dropped or capped at Low.
+
+3. **Partitioning Large Diffs**:
    - For large diffs (>2,000 lines or >40 files), partition the **Standards** axis by architectural area (e.g., `api/`, `web/`, `infra/`, `tests/`) into additional parallel sub-agents. Give every partition identical methodology text; partition coverage, not judgment.
    - The Spec agent and Evidence agent always evaluate the whole diff.
 
@@ -120,19 +127,22 @@ flowchart TD
 
 5. **Sub-agent Briefs (Methodology Inlining Rule)**:
    Because sub-agents run in isolated contexts, **paste the methodology, the simplicity triad, and the code smell baseline in full into the brief** — the sub-agent has no other access to it:
-   - **Standards Sub-agent Brief**: Include diff command, commit list, operational exposure, tree classification, standards files, exclusions, **the full simplicity triad**, and **the code smell baseline from [references/code-smell-baseline.md](references/code-smell-baseline.md)** pasted in full. Brief: "Report findings in this exact schema: `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high | medium | low) · confidence (verified | reported) · evidence (quote code) · cost (stated maintenance impact)`. Skip tooling-enforced checks. Order by severity; cap detailed findings at ~10."
-   - **Spec Sub-agent Brief**: Include diff command, commit list, and spec source (or commit list in degraded mode). Brief: "Report: (a) missing/partial requirements, (b) unrequested behavior (scope creep), (c) incorrect implementations. Quote the spec line for each finding."
-   - **Machine Evidence Sub-agent Brief**: Include test commands, container runtime instructions, and tree tier. Brief: "Actively execute test suites and linters. Report: (a) test suite pass/fail status and exit codes, (b) mutation score or Fast Sabotage results, (c) typecheck results, (d) headless DOM/a11y tree verification for UI components, (e) AST feature-flag gating proof."
+   - **Standards Sub-agent Brief**: Include diff command, commit list, operational exposure, tree classification, standards files, exclusions, **the full simplicity triad**, tiered red-team probes, and **the code smell baseline from [references/code-smell-baseline.md](references/code-smell-baseline.md)** pasted in full. Brief: "Assume the code is broken and prove it. Report findings in this exact schema: `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high | medium | low) · confidence (verified | reported) · probe (input/state → actual vs expected) · evidence (quote code) · cost (stated maintenance impact)`. No probe sketch without a realistic caller = drop or Low. Skip tooling-enforced checks. Order by severity; cap detailed findings at ~10."
+   - **Spec Sub-agent Brief**: Include diff command, commit list, and spec source (or commit list in degraded mode). Brief: "Attack the spec too. Report: (a) missing/partial requirements, (b) unrequested behavior (scope creep), (c) incorrect implementations, (d) spec gaps where the implementation is coherent but the requirement is wrong/ambiguous. Quote the spec line for each finding plus the counterexample."
+   - **Machine Evidence Sub-agent Brief**: Include test commands, container runtime instructions, and tree tier. Brief: "Assume the suite is thin and prove it. Actively execute test suites and linters. Report: (a) test suite pass/fail status and exit codes, (b) mutation score or Fast Sabotage results, (c) typecheck results, (d) headless DOM/a11y tree verification for UI components, (e) AST feature-flag gating proof, (f) red-team probes with runnable input/state → actual vs expected. No concrete failure demonstration = no High."
 
 ---
 
-### 5. Aggregate and verify
+### 5. Aggregate, cross-examine, rebut, adjudicate
 
-1. **Verify**: Open every high-severity finding and a sample of the rest at its quoted location. Mark findings `verified` or `unverified`; drop invalid findings. Require proof of non-use (including dynamic reference patterns) before publishing deletion-class findings.
+1. **Verify**: Open every high-severity finding and a sample of the rest at its quoted location. Mark findings `verified` or `unverified`; drop invalid findings. Require proof of non-use (including dynamic reference patterns) before publishing deletion-class findings. No concrete failure demonstration = no High.
 2. **Dedup with attribution**: Merge identical issues reported by multiple agents, crediting both.
-3. **Keep axes separate**: Present findings under `## Standards`, `## Spec`, and `## Machine Evidence & Blast Radius`. Do not merge or rerank across axes.
-4. **Per-Axis Accounting**: Conclude the report with a one-line summary per axis: total verified/unverified findings and the worst issue within each axis. Do not pick a single winner across axes.
-5. **State static review limits**: Explicitly declare anything not verifiable statically or via headless test tools.
+3. **Cross-examination (gated)**: Run only for disputed High/Medium findings on Trunk/Branch. Leaf and unanimous Lows skip debate. Each reviewer attacks the other's findings (not the author): invalid repro, unrealistic caller/path, spec misread, tooling-enforced nit, or overshoot. Attack the review itself, not just the code.
+4. **Rebuttal**: Each reviewer defends or concedes. Conceding an invalid finding outranks defending it. Narrow `partial` where the probe is real but severity or scope was overstated.
+5. **Adjudication**: A third clean-context agent decides disputed findings only: `confirmed / rejected / partial`, with quoted code + reason. Unanimous findings skip adjudication. If the dispute is a spec ambiguity with no oracle, emit `escalate_to_human: REQUIRED` instead of voting.
+6. **Keep axes separate**: Present confirmed findings under `## Standards`, `## Spec`, and `## Machine Evidence & Blast Radius`. Do not merge or rerank across axes.
+7. **Per-Axis Accounting**: Conclude with a one-line summary per axis: total confirmed/rejected/partial and the worst confirmed issue. Also list rejected findings briefly so the next loop does not relitigate them.
+8. **State static review limits**: Explicitly declare anything not verifiable statically or via headless test tools.
 
 ---
 
@@ -167,29 +177,28 @@ Autonomous orchestrators must not auto-merge or auto-commit tasks bearing an act
 
 ---
 
-### 7. Report-first gate (mandatory)
+### 7. Auto-fix gate (mandatory, no stop)
 
-Deliver the aggregated report and **stop**.
+Do not stop after the adjudicated report. Proceed directly to fixing confirmed findings only:
 
-Never implement code fixes in the same turn unless the user explicitly requested fixes in the initial prompt. Findings are decision artifacts for the owner to accept, reject, or re-scope. Auto-fixing collapses review into an unreviewable mutation.
+1. **Triage**: Confirmed High severity and missing machine evidence first, then confirmed Medium. Rejected findings are never fixed. Partial findings are fixed to their narrowed scope.
+2. **Regression test per confirmed bug**: Add one minimal regression test reproducing the probe (`input/state → actual vs expected`) before or with the fix. A confirmed finding without a new or updated test stays open.
+3. **Apply minimal surgical fixes**: Touch only flagged lines plus directly required tests. Adhere strictly to KISS/YAGNI. Do not introduce wider refactors that expand the diff.
+4. **Re-validate & refresh evidence**: Run the applicable test suite, typecheck, and headless DOM/a11y or flag checks in the appropriate container/runtime. Require exit code `0` and clean stderr.
+5. **Advance `<review-point>`**: Record the pre-fix HEAD as `<review-point>` before fixing so the next re-review pass can diff `<review-point>..HEAD` as the isolated fix diff.
 
 ---
 
-## PR Babysitting & Verify-Fixes Mode
+## Closed-Loop Re-Review Until Clean (mandatory)
 
-When iterating on review feedback or running automated feedback resolution, follow the **PR Babysitting Protocol**:
+After every fix pass, relaunch the §4 adversarial review loop. Each loop iteration reviews both the code and the previous review:
 
-1. **Triage Findings**: Address High-severity issues and missing machine evidence first.
-2. **Apply Minimal Surgical Fixes**: Fix only the flagged defect adhering strictly to KISS/YAGNI. Do not introduce wide secondary refactors that expand the diff.
-3. **Re-Validate & Refresh Evidence**: Run automated tests in the appropriate container/runtime, verify exit code `0`, and update headless DOM/runtime traces.
-4. **Run `verify-fixes` Review**:
-   - Re-review the exact fix diff between the prior review point and current HEAD:
-     ```sh
-     git diff <review-point>..HEAD
-     ```
-   - Apply the fix lens: *Did the fix introduce what it was fixing? Did it loosen validation too far? Did it break adjacent callers?*
-   - Update `<review-point>` to current HEAD.
-5. **Iterate until Clean**: Continue until all blocking findings and evidence gaps are resolved.
+1. **Re-review inputs**: Give each re-review sub-agent (a) full diff `git diff <fixed-point>...HEAD`, (b) isolated fix diff `git diff <review-point>..HEAD`, (c) the prior confirmed/rejected/partial list with per-axis accounting, and (d) new regression tests.
+2. **Prior-review audit lens**: For each prior finding ask: was it correctly fixed, is it now a false positive, did the fix overshoot (loosened validation too far), did it break adjacent callers, or did it introduce a secondary defect? Drop invalidated findings; file new findings for fix-induced defects. Do not relitigate rejected findings unless the fix diff revives them.
+3. **Full methodology re-applied**: Re-run independent discovery + gated cross-examination + adjudication. Do not skip axes on re-review. Leaf and unanimous Lows still skip debate.
+4. **Update `<review-point>` to current HEAD** after each re-review pass.
+5. **Exit only when clean**: Loop while any confirmed finding (High, Medium, or Low) remains or any required machine evidence is red. Exit only when all three axes report zero confirmed findings with green evidence (tests exit `0`, typecheck clean, mutation/sabotage and DOM/a11y/flag checks passing per tier).
+6. **Loop safeguards**: Cap at 10 iterations. If the same confirmed finding survives 2 consecutive fix passes unchanged, or findings oscillate without converging, emit `escalate_to_human` with status `REQUIRED`, describe the non-convergence, and stop auto-fixing. Never auto-merge or auto-commit while `escalate_to_human: REQUIRED` is active without interactive user sign-off.
 
 ---
 
