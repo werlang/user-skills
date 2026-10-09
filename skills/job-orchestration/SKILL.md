@@ -159,7 +159,7 @@ approvals and evidence; rerun checks against the resulting state.
 
 ## 6. Enforce independent test-first development
 
-Load `tdd` and the relevant test-delivery guidance. For each small behavioral
+Load `testing` and follow its tiered loop. For each small behavioral
 slice, follow this sequence rather than batching all tests before all code:
 
 1. Define specification-derived rules and the agreed public testing boundary.

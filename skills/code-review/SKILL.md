@@ -34,7 +34,7 @@ flowchart TD
 ### 1. Pin the fixed point and calibrate the risk gradient (The Tree Concept)
 
 1. **Resolve the fixed point and comparison refs**:
-   - Capture the fixed point (`main`, commit SHA, branch name, tag, etc.). If omitted, prompt the user.
+   - Capture the fixed point (`main`, commit SHA, branch name, tag, etc.). If omitted, prompt the user — unless the user named paths/area instead, in which case review the current tree filtered to those paths and skip the empty-diff gate.
    - Run `git rev-parse <fixed-point>` and confirm the diff is non-empty.
    - Capture comparison commands:
      ```sh
@@ -47,7 +47,7 @@ flowchart TD
    Human reviewers skim Leaf code to save time and manually inspect Trunk code. Agent reviewers must take the opposite posture to guard against LLM failure modes:
    - **Trunk Code (High Blast Radius — The Agent Trap)**: Core infrastructure, networking, authentication/authorization engines, database schemas and migrations, global state managers, base framework lifecycles, and shared foundational utility packages.
      - *Agent Failure Mode*: An LLM reviewer is easily tricked by Trunk code that looks syntactically clean and idiomatic, missing subtle concurrency races, distributed deadlocks, schema lock contention, or caching edge cases.
-     - *Agent Review Posture*: Do not trust syntax alone. Demand independent verification ([IV-TDD](../test-first-delivery-generalized/SKILL.md)), require mutation falsification (`mutation_score >= 0.90` or documented pass of the Fast Sabotage Litmus Test), audit strict backwards compatibility, and **route to the Human Escalation Gate** for architectural sign-off.
+     - *Agent Review Posture*: Do not trust syntax alone. Demand independent verification ([testing](../testing/SKILL.md)), require mutation falsification (`mutation_score >= 0.90` or documented pass of the Fast Sabotage Litmus Test), audit strict backwards compatibility, and **route to the Human Escalation Gate** for architectural sign-off.
    - **Branch Code (Moderate Blast Radius)**: Domain business logic, bounded feature services, API controllers, worker processors, and shared component modules.
      - *Agent Review Posture*: Dual-axis Standards + Spec review with active execution of automated unit/integration test suites.
    - **Leaf Code (Low / Zero Blast Radius — The Agent Strength)**: Isolated UI views, leaf endpoints, standalone scripts, or feature-gated components that can be safely disabled without collateral impact.
@@ -127,7 +127,7 @@ flowchart TD
 
 5. **Sub-agent Briefs (Methodology Inlining Rule)**:
    Because sub-agents run in isolated contexts, **paste the methodology, the simplicity triad, and the code smell baseline in full into the brief** — the sub-agent has no other access to it:
-   - **Standards Sub-agent Brief**: Include diff command, commit list, operational exposure, tree classification, standards files, exclusions, **the full simplicity triad**, tiered red-team probes, and **the code smell baseline from [references/code-smell-baseline.md](references/code-smell-baseline.md)** pasted in full. Brief: "Assume the code is broken and prove it. Report findings in this exact schema: `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high | medium | low) · confidence (verified | reported) · probe (input/state → actual vs expected) · evidence (quote code) · cost (stated maintenance impact)`. No probe sketch without a realistic caller = drop or Low. Skip tooling-enforced checks. Order by severity; cap detailed findings at ~10."
+   - **Standards Sub-agent Brief**: Include diff command, commit list, operational exposure, tree classification, standards files, exclusions, **the full simplicity triad**, tiered red-team probes, **the code smell baseline from [references/code-smell-baseline.md](references/code-smell-baseline.md)** pasted in full, and the applicable section of **[references/bug-heuristics.md](references/bug-heuristics.md)** pasted in full (backend section for `api/`/`services/`/`workers/`, frontend section for `web/`/`components/`/`templates/`, both when crossing API↔client or schema↔model boundaries). Brief: "Assume the code is broken and prove it. Report findings in this exact schema: `location (file:line) · category (documented-standard violation | suspected bug | smell) · severity (high | medium | low) · confidence (verified | reported) · probe (input/state → actual vs expected) · evidence (quote code) · cost (stated maintenance impact)`. No probe sketch without a realistic caller = drop or Low. Skip tooling-enforced checks. Order by severity; cap detailed findings at ~10."
    - **Spec Sub-agent Brief**: Include diff command, commit list, and spec source (or commit list in degraded mode). Brief: "Attack the spec too. Report: (a) missing/partial requirements, (b) unrequested behavior (scope creep), (c) incorrect implementations, (d) spec gaps where the implementation is coherent but the requirement is wrong/ambiguous. Quote the spec line for each finding plus the counterexample."
    - **Machine Evidence Sub-agent Brief**: Include test commands, container runtime instructions, and tree tier. Brief: "Assume the suite is thin and prove it. Actively execute test suites and linters. Report: (a) test suite pass/fail status and exit codes, (b) mutation score or Fast Sabotage results, (c) typecheck results, (d) headless DOM/a11y tree verification for UI components, (e) AST feature-flag gating proof, (f) red-team probes with runnable input/state → actual vs expected. No concrete failure demonstration = no High."
 
@@ -205,14 +205,13 @@ After every fix pass, relaunch the §4 adversarial review loop. Each loop iterat
 ## References & Checklists
 
 - [references/code-smell-baseline.md](references/code-smell-baseline.md) — Comprehensive code smell catalog with mechanical detection cues, grep patterns, cost symptoms, and test review standards.
+- [references/bug-heuristics.md](references/bug-heuristics.md) — High-risk backend and frontend defect patterns with mechanical cues and probe sketches (preserved from retired bug-review skills).
 - [references/tree-concept-gradient.md](references/tree-concept-gradient.md) — Code classification (Trunk vs Leaf), blast radius diagnostic questions, and scrutiny gradient matrix from an agent reviewer perspective.
 - [references/evidence-and-launch-checklist.md](references/evidence-and-launch-checklist.md) — Agent-verifiable evidence protocols, automated hardening checklist, ESCALATE_TO_HUMAN machine contract, and PR babysitting workflow.
 
 ## Related Skills
 
 - [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) — Authoritative standards for Clean Code, OOP architecture, and safe refactoring.
-- [`backend-bug-review-generalized`](../backend-bug-review-generalized/SKILL.md) — Backend defect and regression auditing.
-- [`frontend-bug-review-generalized`](../frontend-bug-review-generalized/SKILL.md) — Frontend rendering, state, and interaction auditing.
 - [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) — Security vector, injection, and authorization auditing.
-- [`test-first-delivery-generalized`](../test-first-delivery-generalized/SKILL.md) — Independent verification and authoritative test freezing.
+- [`testing`](../testing/SKILL.md) — Independent verification and authoritative test freezing.
 - [`document-touched-code`](../document-touched-code/SKILL.md) — JSDoc contracts and interface documentation.

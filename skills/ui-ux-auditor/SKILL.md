@@ -12,9 +12,9 @@ Run two passes every time:
 
 ## Required Pairing
 
-Always read [../test-first-delivery-generalized/SKILL.md](../test-first-delivery-generalized/SKILL.md) before executing the audit.
+Always read [../testing/SKILL.md](../testing/SKILL.md) before executing the audit.
 
-If the target has a browser-facing UI, also read [../frontend-bug-review-generalized/SKILL.md](../frontend-bug-review-generalized/SKILL.md).
+If the target has a browser-facing UI, also read [../code-review/references/bug-heuristics.md](../code-review/references/bug-heuristics.md) frontend section.
 
 ## Audit Contract
 

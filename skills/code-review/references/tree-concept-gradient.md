@@ -7,7 +7,7 @@ Review intensity must follow a **gradient based on architectural risk, blast rad
 
 ```mermaid
 graph TD
-    Trunk["Trunk Code (Core Infra, Schemas, Auth, Networking)<br/><b>High Blast Radius</b> · Agent Trap: Syntactic Plausibility<br/>Required: IV-TDD, Mutation Testing >=90%, Human Architectural Escalation"]
+    Trunk["Trunk Code (Core Infra, Schemas, Auth, Networking)<br/><b>High Blast Radius</b> · Agent Trap: Syntactic Plausibility<br/>Required: testing oracle, Mutation Testing >=90%, Human Architectural Escalation"]
     Branch["Branch Code (Domain Services, Feature Workflows)<br/><b>Moderate Blast Radius</b> · Dual-Axis (Standards + Spec)<br/>Required: Active Test Execution, Contract & Error Flow Verification"]
     Leaf["Leaf Code (Isolated UI, Feature-Gated Components, Leaf Endpoints)<br/><b>Low/Zero Blast Radius</b> · Agent Strength: Exhaustive Mechanical Audit<br/>Required: 100% Prop/Type/DOM Check, AST Feature-Flag Verification"]
 
@@ -24,7 +24,7 @@ graph TD
 - **Agent Failure Mode**: An LLM agent reviewer is easily deceived by Trunk code that looks syntactically clean and idiomatic, missing subtle concurrency races, distributed deadlocks, schema lock contention, or caching edge cases.
 - **Agent Review Imperatives**:
   - **Do not trust syntax alone**: Never approve Trunk code on visual code inspection.
-  - **Demand Independent Verification (IV-TDD)**: Verify that authoritative tests were authored independently without seeing the implementation.
+  - **Demand testing oracle rules**: Verify that authoritative tests were human-anchored and frozen before impl (see `../../testing/SKILL.md`).
   - **Execute Mutation Falsification**: Require a mutation kill score of `>= 0.90` (or a documented pass of the Fast Sabotage Litmus Test) on logic-heavy Trunk modules.
   - **Audit Invariant Defense**: Verify backwards compatibility, idempotent operations, and non-destructive migrations.
   - **Mandatory Human Escalation**: Explicitly flag Trunk changes in the final review report for senior human architectural sign-off.
@@ -68,7 +68,7 @@ When calibrating a diff, run these targeted code queries:
 | :--- | :--- | :--- | :--- |
 | **Blast Radius** | Localized / Zero collateral | Bounded to domain | System-wide / Core infra |
 | **Agent Posture** | Exhaustive mechanical audit | Dual-axis Standards + Spec | Adversarial falsification & invariant audit |
-| **Verification Method** | Typecheck + lint + DOM/a11y tree check | Active unit & integration test run | IV-TDD + Mutation score >= 0.90 (or Fast Sabotage Litmus pass) |
+| **Verification Method** | Typecheck + lint + DOM/a11y tree check | Active unit & integration test run | testing oracle + Mutation score >= 0.90 (or Fast Sabotage Litmus pass) |
 | **Feature Isolation** | AST check: Flag wraps entry point & fallback exists | Graceful degradation on dependency failure | Forward-compatible migration & zero-downtime safety |
 | **Correlated Risk** | Low (isolated scope) | Medium | High (LLM plausible hallucination trap) |
 | **Approval Authority** | Agent can fully approve | Agent approves + human glance | Agent audits + **Mandatory Human Escalation** |

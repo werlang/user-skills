@@ -42,7 +42,7 @@ The user may override or guide any part of the review loop:
      ```sh
      grep -rn "^name:\|^description:" skills/*/SKILL.md
      ```
-   - Inspect [`skills/README.md`](../README.md) to locate the closest domain owner (e.g. `code-review` for review criteria, `clean-code-and-oop` for coding standards, `tdd` for testing).
+   - Inspect [`skills/README.md`](../README.md) to locate the closest domain owner (e.g. `code-review` for review criteria, `clean-code-and-oop` for coding standards, `testing` for testing).
    - Prefer updating an existing guide over creating a new one. If repository-wide root conventions change, update [`AGENTS.md`](../../AGENTS.md).
    - Only create a new skill when no existing skill is a viable long-term owner.
 

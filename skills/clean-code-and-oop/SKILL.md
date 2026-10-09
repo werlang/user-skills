@@ -106,5 +106,3 @@ Consult the bundled reference guides for concrete before/after examples and deta
 - [`api-building`](../api-building/SKILL.md) - Clean API architecture and entity models.
 - [`web-frontend`](../web-frontend/SKILL.md) - Component OOP hierarchy and model-view separation.
 - [`document-touched-code`](../document-touched-code/SKILL.md) - JSDoc contracts and interface documentation.
-- [`backend-bug-review-generalized`](../backend-bug-review-generalized/SKILL.md) - Backend bug audit and regression prevention.
-- [`frontend-bug-review-generalized`](../frontend-bug-review-generalized/SKILL.md) - Frontend contract and interaction bug audit.
