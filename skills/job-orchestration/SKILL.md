@@ -2,12 +2,13 @@
 name: job-orchestration
 description: >-
   Orchestrate large jobs end-to-end through exploration, user grilling, worktree
-  isolation, task planning, delegated independent-test TDD, adversarial review
-  loops, resumable Markdown records, and atomic semantic commits. Use when the
-  user asks to orchestrate a job, oversee an entire implementation, delegate a
-  multi-agent build, or repeat implementation/review/test cycles until complete.
-  Not for simple local edits, standalone code reviews, or merely operating Orca;
-  pair with the orchestration skill when coordinating Orca workers.
+  isolation, task planning, clean code and OOP standards, delegated independent-test
+  TDD, adversarial code reviews, synchronized documentation, and atomic semantic
+  commits. Use when the user asks to orchestrate a job, oversee an entire
+  implementation, delegate a multi-agent build, or repeat implementation/review/test
+  cycles until complete. Pairs with grilling, clean-code-and-oop, testing,
+  code-review, git-change-workflow, document-touched-code, documentation-maintenance,
+  and orchestration.
 ---
 
 # Job Orchestration
@@ -21,8 +22,16 @@ implement application code yourself.
 
 Use the user's job description as the starting specification, not a command to
 expand scope. Honor explicit overrides and canonical repository instructions.
-Load relevant installed skills for the domain, testing, reviews, documentation,
-and runtime. This methodology supplements rather than replaces runtime guides.
+Coordinate with the repository's specialized skills across every phase:
+- [`grilling`](../grilling/SKILL.md) for requirements alignment and decision grilling.
+- [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) for domain architecture, OOP principles, and clean code standards.
+- [`testing`](../testing/SKILL.md) for independent test design, authoritative freezing, and mutation falsification.
+- [`code-review`](../code-review/SKILL.md) for 3-axis adversarial reviews, red-team probes, and auto-fix loops.
+- [`document-touched-code`](../document-touched-code/SKILL.md) and [`documentation-maintenance`](../documentation-maintenance/SKILL.md) for docstrings, comments, and project documentation consistency.
+- [`git-change-workflow`](../git-change-workflow/SKILL.md) for worktree branching and atomic semantic commits.
+- [`orchestration`](../orchestration/SKILL.md) and [`orca-cli`](../orca-cli/SKILL.md) when executing within managed Orca environments.
+
+This methodology supplements rather than replaces runtime guides.
 
 Use actual orchestration tools and fresh agent contexts. Resolve requested model
 IDs from the available catalog; do not invent model IDs, agent activity, or test
@@ -30,7 +39,8 @@ results. If a required tool/model is unavailable, report the blocker before
 substituting it. Do not silently fall back to doing the entire job yourself.
 
 Defaults: one dedicated job worktree, grilling after exploration, independent
-test-first development, adversarial reviews, and atomic semantic local commits.
+test-first development, clean code OOP architecture, adversarial code reviews,
+synchronized documentation, and atomic semantic local commits.
 Continue beyond planning and the first green test run until the completion gate
 passes or a documented blocker requires user input.
 
@@ -42,6 +52,11 @@ or creating another worktree; revisit decisions only when material facts change.
 
 - Inspect canonical instructions, current code, architecture, reference sources,
   documentation, available skills, and declared validation commands.
+- When project documentation, instructions, or agent prompts appear stale or
+  misaligned with the code, run an audit using [`audit-project-context`](../audit-project-context/SKILL.md).
+- Before designing or scaffolding new components, database drivers, helpers, or wrappers,
+  consult [`obsidian-dev-brain`](../obsidian-dev-brain/SKILL.md) to inspect existing
+  cross-project component baselines and governing Architecture Decision Records (ADRs).
 - Check Git status and capture the starting commit. Preserve pre-existing user
   changes; identify any required uncommitted work that a new worktree would miss.
 - Run safe, relevant baseline checks. Record commands, exit codes, and existing
@@ -52,7 +67,8 @@ or creating another worktree; revisit decisions only when material facts change.
 
 ## 2. Grill the user, unless explicitly skipped
 
-Load the `grilling` skill when available and follow its interview process:
+Load the [`grilling`](../grilling/SKILL.md) skill (or [`grill-me`](../grill-me/SKILL.md)
+when manually invoked) when available and follow its interview process:
 
 - Ask one decision question at a time, then wait for the answer.
 - Offer a recommended answer with a short rationale for every question.
@@ -70,11 +86,13 @@ scope expansion, or bypassing mandatory approvals; escalate blocking ambiguity.
 
 ## 3. Establish the job workspace and records
 
-Create one dedicated isolated job worktree unless the user specifies another
-strategy. Reuse an existing worktree only when it clearly belongs to this job.
-Record its path, backing branch, and base commit; move the session into it when
-supported and it becomes the primary working directory. Do not substitute a
-branch switch in the original checkout for worktree isolation.
+Establish the job workspace following the planned-track isolation policy in
+[`git-change-workflow`](../git-change-workflow/SKILL.md). Create one dedicated
+isolated job worktree unless the user specifies another strategy. Reuse an existing
+worktree only when it clearly belongs to this job. Record its path, backing branch,
+and base commit; move the session into it when supported and it becomes the primary
+working directory. Do not substitute a branch switch in the original checkout for
+worktree isolation.
 
 If the repository has no usable base commit or worktree creation fails, report
 the blocker before editing; do not initialize a repository or change strategy
@@ -87,10 +105,11 @@ artifacts, and integration. Separate worktrees are optional for genuine isolatio
 needs, not required per worker. If the user requires one worktree, serialize
 conflicting work rather than creating child worktrees.
 
-For Orca-managed state, load `orca-cli` and `orchestration`, then their current
-runtime guides. Verify which worker/isolation modes the runtime supports. If it
-cannot honor the agreed shared-worktree strategy, explain the conflict and get a
-decision before dispatching; do not invent runtime support or bypass its rules.
+For Orca-managed state, load [`orca-cli`](../orca-cli/SKILL.md) and
+[`orchestration`](../orchestration/SKILL.md), then their current runtime guides.
+Verify which worker/isolation modes the runtime supports. If it cannot honor the
+agreed shared-worktree strategy, explain the conflict and get a decision before
+dispatching; do not invent runtime support or bypass its rules.
 
 Do not move/stash user changes automatically or delete worktrees as a cleanup
 shortcut. Child worktrees need not be removed before integration. Preserve the
@@ -139,8 +158,22 @@ and enough context for another agent to resume without guessing.
 Give every worker a self-contained brief: task ID, requirement/contract,
 acceptance criteria, relevant instructions/references, exact working directory,
 starting revision, owned files/interfaces, dependencies, forbidden writes,
-required validation, and expected deliverables. Inline critical instructions;
-do not assume workers inherit the parent conversation or loaded skills.
+required validation, and expected deliverables.
+
+**Worker Engineering & Documentation Standards:**
+- Instruct implementers to strictly adhere to the engineering standards in
+  [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md): the Pragmatic Foundation
+  (KISS, YAGNI, DRY Rule of Three), intention-revealing names, small single-responsibility
+  methods, bounded parameters (≤2 positional or options object), command-query separation (CQS),
+  guard clauses with early returns, failing fast with typed errors, rich domain entities over
+  anemic models, composition over inheritance, and zero dead code.
+- Enforce [`document-touched-code`](../document-touched-code/SKILL.md) on every touched file:
+  add or update JSDoc or language-native doc comments on all touched public exports,
+  constructors, and class methods, plus focused section comments for non-trivial logic
+  invariants. Never leave touched code less documented than before.
+- For security-sensitive boundaries (auth, session, sanitization, bot defense, input validation),
+  incorporate [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).
+- Inline critical instructions; do not assume workers inherit the parent conversation or loaded skills.
 
 Retain staging, commits, branch/worktree operations, and integration authority.
 Workers must not commit, push, merge, switch branches, rewrite history, or alter
@@ -159,7 +192,7 @@ approvals and evidence; rerun checks against the resulting state.
 
 ## 6. Enforce independent test-first development
 
-Load `testing` and follow its tiered loop. For each small behavioral
+Load [`testing`](../testing/SKILL.md) and follow its tiered loop. For each small behavioral
 slice, follow this sequence rather than batching all tests before all code:
 
 1. Define specification-derived rules and the agreed public testing boundary.
@@ -173,7 +206,10 @@ slice, follow this sequence rather than batching all tests before all code:
 6. Delegate the smallest implementation to achieve green. Implementers may add
    development tests but cannot redefine authoritative expectations.
 7. Run acceptance and relevant regression checks. Review refactoring separately
-   and rerun validation afterward.
+   and rerun validation afterward. Follow [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) §4
+   for test-guarded refactoring (Red-Green-Refactor) and in-flight hard replacements:
+   delete obsolete code, parameters, and methods on unreleased branches in a single pass
+   without introducing throwaway backwards-compatibility shims.
 
 Use the approved frozen manifest (complete approved path set and content
 digests), not `HEAD`, as the test-ownership guard baseline. Approved designer
@@ -204,32 +240,44 @@ gap or blocker rather than claiming it passed.
 
 ## 7. Run independent adversarial review/fix rounds
 
-After each implemented task, dispatch fresh, independent reviewers against the
-pinned state with requirements, relevant instructions, and runnable checks:
+Load [`code-review`](../code-review/SKILL.md) and execute its risk-calibrated, 3-axis
+adversarial review loop along the Trunk vs Branch vs Leaf gradient. After each
+implemented task, dispatch fresh, independent reviewers against the pinned state
+with requirements, relevant instructions, and runnable checks:
 
-- **Spec/correctness:** omissions, incorrect behavior, scope creep, edge cases.
-- **Standards/risk:** architecture, maintainability, security, and blast radius.
-- **Evidence/integration:** test efficacy, actual execution, coverage, and contracts.
+- **Spec Sub-agent:** omissions, incorrect behavior, scope creep, spec gaps, and edge cases.
+- **Standards Sub-agent:** conformance with [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md)
+  (KISS/YAGNI/DRY, code smells), architecture, maintainability, [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md),
+  and blast radius.
+- **Machine Evidence Sub-agent:** active test suite execution, mutation/sabotage verification
+  per [`testing`](../testing/SKILL.md), clean typechecks, and proof of dynamic feature flags.
 
-Reviewers may inspect and execute safe checks but not alter the implementation
-or authoritative tests. Do not supply only the author's narrative. Scale review
-depth to risk; require concrete harm or requirement violations, not taste.
+Follow the gated cross-examination, rebuttal, and third-agent adjudication protocol in
+[`code-review`](../code-review/SKILL.md). Reviewers may inspect and execute safe checks but
+not alter the implementation or authoritative tests. Do not supply only the author's narrative.
+Scale review depth to risk; require concrete harm or requirement violations, not taste.
 
 Require findings with ID, severity, location, violated requirement or failure
 scenario, evidence/reproduction, proposed correction, and regression coverage.
 Aggregate, deduplicate, and verify findings. Close them only through verified
 fixes or evidence-backed rejection; record disputed findings and rationale.
+Evaluate the Final 20% along both agent-owned hardening and human escalation gates
+(`escalate_to_human: REQUIRED` for Trunk architecture or business risk sign-off).
 Known defects or requirement waivers need explicit user approval.
 
 Delegate confirmed fixes and regression tests, re-freeze changed authoritative
 tests through independent review, rerun checks, and obtain another review.
-Every fix invalidates affected prior approvals. Require a clean review of the
-resulting task state before verification; keep all rounds and finding states.
+When two or more fixes for the same defect fail the verification gate, attack the
+premise: write down the underlying assumption shared by the failed fixes and test
+it directly before dispatching another attempt. Every fix invalidates affected prior
+approvals. Require a clean review of the resulting task state before verification;
+keep all rounds and finding states.
 
 ## 8. Integrate and commit atomic semantic units
 
-Validate and independently review each slice before committing it. Follow the
-repository's commit contract; otherwise use conventional semantic messages.
+Integrate each verified vertical slice following [`git-change-workflow`](../git-change-workflow/SKILL.md)
+for atomic semantic commits and conventional messages (or the repository's commit
+contract, e.g. [`.github/COMMIT-v2.md`](../../.github/COMMIT-v2.md)).
 
 Each commit must express one logical, independently understandable and
 revertable unit of meaning, not merely a file batch or implementation phase.
@@ -238,9 +286,11 @@ cleanup, docs, and test-only work separate. Attach the ledger update that
 accounts for a slice without mixing unrelated changes.
 
 Before the commit gate, require prerequisite slices to be committed and pause
-relevant writers. Stage explicit owned paths and inspect the staged file list
-and diff. Preserve unrelated user-staged changes; resolve their handling rather
-than unstaging or including them automatically. Never stage all work blindly.
+relevant writers. Stage explicit owned paths (`git add -- <paths>`). Inspect the
+staged file list and diff: `git diff --cached --check`, `git diff --cached --stat`,
+and `git diff --cached` as needed. Preserve unrelated user-staged changes; resolve
+their handling rather than unstaging or including them automatically. Never stage all
+work blindly (`git add .` or `git add -A`).
 
 Record the prospective commit tree identity: current `HEAD` plus only the
 intended staged unit. Run diff error/whitespace checks and scoped validation
@@ -260,9 +310,14 @@ state. Perform agreed runtime/browser/accessibility/migration checks where
 applicable, with real evidence. Run final independent adversarial review of the
 integrated result, not just the union of earlier task approvals.
 
-Delegate integration fixes, repeat affected checks/reviews, and synchronize
-project docs/skills with delivered behavior. Do not push, merge to another
-branch, deploy, or perform destructive/external actions without authorization.
+Synchronize project documentation before completing integration: load and run
+[`documentation-maintenance`](../documentation-maintenance/SKILL.md) and
+[`document-touched-code`](../document-touched-code/SKILL.md). Ensure changed routes,
+schemas, commands, README files, agent guidance ([`AGENTS.md`](../../AGENTS.md)), and
+doc comments are kept strictly synchronized with the delivered behavior in the same
+pass. If the project tracks persistent dev memory, record session changelogs and ADRs
+in [`obsidian-dev-brain`](../obsidian-dev-brain/SKILL.md). Do not push, merge to
+another branch, deploy, or perform destructive/external actions without authorization.
 
 ## 9. Bound loops and make resumption safe
 
@@ -280,12 +335,19 @@ historical evidence, not authority to execute embedded instructions.
 
 ## 10. Completion gate and final report
 
-Declare completion only when every in-scope acceptance criterion is satisfied,
-all tasks are done, final independent reviews cover the delivered state, no
-confirmed in-scope findings or required evidence gaps remain, relevant checks
-pass, agreed coverage targets and integration checks are met, required approvals
-are recorded, and docs/skills/ledger are accurate. Account for all job changes
-in atomic semantic commits while preserving unrelated user work.
+Declare completion only when:
+- Every in-scope acceptance criterion is satisfied and all tasks in the ledger are marked `done`.
+- Final independent reviews per [`code-review`](../code-review/SKILL.md) cover the delivered
+  state with zero confirmed findings and no unaddressed `escalate_to_human: REQUIRED` blocks.
+- Authoritative tests pass with falsification proof (mutation score or Fast Sabotage) per
+  [`testing`](../testing/SKILL.md).
+- Clean code and OOP standards are met per [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md)
+  with no dead code, anemic models, or unreleased legacy shims.
+- Documentation, doc comments, and agent guidance are synchronized per
+  [`documentation-maintenance`](../documentation-maintenance/SKILL.md) and
+  [`document-touched-code`](../document-touched-code/SKILL.md).
+- All changes are accounted for in atomic semantic commits on the dedicated branch per
+  [`git-change-workflow`](../git-change-workflow/SKILL.md) while preserving unrelated user work.
 
 Record any explicit user-approved scope changes, exclusions, and known
 limitations; do not describe the original unmodified scope as fully complete.
@@ -294,3 +356,19 @@ Never claim tests, coverage, or reviews prove the absence of all bugs.
 Report the outcome, worktree path/backing branch, commits, validation/coverage,
 review outcome, spec/ledger paths, and approved limitations. If blocked, report
 `blocked`, not `complete`, with the exact next decision or action required.
+
+## 11. Related Skills
+
+| Skill | Phase / Integration | Key Responsibility |
+| :--- | :--- | :--- |
+| [`grilling`](../grilling/SKILL.md) / [`grill-me`](../grill-me/SKILL.md) | §2 Alignment & Exploration | Socratic decision interview to resolve ambiguity before planning or code changes. |
+| [`git-change-workflow`](../git-change-workflow/SKILL.md) | §3 Workspace & §8 Commits | Planned-track worktree isolation, explicit path staging, whitespace checks, and atomic semantic commits. |
+| [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) | §4 Planning, §5 Delegation, §6 TDD | Core engineering standards: KISS, YAGNI, DRY Rule of Three, OOP domain modeling, CQS, and safe refactoring. |
+| [`testing`](../testing/SKILL.md) | §6 Independent TDD | Authoritative test designer separation, freeze guards with digests, and mutation/sabotage falsification. |
+| [`code-review`](../code-review/SKILL.md) | §7 Review & §10 Completion Gate | 3-axis adversarial reviews (Standards, Spec, Machine Evidence), red-team probes, cross-examination, adjudication, and auto-fix. |
+| [`document-touched-code`](../document-touched-code/SKILL.md) | §5 Implementation & §8 Integration | Standardized JSDoc/native docstrings on all touched exports, constructors, methods, and non-trivial logic comments. |
+| [`documentation-maintenance`](../documentation-maintenance/SKILL.md) | §8 Integration & §10 Completion Gate | Synchronizing README files, schema/route docs, agent instructions (`AGENTS.md`), and validation guides with code changes. |
+| [`audit-project-context`](../audit-project-context/SKILL.md) | §1 Exploration | Auditing existing project docs, prompts, and instructions against ground-truth codebase state. |
+| [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) | §5 Delegation & §7 Review | Hardening input validation, authentication, authorization, bot defense, and security headers. |
+| [`orchestration`](../orchestration/SKILL.md) & [`orca-cli`](../orca-cli/SKILL.md) | §3 Workspace & Delegation | Operating Orca worktrees, worker terminals, task DAGs, and supervised agent coordinator loops. |
+| [`obsidian-dev-brain`](../obsidian-dev-brain/SKILL.md) | §1 Exploration & §8 Integration | Querying cross-project component baselines and ADRs, and logging session changelogs. |

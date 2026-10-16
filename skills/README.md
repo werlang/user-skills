@@ -32,7 +32,7 @@ choosing which skill to read.
 | `audit-project-context` | Auditing README files, prompts, skills, agents, and instructions against the actual codebase. | [`SKILL.md`](audit-project-context/SKILL.md) |
 | `code-review` | Risk-calibrated review of a diff (Trunk vs Leaf) on standards, spec, evidence, and launch-readiness, with independent red-team discovery, gated cross-examination plus adjudication, auto-fix with regression tests, and closed-loop re-review until clean. | [`SKILL.md`](code-review/SKILL.md) |
 | `git-change-workflow` | Choosing current-branch fast tracks or dedicated branches with small, focused, atomic commits for larger work. | [`SKILL.md`](git-change-workflow/SKILL.md) |
-| `job-orchestration` | End-to-end delegated jobs with exploration, user grilling, a shared job worktree, independent TDD, adversarial review loops, resumable records, and atomic semantic commits. | [`SKILL.md`](job-orchestration/SKILL.md) |
+| `job-orchestration` | End-to-end delegated jobs with exploration, user grilling, worktree isolation, clean code and OOP standards, independent TDD, adversarial code reviews, synchronized documentation, and atomic semantic commits. | [`SKILL.md`](job-orchestration/SKILL.md) |
 | `testing` | Behavior testing for any code change — tiered Trunk/Branch/Leaf effort, human-anchored oracles, falsification triad, freeze guard, and mutation/sabotage verification. | [`SKILL.md`](testing/SKILL.md) |
 | `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |
 
