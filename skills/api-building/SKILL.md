@@ -1,6 +1,6 @@
 ---
 name: api-building
-description: Build or refactor reusable Node.js APIs using Express, express.Router, ESM imports, named exports, entity classes in model/, helpers for non-endpoint logic, middleware for auth and other pre-route concerns, and route handlers that talk to model instances. Use when creating CRUD APIs, JWT auth flows, bcrypt password login, route modules, or starter API structures.
+description: Build or refactor reusable Node.js APIs using Express, express.Router, ESM imports, named exports, entity classes in model/, helpers for non-endpoint logic, middleware for auth and other pre-route concerns, and route handlers that talk to model instances. Automatically triggers security-defense-and-mitigation for proactive endpoint defense, authentication, authorization, and input validation. Use when creating CRUD APIs, JWT auth flows, bcrypt password login, route modules, or starter API structures.
 ---
 
 # API Building
@@ -44,6 +44,17 @@ src/
 - Keep route logic explicit, but keep persistence and entity behavior inside models.
 - **Maintainability & Simplicity**: Default to simple, direct, non-overengineered code. Avoid unnecessary abstraction layers, duplicate helper functions, or excessive complexity. Keep code robust, safe, performant, and easy to maintain.
 
+## Mandatory Security Defense (Auto-Triggered)
+
+Whenever building or refactoring API endpoints, automatically apply [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) under the Proactive Security Rule:
+
+1. **Authentication & Password Safety**: Hash all passwords with `bcrypt` (work factor ≥12). Secure JWTs with strong signing secrets from environment variables, explicit expiry (`expiresIn: '1h'`), and store tokens in `HttpOnly; Secure; SameSite=Strict` cookies or standard `Authorization: Bearer` headers.
+2. **Authorization & IDOR/BOLA Defense**: Never trust client-supplied resource ownership (e.g. `req.body.userId`, `/users/:id`). Verify that the authenticated session identity matches the target entity's owner before reading, mutating, or deleting rows.
+3. **Input Validation & Sanitization**: Validate all `req.params`, `req.query`, and `req.body` inputs in routes before touching models. Disallow mass assignment (whitelist permitted fields). Reject or sanitize malformed, overlong, or unexpected keys.
+4. **Injection Prevention**: All SQL queries inside models must use parameterized queries via [`mysql-helper`](../mysql-helper/SKILL.md). Never concatenate user input into SQL strings.
+5. **Rate Limiting & Bot Defense**: Apply rate-limiting middleware to auth endpoints (`/login`, `/register`, `/forgot-password`) to prevent brute-forcing.
+6. **HTTP Security Headers**: Apply standard security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options) across API responses.
+
 ## Endpoint Pattern
 
 Prefer this request flow:
@@ -72,4 +83,4 @@ Include a stable, machine-readable `code` string in all 4xx/5xx responses so fro
 
 - Read `references/architecture.md` for the generic architecture rules.
 - Read `references/mini-project/` for a small starter API that follows this structure.
-- Pair this with the [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), `mysql-helper`, `entity-models`, and `web-frontend` skills when needed.
+- Pair this with [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md), [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), [`mysql-helper`](../mysql-helper/SKILL.md), [`entity-models`](../entity-models/SKILL.md), and [`web-frontend`](../web-frontend/SKILL.md) when needed.

@@ -160,6 +160,23 @@ acceptance criteria, relevant instructions/references, exact working directory,
 starting revision, owned files/interfaces, dependencies, forbidden writes,
 required validation, and expected deliverables.
 
+### Automatic Domain-Driven Skill Triggers
+
+Whenever a job or task slice touches a specific technical domain, the orchestrator
+MUST automatically trigger and inject the corresponding domain skills into the brief,
+implementation instructions, and verification gates:
+
+- **Frontend & Page Design Tasks** (new UI pages, redesigns, landing pages, views, layouts, component styles, CSS architecture, user journeys):
+  - Automatically trigger [`frontend-design`](../frontend-design/SKILL.md) for creative direction, typographic pairing, intentional palettes, and anti-template aesthetics; detect existing design systems or codify missing tokens before editing.
+  - Automatically trigger [`impeccable`](../impeccable/SKILL.md) for production-grade UI craft, surface modes (`Persuade` / `Operate` / `Read` / `Experience`), layout polish, responsiveness, micro-interactions, and accessibility standards.
+  - Automatically trigger [`css-standards`](../css-standards/SKILL.md) for shared token ownership, font CSS variables (`var(--font-*)`), scoped component nesting, and brand visual consistency.
+  - Automatically trigger [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to audit end-to-end user journeys, friction, affordances, error states, and browser flows.
+
+- **Backend & API Tasks** (endpoints, controllers, models, database queries, workers, authentication, background processors):
+  - Automatically trigger [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) under the Proactive Security Rule: enforce bot mitigation, secure authentication & session cookies, authorization & IDOR/BOLA defense, multi-tier HTTP security headers (CSP, HSTS, CORS), and strict input validation/output escaping across every endpoint.
+  - Automatically trigger [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) for rich domain entities over anemic models, Single Responsibility, Command-Query Separation (CQS), early returns, and fail-fast typed custom errors.
+  - Automatically trigger [`api-building`](../api-building/SKILL.md), [`entity-models`](../entity-models/SKILL.md), and [`mysql-helper`](../mysql-helper/SKILL.md) when scaffolding or refactoring backend routes, models, and database access layers.
+
 **Worker Engineering & Documentation Standards:**
 - Instruct implementers to strictly adhere to the engineering standards in
   [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md): the Pragmatic Foundation
@@ -171,8 +188,6 @@ required validation, and expected deliverables.
   add or update JSDoc or language-native doc comments on all touched public exports,
   constructors, and class methods, plus focused section comments for non-trivial logic
   invariants. Never leave touched code less documented than before.
-- For security-sensitive boundaries (auth, session, sanitization, bot defense, input validation),
-  incorporate [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).
 - Inline critical instructions; do not assume workers inherit the parent conversation or loaded skills.
 
 Retain staging, commits, branch/worktree operations, and integration authority.
@@ -246,11 +261,20 @@ implemented task, dispatch fresh, independent reviewers against the pinned state
 with requirements, relevant instructions, and runnable checks:
 
 - **Spec Sub-agent:** omissions, incorrect behavior, scope creep, spec gaps, and edge cases.
-- **Standards Sub-agent:** conformance with [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md)
-  (KISS/YAGNI/DRY, code smells), architecture, maintainability, [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md),
-  and blast radius.
+- **Standards Sub-agent:**
+  - *Frontend/UI tasks:* audit visual distinctiveness, token reuse, and type scales per
+    [`frontend-design`](../frontend-design/SKILL.md) and [`css-standards`](../css-standards/SKILL.md);
+    craft floor, layout polish, responsive behavior, accessibility, and surface modes per
+    [`impeccable`](../impeccable/SKILL.md); clean code standards per
+    [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md).
+  - *Backend/API tasks:* audit against [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md)
+    (the 5 core pillars: bot mitigation, secure auth/session cookies, BOLA/IDOR authorization,
+    HTTP security headers, input validation/escaping), OOP domain architecture per
+    [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), and blast radius.
 - **Machine Evidence Sub-agent:** active test suite execution, mutation/sabotage verification
   per [`testing`](../testing/SKILL.md), clean typechecks, and proof of dynamic feature flags.
+  For UI surfaces, demand browser journey verification or headless DOM/a11y tree proof per
+  [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md).
 
 Follow the gated cross-examination, rebuttal, and third-agent adjudication protocol in
 [`code-review`](../code-review/SKILL.md). Reviewers may inspect and execute safe checks but
@@ -343,6 +367,12 @@ Declare completion only when:
   [`testing`](../testing/SKILL.md).
 - Clean code and OOP standards are met per [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md)
   with no dead code, anemic models, or unreleased legacy shims.
+- Frontend tasks satisfy craft, typography, token architecture, and accessibility standards
+  per [`frontend-design`](../frontend-design/SKILL.md), [`impeccable`](../impeccable/SKILL.md),
+  [`css-standards`](../css-standards/SKILL.md), and [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md).
+- Backend and API tasks satisfy defense-in-depth security standards per
+  [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) with no
+  unprotected endpoints, IDOR vulnerabilities, or missing security headers.
 - Documentation, doc comments, and agent guidance are synchronized per
   [`documentation-maintenance`](../documentation-maintenance/SKILL.md) and
   [`document-touched-code`](../document-touched-code/SKILL.md).
@@ -363,12 +393,17 @@ review outcome, spec/ledger paths, and approved limitations. If blocked, report
 | :--- | :--- | :--- |
 | [`grilling`](../grilling/SKILL.md) / [`grill-me`](../grill-me/SKILL.md) | §2 Alignment & Exploration | Socratic decision interview to resolve ambiguity before planning or code changes. |
 | [`git-change-workflow`](../git-change-workflow/SKILL.md) | §3 Workspace & §8 Commits | Planned-track worktree isolation, explicit path staging, whitespace checks, and atomic semantic commits. |
+| [`frontend-design`](../frontend-design/SKILL.md) | §4 Planning, §5 Delegation, §7 Review | Creative direction, typography scales, intentional palettes, and anti-template UI design. |
+| [`impeccable`](../impeccable/SKILL.md) | §5 Delegation, §7 Review, §10 Completion | Production-grade frontend craft: surface modes (`Persuade`/`Operate`/`Read`), responsive polish, accessibility, and micro-interactions. |
+| [`css-standards`](../css-standards/SKILL.md) | §5 Delegation & §7 Review | Token-driven CSS architecture, font CSS variables (`var(--font-*)`), and scoped CSS nesting. |
+| [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) | §7 Review & §10 Completion Gate | End-to-end browser user-journey auditing, UX friction inspection, and accessibility verification. |
 | [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) | §4 Planning, §5 Delegation, §6 TDD | Core engineering standards: KISS, YAGNI, DRY Rule of Three, OOP domain modeling, CQS, and safe refactoring. |
+| [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) | §5 Delegation, §7 Review, §10 Completion | Defense-in-depth across 5 pillars: bot defense, auth/session safety, IDOR/BOLA authorization, security headers, and input validation. |
+| [`api-building`](../api-building/SKILL.md) & [`entity-models`](../entity-models/SKILL.md) | §5 Delegation & §6 TDD | Scaffolding Express routes, middlewares, entity models, and relational data flows. |
 | [`testing`](../testing/SKILL.md) | §6 Independent TDD | Authoritative test designer separation, freeze guards with digests, and mutation/sabotage falsification. |
 | [`code-review`](../code-review/SKILL.md) | §7 Review & §10 Completion Gate | 3-axis adversarial reviews (Standards, Spec, Machine Evidence), red-team probes, cross-examination, adjudication, and auto-fix. |
 | [`document-touched-code`](../document-touched-code/SKILL.md) | §5 Implementation & §8 Integration | Standardized JSDoc/native docstrings on all touched exports, constructors, methods, and non-trivial logic comments. |
 | [`documentation-maintenance`](../documentation-maintenance/SKILL.md) | §8 Integration & §10 Completion Gate | Synchronizing README files, schema/route docs, agent instructions (`AGENTS.md`), and validation guides with code changes. |
 | [`audit-project-context`](../audit-project-context/SKILL.md) | §1 Exploration | Auditing existing project docs, prompts, and instructions against ground-truth codebase state. |
-| [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md) | §5 Delegation & §7 Review | Hardening input validation, authentication, authorization, bot defense, and security headers. |
 | [`orchestration`](../orchestration/SKILL.md) & [`orca-cli`](../orca-cli/SKILL.md) | §3 Workspace & Delegation | Operating Orca worktrees, worker terminals, task DAGs, and supervised agent coordinator loops. |
 | [`obsidian-dev-brain`](../obsidian-dev-brain/SKILL.md) | §1 Exploration & §8 Integration | Querying cross-project component baselines and ADRs, and logging session changelogs. |

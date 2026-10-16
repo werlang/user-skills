@@ -1,6 +1,6 @@
 ---
 name: security-defense-and-mitigation
-description: "Guidelines for secure-by-default coding, bot/malicious actor protection, secure authentication/sessions, authorization & IDOR/BOLA defense, multi-tier HTTP security headers (CSP, Permissions-Policy, HSTS), safe file uploads, secrets/supply-chain security, and input validation/escaping. Use this skill when: (1) implementing security/defense features, (2) adding bot defense (honeypots, rate-limiting, CAPTCHA), (3) configuring authentication/authorization/OAuth/tokens/passwords, (4) configuring CORS or security headers across Web frontends and APIs, (5) preventing IDOR/BOLA or mass assignment, (6) handling file uploads, secrets, or dependencies, (7) implementing or refactoring any client-facing input form/endpoint where validation and escaping are required to prevent attacks (SQLi, XSS, SSRF)."
+description: "Guidelines for secure-by-default coding, bot/malicious actor protection, secure authentication/sessions, authorization & IDOR/BOLA defense, multi-tier HTTP security headers (CSP, Permissions-Policy, HSTS), safe file uploads, secrets/supply-chain security, and input validation/escaping. Automatically activates whenever backend APIs, persistence models, database helpers, or web frontend routes are built or refactored (e.g. api-building, entity-models, mysql-helper, web-frontend)."
 ---
 
 # Security Defense & Mitigation
@@ -9,6 +9,14 @@ This skill provides guidelines and security-by-design standards to protect web a
 
 > [!IMPORTANT]
 > **Proactive Security Rule**: Even when the user does not explicitly request security enhancements, any code changes, refactors, or new features you implement MUST be designed with security in mind. If you are answering questions, you should explicitly call out any defense improvements needed to make the code minimally safe.
+
+## Interlocking Backend & Web Skills (Automatic Activation)
+
+This skill automatically activates and binds defense standards whenever implementing or modifying:
+- [`api-building`](../api-building/SKILL.md): Enforces rate limiting, JWT/session authentication, IDOR ownership checks, input validation DTOs, and zero-trust API security headers (`default-src 'none'`).
+- [`entity-models`](../entity-models/SKILL.md): Enforces mass assignment whitelisting, tenant/user IDOR scoping on queries and mutations, and invariant integrity.
+- [`mysql-helper`](../mysql-helper/SKILL.md): Enforces parameterized SQL queries (`?` placeholders), dynamic column/table whitelisting, and SQL injection prevention.
+- [`web-frontend`](../web-frontend/SKILL.md): Enforces multi-tier security headers (CSP, HSTS, X-Frame-Options), secure cookie attributes (`HttpOnly; Secure; SameSite=Strict`), CSRF protection on forms, and template XSS escaping.
 
 ## Core Security Pillars
 

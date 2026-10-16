@@ -1,6 +1,6 @@
 ---
 name: web-frontend
-description: Build or refactor reusable server-rendered web frontends using Express, render middleware, template variables, page entry files in src/js root, DOM-related component classes in components/, support helpers in helpers/, and API-backed entity classes in models/. Use when scaffolding or reorganizing frontend projects that consume an API through frontend model methods.
+description: Build or refactor reusable server-rendered web frontends using Express, render middleware, template variables, page entry files in src/js root, DOM-related component classes in components/, support helpers in helpers/, and API-backed entity classes in models/. Automatically triggers frontend-design, impeccable, and css-standards when building or styling UI pages, and security-defense-and-mitigation for web security headers, secure cookies, and CSRF protection. Use when scaffolding or reorganizing frontend projects that consume an API through frontend model methods.
 ---
 
 # Web Frontend
@@ -50,8 +50,20 @@ web/
 - Never store application data in DOM `data-*` attributes. Data attributes are for framework selectors and DOM behavior hooks only. All domain data (IDs, values, lookup mappings) must live in dedicated JavaScript structures — plain objects, Maps, or class properties. When rendering a list of selectable items, build a lookup map keyed by element ID or index and resolve data from the map at interaction time instead of reading `getAttribute('data-*')`.
 - **Maintainability & Simplicity**: Default to simple, direct, non-overengineered frontend code. Avoid unnecessary wrapper components, duplicate network requests, or excessive abstraction layers. Keep UI behavior clear, safe, and performant.
 
+## Automatic Companion Skills
+
+- **UI & Page Design**: When building, redesigning, or styling web pages and views:
+  - Automatically apply [`frontend-design`](../frontend-design/SKILL.md) for distinctive creative direction, deliberate typography, and custom palette tokens instead of generic templates.
+  - Automatically apply [`impeccable`](../impeccable/SKILL.md) for production-grade craft, surface-mode execution (`Persuade` / `Operate` / `Read` / `Experience`), responsive polish, accessibility, and micro-interactions.
+  - Automatically apply [`css-standards`](../css-standards/SKILL.md) for shared CSS tokens (`var(--font-*)`), scoped component nesting under `web/src/css/`, and brand consistency.
+  - Run [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to validate end-to-end user journeys and catch friction in the rendered browser view.
+- **Frontend Security & Hardening**: When configuring `web/app.js`, sessions, cookies, or templates:
+  - Automatically apply [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md): enforce multi-tier HTTP security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options), secure session cookie attributes (`HttpOnly; Secure; SameSite=Strict`), CSRF protection on forms, and XSS auto-escaping in templates.
+- **Object-Oriented Architecture**:
+  - Apply [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) when structuring component classes, event listeners, and API model wrappers.
+
 ## References
 
 - Read `references/frontend-structure.md` for the generic structure.
 - Read `references/mini-project/` for a small starter frontend.
-- Pair this with [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) and `css-standards` when designing components and styling the UI.
+- Pair with [`frontend-design`](../frontend-design/SKILL.md), [`impeccable`](../impeccable/SKILL.md), [`css-standards`](../css-standards/SKILL.md), [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), and [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).

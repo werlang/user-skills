@@ -1,6 +1,6 @@
 ---
 name: ui-ux-auditor
-description: End-to-end browser-based UI and UX auditing for any product. Use when a user asks to test a page, feature, journey, release candidate, or interface as a real user would; when validating what existing automated tests cover plus requested scenarios plus adjacent UI breakage risks; or when producing a consultant-style Markdown audit report with findings, evidence, and prioritized UX improvements.
+description: End-to-end browser-based UI and UX auditing for any product. Pairs with frontend-design and impeccable to evaluate aesthetic direction, typography, and visual craft alongside functional testing. Use when a user asks to test a page, feature, journey, release candidate, or interface as a real user would; when validating what existing automated tests cover plus requested scenarios plus adjacent UI breakage risks; or when producing a consultant-style Markdown audit report with findings, evidence, and prioritized UX improvements.
 ---
 
 # UI/UX Auditor
@@ -12,9 +12,10 @@ Run two passes every time:
 
 ## Required Pairing
 
-Always read [../testing/SKILL.md](../testing/SKILL.md) before executing the audit.
-
-If the target has a browser-facing UI, also read [../code-review/references/bug-heuristics.md](../code-review/references/bug-heuristics.md) frontend section.
+- Always read [../testing/SKILL.md](../testing/SKILL.md) before executing the audit.
+- If the target has a browser-facing UI, also read [../code-review/references/bug-heuristics.md](../code-review/references/bug-heuristics.md) frontend section.
+- **Visual & Craft Evaluation**: Automatically pair with [`frontend-design`](../frontend-design/SKILL.md) (to audit creative direction, intentional palette/typography, and identify generic or templated patterns) and [`impeccable`](../impeccable/SKILL.md) (to evaluate surface mode alignment, responsive breakpoints, layout polish, and WCAG color contrast / keyboard affordance).
+- **Style Consistency**: Reference [`css-standards`](../css-standards/SKILL.md) when auditing theme variables, font stacks, and component layout styling.
 
 ## Audit Contract
 

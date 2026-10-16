@@ -1,12 +1,19 @@
 ---
 name: frontend-design
-description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults. Designs within the project's existing design system, or establishes one from the project's existing elements when none exists.
+description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults. Automatically triggers and pairs with impeccable for production craft and surface modes, css-standards for token architecture, and ui-ux-auditor for visual and user-journey auditing. Designs within the project's existing design system, or establishes one from the project's existing elements when none exists.
 license: Complete terms in LICENSE.txt
 ---
 
 # Frontend Design
 
 Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
+
+## Mandatory Companion Skills (Auto-Triggered)
+
+Whenever this skill is triggered for page design, visual identity, or layout work:
+- **Craft & Surface Modes**: Automatically pair with [`impeccable`](../impeccable/SKILL.md) to choose the surface mode (`Persuade` / `Operate` / `Read` / `Experience`), enforce the craft floor, refine responsive behavior, and calibrate accessibility.
+- **Token Architecture**: Automatically pair with [`css-standards`](../css-standards/SKILL.md) to bind visual choices to project tokens (`tokens.css`, `var(--font-*)`, theme variables) and maintain scoped component CSS nesting.
+- **Validation**: Automatically pair with [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to inspect real rendered browser views, friction points, and user journey flows.
 
 ## Ground it in the subject
 

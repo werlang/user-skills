@@ -14,6 +14,7 @@ Use this skill when database access should follow a strict helper-driven pattern
 - The helper's public API should expose methods like `find`, `get`, `insert`, `update`, `delete`, and `dump`.
 - If a low-level executor exists, keep it private to the helper implementation.
 - Prefer a `mysql2/promise` pool manager and `CustomError` wrapper for SQL failures.
+- **SQL Injection Defense**: Always use parameterized queries (`?` placeholders or named parameters) for all dynamic values. Never interpolate or concatenate user-supplied input into SQL strings. When column/table names must be dynamic, validate them against a strict static whitelist per [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).
 
 ## Recommended Shape
 
@@ -26,3 +27,4 @@ Use this skill when database access should follow a strict helper-driven pattern
 
 - Read `references/mysql-helper.md` for the generic rules.
 - Read `references/mini-project/` for a small starter helper and base model.
+- Pair with [`api-building`](../api-building/SKILL.md), [`entity-models`](../entity-models/SKILL.md), and [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).

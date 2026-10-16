@@ -1,11 +1,17 @@
 ---
 name: css-standards
-description: Enforce reusable, brand-aware CSS architecture for public web apps by owning shared tokens in a common stylesheet, importing page entrypoints first, keeping component partials scoped, using native CSS nesting consistently, and following media-query and color-token conventions.
+description: Enforce reusable, brand-aware CSS architecture for public web apps by owning shared tokens in a common stylesheet, importing page entrypoints first, keeping component partials scoped, using native CSS nesting consistently, and following media-query and color-token conventions. Automatically pairs with frontend-design for typographic pairing and palette direction, and impeccable for responsive craft and accessibility.
 ---
 
 # CSS Standards
 
 Use this skill when a frontend project needs a consistent, maintainable CSS architecture for shared tokens, page entry styles, component partials, and brand-driven visual language.
+
+## Automatic Companion Skills
+
+- **Aesthetic Direction & Tokens**: Pair with [`frontend-design`](../frontend-design/SKILL.md) to define intentional palettes, display/body typographic hierarchies, and avoid generic templated defaults.
+- **Craft & Accessibility**: Pair with [`impeccable`](../impeccable/SKILL.md) for surface modes, responsive spacing floors, dark/light theme tokens, and accessible focus states.
+- **Validation**: Pair with [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to visually audit rendered styles and breakpoint transitions in real browser views.
 
 ## Scope
 

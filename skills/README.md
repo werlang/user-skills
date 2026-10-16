@@ -20,10 +20,10 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
-| `api-building` | Reusable Node.js APIs, Express routes, middleware, authentication, and API starter structures. | [`SKILL.md`](api-building/SKILL.md) |
-| `entity-models` | Class-based API entities, relations, persistence methods, and model coordination. | [`SKILL.md`](entity-models/SKILL.md) |
-| `mysql-helper` | MySQL helper layers with public CRUD methods and private query execution. | [`SKILL.md`](mysql-helper/SKILL.md) |
-| `web-frontend` | Server-rendered Express frontends with render middleware, page entries, components, helpers, and API-backed models. | [`SKILL.md`](web-frontend/SKILL.md) |
+| `api-building` | Reusable Node.js APIs, Express routes, middleware, authentication, and API starter structures. Automatically enforces security defense (auth, IDOR, input validation DTOs, rate limiting, security headers) and clean code standards. | [`SKILL.md`](api-building/SKILL.md) |
+| `entity-models` | Class-based API entities, relations, persistence methods, and model coordination. Enforces mass assignment defense and IDOR ownership scoping. | [`SKILL.md`](entity-models/SKILL.md) |
+| `mysql-helper` | MySQL helper layers with public CRUD methods and private query execution. Enforces strict SQL injection defense via parameterized queries and identifier whitelisting. | [`SKILL.md`](mysql-helper/SKILL.md) |
+| `web-frontend` | Server-rendered Express frontends with render middleware, page entries, components, helpers, and API-backed models. Automatically triggers frontend-design, impeccable, and css-standards for UI pages, and security-defense-and-mitigation for headers, cookies, and CSRF. | [`SKILL.md`](web-frontend/SKILL.md) |
 
 ## Review, testing, and delivery
 
@@ -34,7 +34,7 @@ choosing which skill to read.
 | `git-change-workflow` | Choosing current-branch fast tracks or dedicated branches with small, focused, atomic commits for larger work. | [`SKILL.md`](git-change-workflow/SKILL.md) |
 | `job-orchestration` | End-to-end delegated jobs with exploration, user grilling, worktree isolation, clean code and OOP standards, independent TDD, adversarial code reviews, synchronized documentation, and atomic semantic commits. | [`SKILL.md`](job-orchestration/SKILL.md) |
 | `testing` | Behavior testing for any code change — tiered Trunk/Branch/Leaf effort, human-anchored oracles, falsification triad, freeze guard, and mutation/sabotage verification. | [`SKILL.md`](testing/SKILL.md) |
-| `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |
+| `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. Pairs with frontend-design and impeccable for visual craft and aesthetic review alongside functional testing. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |
 
 ## Documentation and agent context
 
@@ -43,7 +43,6 @@ choosing which skill to read.
 | `clean-code-and-oop` | Writing Clean Code, OOP architectures, SOLID principles, and safe refactoring. | [`SKILL.md`](clean-code-and-oop/SKILL.md) |
 | `document-touched-code` | Adding focused JSDoc, docstrings, method comments, and maintainability comments to changed code. | [`SKILL.md`](document-touched-code/SKILL.md) |
 | `documentation-maintenance` | Keeping documentation, agent guidance, comments, and validation instructions synchronized with implementation. | [`SKILL.md`](documentation-maintenance/SKILL.md) |
-| `lesson-learned` | Capturing durable lessons from refactors as `LESSONS.md` checkbox items and promoting them to project-local docs/specs/skills/prompts (auto-invokes on `refactor`, `restructure`, `clean up`, `capture lesson`, `LESSONS.md`). | [`SKILL.md`](lesson-learned/SKILL.md) |
 | `migrate-project-context` | Porting project docs, prompts, skills, and agent instructions into a different repository. | [`SKILL.md`](migrate-project-context/SKILL.md) |
 | `skill-creator` | Designing and scaffolding new Codex skills. | [`SKILL.md`](skill-creator/SKILL.md) |
 | `skill-optimizer` | Iteratively improving, updating, and hardening skills using multi-round adversarial review loops. | [`SKILL.md`](skill-optimizer/SKILL.md) |
@@ -62,10 +61,10 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
-| `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, and responsive conventions. | [`SKILL.md`](css-standards/SKILL.md) |
-| `frontend-design` | Creative direction, visual identity, palette and typography taste, composition, imagery, motion character, and brand voice for frontend interfaces. Works inside the project's existing design system, establishes one from existing project elements when absent, and grills the user on brand-defining calls it cannot infer. | [`SKILL.md`](frontend-design/SKILL.md) |
-| `impeccable` | Production implementation and technical frontend quality: accessibility, responsive behavior, interaction states, performance, maintainability, and validation. | [`SKILL.md`](impeccable/SKILL.md) |
-| `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
+| `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, and responsive conventions. Pairs with frontend-design and impeccable for visual identity and craft. | [`SKILL.md`](css-standards/SKILL.md) |
+| `frontend-design` | Distinctive visual design, typography, custom palettes, and anti-template aesthetics. Automatically triggers and pairs with impeccable, css-standards, and ui-ux-auditor. | [`SKILL.md`](frontend-design/SKILL.md) |
+| `impeccable` | Production implementation and technical frontend quality across visual hierarchy, craft, responsive behavior, and accessibility. Automatically pairs with frontend-design, css-standards, and ui-ux-auditor. | [`SKILL.md`](impeccable/SKILL.md) |
+| `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. Automatically activates for backend APIs, entity models, database helpers, and web frontend routes. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
 | `seo-optimizer` | Auditing, diagnosing, implementing, and verifying technical, on-page, international, content, indexing, structured-data, and performance SEO work. | [`SKILL.md`](seo-optimizer/SKILL.md) |
 
 ## Developer memory

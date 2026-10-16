@@ -15,6 +15,9 @@ Use this skill when entities should be implemented as classes and relationships 
 - Keep relation logic in models or dedicated relation helpers.
 - Keep persistence logic in models and delegate database access to a shared driver helper.
 - Let routes orchestrate request-level work through model instances.
+- **Mass Assignment Defense**: Whitelist explicitly permitted fields on model create/update methods; never assign raw `req.body` directly to database persistence layers per [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md).
+- **IDOR / BOLA Prevention**: Always scope entity query and mutation methods by the authenticated account/tenant ID (`where owner_id = ?`) to ensure unauthorized cross-user access is impossible.
+- **Rich Domain Encapsulation**: Keep validation invariants and domain business rules inside entity methods rather than in anemic data bags per [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md).
 
 ## Relation Pattern
 
@@ -32,3 +35,4 @@ Typical responsibilities:
 
 - Read `references/entity-models.md` for the generic architecture.
 - Read `references/mini-project/` for a small relation-aware example.
+- Pair with [`api-building`](../api-building/SKILL.md), [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md), and [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md).

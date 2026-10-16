@@ -1,6 +1,6 @@
 ---
 name: impeccable
-description: Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Handles UX review, visual hierarchy, information architecture, cognitive load, accessibility, performance, responsive behavior, theming, anti-patterns, typography, fonts, spacing, layout, alignment, color, motion, micro-interactions, UX copy, error states, edge cases, i18n, and reusable design systems or tokens. Also use for bland designs that need to become bolder or more delightful, loud designs that should become quieter, live browser iteration on UI elements, or ambitious visual effects that should feel technically extraordinary. Not for backend-only or non-UI tasks.
+description: Use when the user wants to design, redesign, shape, critique, audit, polish, clarify, distill, harden, optimize, adapt, animate, colorize, extract, or otherwise improve a frontend interface. Covers websites, landing pages, dashboards, product UI, app shells, components, forms, settings, onboarding, and empty states. Automatically pairs with frontend-design for creative direction and typography, css-standards for token architecture, and ui-ux-auditor for browser journey validation.
 version: 4.5.0
 user-invocable: true
 argument-hint: "[shape · audit|critique · animate|bolder|colorize|delight|layout|overdrive|quieter|typeset · adapt|clarify|distill · harden|onboard|optimize|polish · init|document|extract|live|generate] [target]"
@@ -13,6 +13,13 @@ Core principles:
 - Go all out. No hedging, no shortcuts. The deliverable must be complete (except assets the user must provide).
 - Dream big and bold. Distinct, beautiful, outstanding and highly inspiring work.
 - Verify in bounded passes, not a loop, and the ceiling covers the whole cycle: screenshots, defect scans, micro-edits, and rebuilds alike. Build fully, inspect once with a batched round (desktop and mobile together on the web; the shipped device classes on a native platform), fix everything it shows in one batch, confirm with at most one more round, and stop polishing. Open-ended self-QA burns the user's money doing worse what the finish handoffs do better.
+
+## Companion Design Skills
+
+When executing frontend interface work:
+- **Creative Direction**: Pair with [`frontend-design`](../frontend-design/SKILL.md) to establish a distinctive visual identity, deliberate typography, and anti-template aesthetics before refining code.
+- **CSS Architecture**: Pair with [`css-standards`](../css-standards/SKILL.md) to ground spacing, colors, and typography in shared tokens and maintain scoped component CSS nesting.
+- **User Flow & QA**: Pair with [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) for full browser journey verification, edge case exploration, and accessibility audits.
 
 ## Setup
 
