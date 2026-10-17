@@ -67,6 +67,13 @@ choosing which skill to read.
 | `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. Automatically activates for backend APIs, entity models, database helpers, and web frontend routes. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
 | `seo-optimizer` | Auditing, diagnosing, implementing, and verifying technical, on-page, international, content, indexing, structured-data, and performance SEO work. | [`SKILL.md`](seo-optimizer/SKILL.md) |
 
+## Documents and spreadsheets
+
+| Skill | Use it for | Definition |
+| --- | --- | --- |
+| `docx` | Creating, reading, editing, and manipulating Word documents (.docx/.dotx), tracked changes, XML run merging, and comments. | [`SKILL.md`](docx/SKILL.md) |
+| `xlsx` | Creating, editing, and analyzing spreadsheets (.xlsx/.xlsm/.csv), formula recalculation, error validation, and financial modeling. | [`SKILL.md`](xlsx/SKILL.md) |
+
 ## Developer memory
 
 | Skill | Use it for | Definition |
