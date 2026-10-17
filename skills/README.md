@@ -9,6 +9,7 @@ choosing which skill to read.
 | Skill | Use it for | Definition |
 | --- | --- | --- |
 | `agent-browser` | Browser automation CLI workflows, including web pages, Electron apps, exploratory testing, and QA. The entrypoint is a discovery stub; load the installed CLI's current workflow before running commands. | [`SKILL.md`](agent-browser/SKILL.md) |
+| `chrome-browser` | Operating within the user's real Chrome session via the Chrome browser extension (tabs, permissions, recordings, console logs). | [`SKILL.md`](chrome-browser/SKILL.md) |
 | `computer-use` | Inspecting and operating local desktop app windows via Orca computer-use CLI (accessibility trees, screenshots, UI actions). | [`SKILL.md`](computer-use/SKILL.md) |
 | `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
@@ -53,6 +54,7 @@ choosing which skill to read.
 | Skill | Use it for | Definition |
 | --- | --- | --- |
 | `caveman` | Compressing responses into a terse, technically accurate communication style with selectable intensity levels. | [`SKILL.md`](caveman/SKILL.md) |
+| `deep-research` | Multi-source research, topic analysis, and comprehensive report synthesis using coordinated research subagents. | [`SKILL.md`](deep-research/SKILL.md) |
 | `grill-me` | Running a manually invoked relentless interview to sharpen a plan or design. | [`SKILL.md`](grill-me/SKILL.md) |
 | `grilling` | Stress-testing a plan, decision, or idea through a recommended-answer interview. | [`SKILL.md`](grilling/SKILL.md) |
 | `use-spark` | Accessing Spark email, calendar, contacts, and team data via the `spark` CLI. | [`SKILL.md`](use-spark/SKILL.md) |
@@ -71,7 +73,11 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
+| `docs` | Creating, formatting, and collaborating on general editable documents (reports, proposals, SOPs, worksheets). | [`SKILL.md`](docs/SKILL.md) |
 | `docx` | Creating, reading, editing, and manipulating Word documents (.docx/.dotx), tracked changes, XML run merging, and comments. | [`SKILL.md`](docx/SKILL.md) |
+| `google-workspace` | Creating and editing Google Docs, Sheets, Slides, and Drive files via workspace connectors. | [`SKILL.md`](google-workspace/SKILL.md) |
+| `pdf` | Processing PDF files: extracting text and tables, splitting/merging, filling forms, and OCR. | [`SKILL.md`](pdf/SKILL.md) |
+| `pptx` | Creating, editing, and analyzing PowerPoint presentations (.pptx/.potx), slide layout duplication, and visual thumbnail QA. | [`SKILL.md`](pptx/SKILL.md) |
 | `xlsx` | Creating, editing, and analyzing spreadsheets (.xlsx/.xlsm/.csv), formula recalculation, error validation, and financial modeling. | [`SKILL.md`](xlsx/SKILL.md) |
 
 ## Developer memory
