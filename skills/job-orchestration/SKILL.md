@@ -1,14 +1,16 @@
 ---
 name: job-orchestration
 description: >-
-  Orchestrate large jobs end-to-end through exploration, user grilling, worktree
+  Orchestrate large jobs end-to-end through exploration, user grilling with
+  post-grilling per-role model selection across agent harnesses, worktree
   isolation, task planning, clean code and OOP standards, delegated independent-test
   TDD, adversarial code reviews, synchronized documentation, and atomic semantic
   commits. Use when the user asks to orchestrate a job, oversee an entire
   implementation, delegate a multi-agent build, or repeat implementation/review/test
-  cycles until complete. Pairs with grilling, clean-code-and-oop, testing,
-  code-review, git-change-workflow, document-touched-code, documentation-maintenance,
-  and orchestration.
+  cycles until complete. Launch every subagent through Orca using the orca-cli and
+  orchestration skills; if Orca cannot be found or run, warn the user. Pairs with
+  grilling, clean-code-and-oop, testing, code-review, git-change-workflow,
+  document-touched-code, documentation-maintenance, orca-cli, and orchestration.
 ---
 
 # Job Orchestration
@@ -29,7 +31,7 @@ Coordinate with the repository's specialized skills across every phase:
 - [`code-review`](../code-review/SKILL.md) for 3-axis adversarial reviews, red-team probes, and auto-fix loops.
 - [`document-touched-code`](../document-touched-code/SKILL.md) and [`documentation-maintenance`](../documentation-maintenance/SKILL.md) for docstrings, comments, and project documentation consistency.
 - [`git-change-workflow`](../git-change-workflow/SKILL.md) for worktree branching and atomic semantic commits.
-- [`orchestration`](../orchestration/SKILL.md) and [`orca-cli`](../orca-cli/SKILL.md) when executing within managed Orca environments.
+- [`orca-cli`](../orca-cli/SKILL.md) and [`orchestration`](../orchestration/SKILL.md) for launching every subagent through Orca (see section 5); if Orca cannot be found or run, warn the user instead of silently substituting another mechanism.
 
 This methodology supplements rather than replaces runtime guides.
 
@@ -38,7 +40,8 @@ IDs from the available catalog; do not invent model IDs, agent activity, or test
 results. If a required tool/model is unavailable, report the blocker before
 substituting it. Do not silently fall back to doing the entire job yourself.
 
-Defaults: one dedicated job worktree, grilling after exploration, independent
+Defaults: one dedicated job worktree, grilling after exploration followed by a
+per-role model-selection round, Orca-orchestrated subagent dispatch, independent
 test-first development, clean code OOP architecture, adversarial code reviews,
 synchronized documentation, and atomic semantic local commits.
 Continue beyond planning and the first green test run until the completion gate
@@ -76,13 +79,41 @@ when manually invoked) when available and follow its interview process:
   ambiguity is resolved. Do not re-ask decisions the user already supplied.
 - Cover scope and exclusions, reference precedence, compatibility/refactoring
   policy, architecture, public testing boundaries, coverage/validation targets,
-  worker models, isolation, review depth, execution limits, and delivery.
+  isolation, review depth, execution limits, and delivery.
 - Confirm shared understanding before planning or implementation. A confirmed
   design can satisfy an approval gate only for the decisions it actually covers.
 
 If the user explicitly opts out, apply their stated choices and record bounded
 assumptions. Skipping the interview does not authorize destructive actions,
 scope expansion, or bypassing mandatory approvals; escalate blocking ambiguity.
+
+### Per-role model selection round
+
+After the interview confirms shared understanding — or after honoring a stated
+opt-out — ask the user to choose the model for each delegated role before
+planning or implementation:
+
+- Cover each role in turn — implementer, tester/test designer, code reviewers,
+  fixers, documentation workers, and any other worker the job defines — using
+  the same one-question-at-a-time discipline with a recommended choice and
+  rationale per role.
+- Planning stays with the orchestrator itself: do not ask about or delegate a
+  model for the planner/orchestrator role.
+- Selections may span agent harnesses (for example Claude Code, Antigravity,
+  Codex, or OpenCode) and their model catalogs. Identify each choice as a
+  harness plus model ID, or as one harness-wide default per role.
+- Prefer a different harness or model for test-design and review roles than for
+  implementation when suitable options exist; independence strengthens the
+  testing and review gates.
+- Resolve every selection against its harness's actual catalog; never invent
+  IDs, and warn the user instead of silently substituting when a harness or
+  model is unavailable.
+- Record the resolved role → harness/model mapping in the specification and
+  carry it into task records, worker briefs, and the ledger.
+
+Skip the round only when the user already supplied every role's model or
+explicitly declines. On decline, use each harness's default model, record it as
+a bounded assumption, and revisit it when material facts change.
 
 ## 3. Establish the job workspace and records
 
@@ -105,11 +136,13 @@ artifacts, and integration. Separate worktrees are optional for genuine isolatio
 needs, not required per worker. If the user requires one worktree, serialize
 conflicting work rather than creating child worktrees.
 
-For Orca-managed state, load [`orca-cli`](../orca-cli/SKILL.md) and
-[`orchestration`](../orchestration/SKILL.md), then their current runtime guides.
-Verify which worker/isolation modes the runtime supports. If it cannot honor the
-agreed shared-worktree strategy, explain the conflict and get a decision before
-dispatching; do not invent runtime support or bypass its rules.
+Worker dispatch runs through Orca (see section 5): load [`orca-cli`](../orca-cli/SKILL.md)
+and [`orchestration`](../orchestration/SKILL.md), then their version-matched
+runtime guides. Verify which worker/isolation modes the runtime supports. If Orca
+cannot be found or cannot run, warn the user with the exact error before any
+dispatch. If it cannot honor the agreed shared-worktree strategy, explain the
+conflict and get a decision before dispatching; do not invent runtime support or
+bypass its rules.
 
 Do not move/stash user changes automatically or delete worktrees as a cleanup
 shortcut. Child worktrees need not be removed before integration. Preserve the
@@ -136,8 +169,9 @@ implementation, tests, documentation, integration, and final validation.
 Map every acceptance criterion to tasks and verification evidence.
 
 For each task, record an ID, outcome, acceptance criteria, non-goals,
-dependencies, affected interfaces/files, risk, owner/agent ID, permitted write
-scope, testing boundaries, validation commands, and review requirements.
+dependencies, affected interfaces/files, risk, owner/agent ID, assigned
+harness/model, permitted write scope, testing boundaries, validation commands,
+and review requirements.
 
 Use states:
 `planned → ready → implementing → reviewing → fixing → verified → done`
@@ -157,8 +191,28 @@ and enough context for another agent to resume without guessing.
 
 Give every worker a self-contained brief: task ID, requirement/contract,
 acceptance criteria, relevant instructions/references, exact working directory,
-starting revision, owned files/interfaces, dependencies, forbidden writes,
-required validation, and expected deliverables.
+starting revision, owned files/interfaces, dependencies, assigned harness/model,
+forbidden writes, required validation, and expected deliverables.
+
+### Worker dispatch runs through Orca
+
+Every subagent/worker launch goes through Orca using the dedicated skills
+[`orca-cli`](../orca-cli/SKILL.md) for worktrees, terminals, and spawning
+workers, and [`orchestration`](../orchestration/SKILL.md) for task dispatch,
+threaded messages, ask/reply, `worker_done`/escalation waits, decision gates,
+and coordinator loops.
+
+- Resolve the Orca executable once for this session and load each skill's
+  version-matched runtime guide before running Orca commands.
+- Launch each worker on the harness and model assigned to its role in the
+  specification. Never swap in a different harness or model at dispatch time
+  without warning the user and getting a decision.
+- Dispatch each worker brief as a real Orca task in the job worktree; read
+  worker state, messages, and results from the runtime. Never simulate agent
+  activity or substitute a non-Orca subagent mechanism.
+- If Orca cannot be found or cannot run, stop and warn the user with the exact
+  resolution attempts and errors, record the blocker in the ledger, and obtain
+  an explicit decision before falling back to any other subagent mechanism.
 
 ### Automatic Domain-Driven Skill Triggers
 
@@ -391,7 +445,7 @@ review outcome, spec/ledger paths, and approved limitations. If blocked, report
 
 | Skill | Phase / Integration | Key Responsibility |
 | :--- | :--- | :--- |
-| [`grilling`](../grilling/SKILL.md) / [`grill-me`](../grill-me/SKILL.md) | §2 Alignment & Exploration | Socratic decision interview to resolve ambiguity before planning or code changes. |
+| [`grilling`](../grilling/SKILL.md) / [`grill-me`](../grill-me/SKILL.md) | §2 Alignment, Exploration & Model Selection | Socratic decision interview resolving ambiguity, plus the per-role worker model questions, before planning or code changes. |
 | [`git-change-workflow`](../git-change-workflow/SKILL.md) | §3 Workspace & §8 Commits | Planned-track worktree isolation, explicit path staging, whitespace checks, and atomic semantic commits. |
 | [`frontend-design`](../frontend-design/SKILL.md) | §4 Planning, §5 Delegation, §7 Review | Creative direction, typography scales, intentional palettes, and anti-template UI design. |
 | [`impeccable`](../impeccable/SKILL.md) | §5 Delegation, §7 Review, §10 Completion | Production-grade frontend craft: surface modes (`Persuade`/`Operate`/`Read`), responsive polish, accessibility, and micro-interactions. |
@@ -405,5 +459,5 @@ review outcome, spec/ledger paths, and approved limitations. If blocked, report
 | [`document-touched-code`](../document-touched-code/SKILL.md) | §5 Implementation & §8 Integration | Standardized JSDoc/native docstrings on all touched exports, constructors, methods, and non-trivial logic comments. |
 | [`documentation-maintenance`](../documentation-maintenance/SKILL.md) | §8 Integration & §10 Completion Gate | Synchronizing README files, schema/route docs, agent instructions (`AGENTS.md`), and validation guides with code changes. |
 | [`audit-project-context`](../audit-project-context/SKILL.md) | §1 Exploration | Auditing existing project docs, prompts, and instructions against ground-truth codebase state. |
-| [`orchestration`](../orchestration/SKILL.md) & [`orca-cli`](../orca-cli/SKILL.md) | §3 Workspace & Delegation | Operating Orca worktrees, worker terminals, task DAGs, and supervised agent coordinator loops. |
+| [`orca-cli`](../orca-cli/SKILL.md) & [`orchestration`](../orchestration/SKILL.md) | §3 Workspace & §5 Delegation | Launching every subagent through Orca: worktrees, terminal workers, task dispatch, task DAGs, and supervised coordinator loops; warning the user when Orca cannot be found or run. |
 | [`obsidian-dev-brain`](../obsidian-dev-brain/SKILL.md) | §1 Exploration & §8 Integration | Querying cross-project component baselines and ADRs, and logging session changelogs. |

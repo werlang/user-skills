@@ -36,7 +36,7 @@ Save as `docs/orchestration/<job-slug>-spec.md`.
 ## Execution and quality contract
 - Grilling: required/explicitly skipped; shared-understanding confirmation:
 - Worktree strategy and any user override:
-- Implementer/reviewer models and resolved IDs:
+- Per-role worker harness/model assignments and resolved IDs (implementer, tester, reviewers, fixers, docs):
 - Testing boundaries, authoritative test ownership, and approved-manifest freeze guard:
 - Baseline checks and coverage targets/exclusions:
 - Required integration/runtime/browser/migration checks:
@@ -86,7 +86,7 @@ Save as `docs/orchestration/<job-slug>.md`.
 - Acceptance criteria and non-goals:
 - Public contracts and affected files/interfaces:
 - Risk and required approval:
-- Working directory, starting revision, and worker context:
+- Working directory, starting revision, and worker context (harness/model):
 - Required commands/checks:
 - Authoritative tests, reviewer approval, and frozen content digests:
 - Frozen test guard baseline (approved complete manifest, not HEAD):
