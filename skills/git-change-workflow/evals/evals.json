@@ -18,6 +18,24 @@
       "prompt": "The feature is already committed on the task branch, but review found a missing authorization check. Fix it without rewriting history.",
       "expected_output": "Keep the existing task branch, make the focused authorization fix, validate it, and create a new conventional fix(scope): commit rather than amending the prior commit.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Add CSV export to the reports page. This repo has no CONTRIBUTING.md.",
+      "expected_output": "Classify as planned work, offer once to add a CONTRIBUTING.md from references/contributing-template.md filled from the repo's real branches, history and CI; on a yes, commit it on its own as docs; then branch as feat/<slug> from the repo's base branch and make atomic Conventional Commits.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Implement the new billing endpoint. CONTRIBUTING.md says work branches start from dev, scope is required and lists api, web and db as scopes. I have unrelated uncommitted edits in this checkout I don't want touched.",
+      "expected_output": "Follow CONTRIBUTING.md over skill defaults: create an isolated sibling worktree on a feat/<slug> branch based on dev without touching the uncommitted edits, and write commits like feat(api): ... using only the listed scopes.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Commit the staged changes. They contain a bug fix in the parser and an unrelated README rewrite.",
+      "expected_output": "Do not write one compromise message; split into two atomic commits (a fix(<scope>) commit and a docs commit) by staging explicit paths, each with an imperative subject of at most 72 characters.",
+      "files": []
     }
   ]
 }
