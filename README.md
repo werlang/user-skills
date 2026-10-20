@@ -13,7 +13,6 @@ single application, package manifest, or root-level runtime.
 | [`skills/`](skills/) | Reusable skills. Each cataloged skill is a directory with a `SKILL.md` entrypoint. |
 | Skill-local `reference/` or `references/` directories | Focused checklists, templates, examples, and reference implementations used by skills. |
 | Skill-local `scripts/` directories | Optional validation or workflow scripts shipped with a skill. |
-| [`.github/COMMIT-v2.md`](.github/COMMIT-v2.md) | Commit-message convention for this repository. |
 
 ## Skill definitions
 

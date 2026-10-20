@@ -321,8 +321,8 @@ keep all rounds and finding states.
 ## 8. Integrate and commit atomic semantic units
 
 Integrate each verified vertical slice following [`git-change-workflow`](../git-change-workflow/SKILL.md)
-for atomic semantic commits and conventional messages (or the repository's commit
-contract, e.g. [`.github/COMMIT-v2.md`](../../.github/COMMIT-v2.md)).
+for atomic semantic commits and conventional messages, honoring the repository's
+own commit rules (usually `CONTRIBUTING.md`) where it defines them.
 
 Each commit must express one logical, independently understandable and
 revertable unit of meaning, not merely a file batch or implementation phase.
