@@ -18,6 +18,12 @@
       "prompt": "Resume the orchestrated job from its Markdown ledger. It says every task is done, but one worker edited code after the last approval and the integrated test run now fails. The same defect survived three review/fix rounds without progress. Don't stop until no bugs are left; tell me the correct next steps without changing files yet.",
       "expected_output": "Reconcile the ledger with actual worktree, commit/content snapshots, worker changes, and test evidence. Reopen affected tasks and invalidate stale reviews/checks rather than trusting done labels. Do not declare completion or guarantee bug absence. Mark the non-converging issue blocked, record attempted fixes and the exact needed user decision, and continue only safe independent tasks. After a decision, require independent regression coverage, delegated fixes, fresh task and integrated reviews, actual passing checks, and accounted-for atomic semantic commits.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Orchestrate this job: update the marketing page copy and footer styles, add a CSV export to the reports screen, and change how the payment webhook records refunds. Keep it cheap — I don't want seven agents per task. Show me the plan with your review and testing depth per task before starting.",
+      "expected_output": "Tier tasks by blast radius: copy/styles as Leaf, CSV export as Branch (or Leaf only if it touches no PII), payment webhook as Trunk because it involves money. Leaf gets implementer-written tests and one batched reviewer; Branch gets an independent Test Designer, manifest freeze, Fast Sabotage, and one combined reviewer; Trunk gets the full code-review protocol, independent test review, and mutation or sabotage. The orchestrator runs test commands itself, links a shared context digest instead of re-pasting context, plans parallel waves with disjoint write scopes, and states that a full adversarial review of the integrated diff runs at the end regardless of task tiers. Do not drop Orca dispatch, worktree isolation, or atomic commits to save cost.",
+      "files": []
     }
   ]
 }
