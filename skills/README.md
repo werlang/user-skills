@@ -15,7 +15,6 @@ choosing which skill to read.
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
 | `orca-cli` | Operating Orca-managed worktrees, terminals, repos, automations, artifacts, and the embedded browser via the public `orca` CLI. | [`SKILL.md`](orca-cli/SKILL.md) |
 | `orchestration` | Structured multi-agent coordination via Orca orchestration (threads, task DAGs, coordinator loops, decision gates). | [`SKILL.md`](orchestration/SKILL.md) |
-| `socraticode` | Searching code structure, symbols, dependencies, impact, execution flows, and non-code context. | [`SKILL.md`](socraticode/SKILL.md) |
 
 ## API and application structure
 
