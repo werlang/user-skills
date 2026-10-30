@@ -41,6 +41,7 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
+| `bootstrap-project-skills` | Bootstrapping or refreshing a repository's own project skills from the global ones: picking the relevant globals, localizing each to the codebase's verified facts and deviations, indexing and verifying them. | [`SKILL.md`](bootstrap-project-skills/SKILL.md) |
 | `clean-code-and-oop` | Writing Clean Code, OOP architectures, SOLID principles, and safe refactoring. | [`SKILL.md`](clean-code-and-oop/SKILL.md) |
 | `document-touched-code` | Adding focused JSDoc, docstrings, method comments, and maintainability comments to changed code. | [`SKILL.md`](document-touched-code/SKILL.md) |
 | `documentation-maintenance` | Keeping documentation, agent guidance, comments, and validation instructions synchronized with implementation. | [`SKILL.md`](documentation-maintenance/SKILL.md) |
