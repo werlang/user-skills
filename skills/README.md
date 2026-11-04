@@ -68,6 +68,7 @@ choosing which skill to read.
 | `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, and responsive conventions. Pairs with frontend-design and impeccable for visual identity and craft. | [`SKILL.md`](css-standards/SKILL.md) |
 | `frontend-design` | Distinctive visual design, typography, custom palettes, and anti-template aesthetics. Automatically triggers and pairs with impeccable, css-standards, and ui-ux-auditor. | [`SKILL.md`](frontend-design/SKILL.md) |
 | `impeccable` | Production implementation and technical frontend quality across visual hierarchy, craft, responsive behavior, and accessibility. Automatically pairs with frontend-design, css-standards, and ui-ux-auditor. | [`SKILL.md`](impeccable/SKILL.md) |
+| `security-audit` | Security guidance and vulnerability review across codebases, APIs, services, CLI tools, libraries, and daemons. Runs the full six-phase audit workflow only for explicit audit, pen-test, or report-artifact requests. | [`SKILL.md`](security-audit/SKILL.md) |
 | `security-defense-and-mitigation` | Authentication, authorization, bot defense, security headers, validation, escaping, and secure defaults. Automatically activates for backend APIs, entity models, database helpers, and web frontend routes. | [`SKILL.md`](security-defense-and-mitigation/SKILL.md) |
 | `seo-optimizer` | Auditing, diagnosing, implementing, and verifying technical, on-page, international, content, indexing, structured-data, and performance SEO work. | [`SKILL.md`](seo-optimizer/SKILL.md) |
 
