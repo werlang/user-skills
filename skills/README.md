@@ -13,6 +13,7 @@ choosing which skill to read.
 | `computer-use` | Inspecting and operating local desktop app windows via Orca computer-use CLI (accessibility trees, screenshots, UI actions). | [`SKILL.md`](computer-use/SKILL.md) |
 | `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
+| `herdr` | Controlling a Herdr terminal multiplexer session from inside a Herdr-managed pane: agents, panes, tabs, workspaces, saved SSH machines, and output reads. | [`SKILL.md`](herdr/SKILL.md) |
 | `orca-cli` | Operating Orca-managed worktrees, terminals, repos, automations, worktree comments, and the embedded browser via the public `orca` CLI. | [`SKILL.md`](orca-cli/SKILL.md) |
 | `orchestration` | Structured multi-agent coordination and dispatched-worker duties via Orca orchestration (threads, task DAGs, coordinator loops, decision gates). | [`SKILL.md`](orchestration/SKILL.md) |
 
