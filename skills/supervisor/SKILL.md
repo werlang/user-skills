@@ -7,186 +7,185 @@ description: Supervise one coding agent working in another terminal, session, or
 
 ## Position
 
-One supervisor, one worker. The worker types; you frame, judge, and accept. A
-supervisor's cost is its turns, so spend them on decisions rather than on
-elapsed time.
+One supervisor, one worker. The worker types; you frame, judge, and accept.
+Spend your turns on decisions, not on elapsed time.
 
-This is the lean counterpart of [`job-orchestration`](../job-orchestration/SKILL.md)
-(one job, full ceremony) and of a fleet distro such as firstmate (many workers,
-disk state, zero-token supervision). Move to `job-orchestration` when the change
+Do the work directly, without supervising, when either holds:
+
+- The change is smaller than its brief: writing the brief costs more than the
+  change.
+- Nothing can block on the worker for you. Without `hc wait`, `herdr agent
+  wait`, or a background subagent that notifies on completion, you would poll in
+  turns, which is the expensive failure this skill exists to avoid.
+
+Move to [`job-orchestration`](../job-orchestration/SKILL.md) when the change
 touches auth, money, migrations, or a shared public contract, or when more than
-about four workers must negotiate the same files.
+three workers must run. Independent tasks that should run in parallel also go
+there; this skill runs them one after another.
 
 ## The one rule
 
 > Take a turn when the decision could change what gets committed.
 
 Four things qualify: **framing**, **judgement**, **authority**, **escalation**.
-Everything else is a script, a status file, or the worker's job. If you are
-reading a terminal to learn whether something is still running, you have already
-broken this rule.
+Everything else is a script, a status file, or the worker's job. Reading a
+terminal to learn whether something is still running means the rule is broken.
 
 ## 1. Isolate before the worker types
 
-Choose isolation by how the project validates, not by taste:
+Every job lives on a new work branch, and every worker gets its own worktree.
+Follow the user's or project's branch, commit, and integration rules; load
+[`git-change-workflow`](../git-change-workflow/SKILL.md) when they are unclear.
 
-- Validation runs on the host (`node`, `npx`, `tsc`, `pytest`) → give the worker
-  a worktree: `git worktree add .worktrees/<task> -b fm/<task>`.
-- Validation runs inside a container that bind-mounts the checkout, or the repo
-  has no commit yet → create the baseline commit first and use a branch in the
-  main tree. A fresh worktree is invisible to that container, so the worker's
-  "tests pass" would come from a tree it did not edit.
-- No repository at all → `git init` and commit the current state. A baseline
-  commit is still a revert point, and without one you cannot answer "what did the
-  agent change".
+1. **Baseline.** No commit yet → commit the current state first; no repository →
+   `git init` and commit. Without a base commit there is no diff base.
+2. **Work branch.** `git branch <type>/<slug> <base>`, without switching the
+   user's checkout.
+3. **Worker worktree.** `git worktree add .worktrees/<task> -b <type>/<slug>-<task> <type>/<slug>`.
+   Keep `.worktrees/` ignored (`.git/info/exclude` when the project's
+   `.gitignore` should not change).
+4. **Validation must see the worktree.** If validation runs in a container that
+   bind-mounts the main checkout, point it at the worktree first. If that is
+   impossible, say so in the brief and validate only after the merge.
 
-The worker never commits, never switches branches, never stashes. You commit
-after each accepted round, one commit per round, so every review has a diff base
-and the user has a revert point. Load
-[`git-change-workflow`](../git-change-workflow/SKILL.md) when the branch, commit,
-or delivery policy is unclear.
+The worker never commits, switches branches, or stashes. After each accepted
+round you commit in the worker's worktree: atomic Conventional Commits, one
+logical change each, unless the user's or project's rules say otherwise.
 
-Read the installed terminal CLI's own manual before driving it (`hc --skill`,
-`herdr --help`); do not guess syntax from another version. Use
-[`herdr`](../herdr/SKILL.md) when the target is a Herdr-managed pane.
+**Close the job.** After the final review passes:
+
+1. Merge each worker branch into the work branch (default `git merge --no-ff`).
+   Resolve conflicts yourself, or send them back as a round.
+2. Re-run the validation command on the work branch.
+3. Remove each worktree (`git worktree remove`), delete each merged worker
+   branch (`git branch -d`), and run `git worktree prune`.
+4. Close the watcher and worker terminals you created.
+5. Delete the status file only after the report below is delivered.
+
+The work branch stays unmerged into the user's branch and is not pushed. Integrating
+it is the user's decision.
+
+Read the installed terminal CLI's manual (`hc --skill`, `herdr --help`) before
+driving it. Use [`herdr`](../herdr/SKILL.md) for Herdr-managed panes.
 
 ## 2. Brief before you spawn
 
-Write the brief before the worker exists; see
-[`references/brief.md`](references/brief.md) for the template. The eight fields
-are not optional: outcome, acceptance criteria, owned files, forbidden writes,
-validation command, evidence format, model and effort, round cap.
+Write the brief first; the template is in
+[`references/brief.md`](references/brief.md). Its eight fields are required.
 
-Deliver it as the worker's **first message**, not as a follow-up send. A send to
-a booting agent can be dropped, and a worker that starts without the contract
-will invent one. `hc` templates (`~/.config/herdr-core/templates/<name>.md`)
-already fold standing instructions, a model-bearing `command`, and the task into
-that first message.
+**Preflight.** Before the worker starts, run the validation command in the fresh
+worktree and record the exit code and any tests already failing. This catches a
+missing database or container before a round is spent, and gives "tests pass" a
+baseline.
 
-Choosing the model is part of dispatch. Discovering it after the first rejected
-round costs a round; ask the worker only for what the brief failed to say.
+Deliver the brief as the worker's **first message**. A send to a booting agent
+can be dropped. Choose the model at dispatch, not after round one.
 
-## 3. One status file
+## 3. One status file, claims and verdicts
 
-Have the worker append, never rewrite, one line per event to
-`state/<task>.status`:
+Each task has one append-only file, `.worktrees/state/<task>.status`, outside the
+worker's tree, so it is never committed. The worker appends claims; the
+supervisor appends verdicts. Nobody rewrites a line.
 
-```text
-working: <what>
-done: <what changed, validation command, result>
-blocked: <obstacle>
-needs-decision: <key> <question>
-paused: <what you await> until <ISO 8601>
-```
+Worker: `working:`, `done:`, `blocked:`, `needs-decision: <key> <question>`,
+`paused: … until <ISO 8601>`. Supervisor: `accepted: <commit> — <what>`,
+`rejected: <n> open — <findings>`, and `stalled: <ISO 8601>` when the watcher
+confirms a stall.
 
-Read the tail instead of scrolling a terminal, and treat it as the resumable
-record: it is what lets a second session pick this up without re-deriving the
-task. It is also the only place a decision key exists, so the same question is
-not re-asked three rounds later.
+Read the tail, never the terminal history. The file is the resumable record: it
+shows what was claimed, what was judged, and which decision keys exist.
 
-## 4. Watch with a script, not with turns
+## 4. Wait by blocking, not by turns
 
-Waiting is a predicate, not a conversation. Poll:
+The worker must stop when it needs you. After writing `blocked:` or
+`needs-decision:`, it ends its turn. The blocking wait then returns, and nothing
+depends on the status file being polled.
 
-- `hc get <t> --json` → `.status.state` (`working`, `idle`, `done`, `blocked`)
-  and `.turn`
-- `hc read <t> --lines 0` → hash the visible screen (history reads are refused
-  while the worker is busy, which is fine: the screen *is* the liveness signal)
-- worktree file mtimes inside the current window → is it writing?
-- the status tail → verbs
+- `hc wait <t>` (or `hc send <t> <text> --wait`) for an `hc` terminal.
+- `herdr agent wait <name>` for a Herdr pane.
+- A background subagent notifies on completion; it needs no watcher.
 
-Wake the supervisor only on: screen change, fresh writes, `blocked`, a
-`needs-decision:` line, `done`, or an unchanged screen past a stall threshold
-with no writes. Everything else stays silent. Run the watcher in its own
-terminal (`hc run --bg`) so it outlives the turn, and use `hc wait --children
-any` rather than sleeping.
+Use a watcher only to catch a stall, which no blocking wait sees. Run it with
+`hc run --bg` so it outlives the turn. Its rule:
 
-An unchanged screen, no writes, and `working` is not busy — it is stuck. That
-distinction is the watcher's whole job.
+- Screen changes (`hc read <t>`, hashed), new worktree writes, and new status
+  lines reset its stall timer. They never wake you.
+- A stall is confirmed when the screen is unchanged, nothing is written, and no
+  status line appears for **10 minutes** while the last line says `working:`.
+  Put a different threshold in the brief when the task is known to be slow.
+- On confirmation, the watcher appends `stalled:` and exits. Its exit is what
+  wakes the supervisor, through `hc wait --children any`.
+
+An unchanged screen with no writes and a `working:` line is stuck, not busy.
 
 ## 5. Review by proof, not by reading
 
-A round is accepted on evidence you produced, not on a summary you received.
-Every round, all four:
+Accept a round only on evidence you produced. Check in order and stop at the
+first failure:
 
-1. Run the validation command yourself and record the exit code.
-2. Open every screenshot at full size and describe what is visible.
-3. Re-run every number the worker claims — timings, counts, coverage.
-4. Map every finding from the previous round to a diff hunk, or mark it
-   unaddressed.
+1. Run the validation command yourself and record the exit code. Non-zero →
+   append `rejected:` and send the round back. Stop here.
+2. Re-run every number the worker claims: timings, counts, coverage.
+3. Map each finding from the previous round to a diff hunk, or mark it unaddressed.
+4. Only when the mechanical checks pass and a criterion is visual, open the
+   screenshot at full size. Otherwise the `shot:` hash and sentence are enough.
 
-When a claim is hard to verify, demand proof by action rather than assertion:
-"type into the field without clicking first, then screenshot it" settles in one
-round what three rounds of prose cannot.
+Demand proof by action when a claim is hard to verify: "type into the field
+without clicking, then screenshot it" settles in one round what prose cannot.
+
+**Context budget.** Read the status tail, the evidence block, and the diff for
+the current round. Do not reread earlier transcripts, earlier diffs, or the full
+worker terminal. Use the status file as the record of earlier rounds.
 
 ## 6. Who reviews
 
-Three scopes, one rule: **the worker never reviews; independence lives in the
-evidence, not in the reviewer's identity.**
+The worker never reviews. The check on each round is yours, against evidence,
+and it checks conformance to the brief first, not correctness. That limit is
+accepted.
 
-- **Each round — you, in session, by proof.** You wrote the brief, so you will
-  check conformance before correctness; the four checks above are what keep you
-  honest.
-- **The finished diff — once, fresh.** Dispatch a reviewer that never saw the
-  rounds, with only the brief, the diff from base, and the validation commands.
-  A subagent with a clean context is enough for Leaf and Branch work; use a
-  separate session on a **different model family** for Trunk, because a second
-  run of the same model reproduces the same blind spots.
-- **Trunk, or any final pass you intend to defend — [`code-review`](../code-review/SKILL.md).**
-  Run its full protocol instead of improvising.
+- **Each round:** you, by proof (above).
+- **Finished diff, once:** a reviewer that has never seen the rounds, given only
+  the brief, the diff from base, and the validation commands. For Leaf and Branch
+  work, a clean-context subagent is enough. For Trunk, use a different model
+  family, since the same family repeats the same blind spots.
+- **Trunk, or any final pass you will defend:** run [`code-review`](../code-review/SKILL.md).
 
-Two failed fixes on the same finding means you are defending a diagnosis. Stop
-and put fresh eyes on that single finding. Never dispatch a fresh reviewer per
-round, and never feed one your narrative — that is a rubber stamp with better
-vocabulary.
+## 7. Bound the loop
 
-## 7. Bound the loop and the blast radius
+One loop bound: **three rounds without net progress** → stop, write `blocked:`
+naming the single decision the human must make, and wait. "Net progress" means
+the open-finding count went down or a previously open finding closed; renaming a
+finding does not count.
 
-- Three rounds without the finding count actually dropping → stop, write
-  `blocked:`, and name the single decision the human must make. Renaming a
-  finding does not reset the counter.
-- Label the worker's terminal at spawn (`hc label <t> task=<id>`) and refuse to
-  send to a terminal whose label does not match. Never type into an unlabeled
-  terminal, and never start work from a stale address.
-- The worker uses only its own tabs and panes. Splitting or closing another
-  agent's surface is a coordination incident, not a convenience.
+Exception: two failed fixes on the same finding → stop that finding and put a
+fresh reviewer on it alone. Do not feed that reviewer your narrative.
+
+Targets are fixed too. Label the worker's terminal at spawn (`hc label <t>
+task=<id>`). Check the label with `hc get <t>` before each send and refuse to send
+on a mismatch. Touch only your own tabs and panes.
 
 ## Model allocation
 
 | Work | Model |
 | --- | --- |
-| Detecting, waiting, classifying | none — a script |
+| Detecting, waiting, classifying | none — a script or a blocking wait |
 | Implementation, well specified, cheap to verify | fast/cheap |
 | Implementation, UI fidelity or an unfamiliar API | mid or strong |
 | Framing, judgement, authority, escalation | strongest available |
-| Final review, Trunk | fresh, different family |
+| Final review, Trunk | different family |
 
 ## Report to the human
 
-State the outcome, the evidence you ran yourself, and what you did **not**
-verify. Never narrate waiting. If you did not open it, run it, or read it, say so
-in one line rather than implying coverage.
+State the outcome, the work branch and its commits, the evidence you ran
+yourself, and what you did **not** verify. Confirm the cleanup: no worktree,
+worker branch, terminal, or status file of this job remains. Never narrate
+waiting. If you did not open, run, or read something, say so in one line.
 
-## Skills to load
+## References
 
-Load these when the round touches them, and name them in the brief so the worker
-loads them too.
-
-| The work touches | Load |
-| --- | --- |
-| UI, layout, visual craft, a11y | [`frontend-design`](../frontend-design/SKILL.md), [`impeccable`](../impeccable/SKILL.md), [`css-standards`](../css-standards/SKILL.md); the final reviewer adds [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) |
-| Endpoints, auth, sessions | [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md), [`api-building`](../api-building/SKILL.md) |
-| Models, database access | [`entity-models`](../entity-models/SKILL.md), [`mysql-helper`](../mysql-helper/SKILL.md) |
-| Any code | [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md), [`document-touched-code`](../document-touched-code/SKILL.md) |
-| Tests, or a bug fix | [`testing`](../testing/SKILL.md) |
-| Branch, commits, delivery | [`git-change-workflow`](../git-change-workflow/SKILL.md) |
-| Final or Trunk review | [`code-review`](../code-review/SKILL.md) |
-| Docs drifted from the code | [`documentation-maintenance`](../documentation-maintenance/SKILL.md), [`audit-project-context`](../audit-project-context/SKILL.md) |
-
-## Failure modes seen in practice
-
-- Sending the task to an agent that is still booting, then assuming it arrived.
-- Discovering the worker's model and effort after round one.
-- Treating a passing load check as proof the feature works.
-- Accepting "done" whose evidence contradicts the screenshot.
-- Spending premium turns on "still working, waiting again".
+- [`references/brief.md`](references/brief.md): the worker brief, the evidence
+  format, and the status-line examples.
+- [`references/skill-map.md`](references/skill-map.md): which skills to name in
+  the brief for each kind of work.
+- [`references/failure-modes.md`](references/failure-modes.md): known ways
+  supervision goes wrong.
