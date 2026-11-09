@@ -17,7 +17,8 @@ message. A follow-up send races the boot and can be dropped.
    when the outcome requires it, and then say so in the status file.
 5. **Validation command** — the exact command and the directory it runs in,
    plus the supervisor's preflight result on the untouched worktree (exit code
-   and tests already failing).
+   and tests already failing). Name the whole command set: a round may add to it,
+   never shrink it.
 6. **Evidence format** — below.
 7. **Model and effort** — chosen at dispatch.
 8. **Round cap** — three rounds without net progress ends the task. Also state
