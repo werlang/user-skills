@@ -78,8 +78,18 @@ worktree and record the exit code and any tests already failing. This catches a
 missing database or container before a round is spent, and gives "tests pass" a
 baseline.
 
+**Read the brief as the build will.** Every version it names must agree with
+every other one — a compile-SDK floor against the dependencies that demand a
+higher one, a Kotlin minimum against the artifacts, a Gradle minimum against the
+plugin. A contradiction costs a full build round. Also name the exact validation
+command, so a later round cannot quietly shrink it.
+
 Deliver the brief as the worker's **first message**. A send to a booting agent
-can be dropped. Choose the model at dispatch, not after round one.
+can be dropped, and a CLI that self-updates on start eats the first Enter, so the
+text can sit in the input box looking delivered. Send the text, send Enter as its
+own keystroke, then confirm the agent is working: a first `working:` line in the
+status file, or a visible working state. Do not count an unconfirmed dispatch as
+a started job. Choose the model at dispatch, not after round one.
 
 ## 3. One status file, claims and verdicts
 
