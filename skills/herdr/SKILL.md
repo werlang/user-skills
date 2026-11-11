@@ -201,6 +201,35 @@ Use `--format ansi` when colors and terminal styling are evidence. Otherwise use
 
 If a larger recent read still does not reveal the completed response, ask the agent to write it as Markdown in a temporary directory and reply only with the file path, then read that file on the same machine. Use this only as a fallback; do not request file output in the initial prompt.
 
+## Install, update, and the core
+
+Two things share the name, and mixing them up wastes a whole session:
+
+- `herdr` — the TUI client that owns workspaces/tabs/panes and exposes every command above. The `HERDR_ENV=1` gate applies to it.
+- `herdr-core` — the detached server that actually owns the terminals. Separate binary, reached through the `hc` alias (`hc --version` prints `hc <x.y.z>`). It runs as `herdr-core serve` with a per-session socket in `/run/user/<uid>/herdr-core/` and state in `~/.local/state/herdr-core/<session>/terminals.json`, and it outlives any client. Another machine attaches to a core by running `herdr-core connect` over ssh.
+
+Command surface, update semantics and state layout: `references/core-cli.md`.
+
+Before installing, updating or reinstalling anything called "herdr" on a host, inventory first and say what you found — the ask usually names only one of the two components:
+
+```bash
+command -v herdr hc herdr-core; hc --version; ps -eo pid,cmd | grep '[h]erdr'
+```
+
+Installing or updating a core does not upgrade a running client and vice versa; a client/server version split is normal and is not a fault to repair. Do read-only discovery before any state change, so a course correction costs nothing.
+
+A dangling `/usr/local/bin/herdr` symlink pointing at a missing `~/.local/bin/herdr` means only the core is present. The tell is `herdr --version` failing with `No such file or directory` rather than `command not found`: the link exists, its target does not. Do not report that as a broken core install.
+
+### Installing a core for a remote client
+
+A host that a *client* drives — a phone app, another machine, an editor plugin — is one install plus two proofs. Commands and per-flag detail: `references/core-cli.md`.
+
+- Install with the official installer, never a copied binary: `curl -fsSL https://releases.herdr.dev/core/install.sh | sh` checks the release manifest and the tarball's sha256, writes `~/.local/bin/herdr-core` and the `hc` link, and deliberately does not start a core on a fresh install.
+- **`PATH` is the usual failure, and it looks like a missing core.** A client connecting over SSH runs `hc connect` through an exec channel: no login shell, so `~/.profile` never runs, `~/.local/bin` is absent, and the client reports "core not found" or just an unreachable machine. Link the launcher where every shell looks (`sudo ln -sf "$HOME/.local/bin/hc" /usr/local/bin/hc`) and prove it on a fresh connection with `ssh host 'command -v hc'` — not in the shell where you just installed it.
+- Prove the protocol, not the version string: `printf '{"jsonrpc":"2.0","id":1,"method":"hello"}\n' | hc connect` must answer with the `generation` the client requires (an exact value, `1` today) and the `methods` it calls. That gate is usually the generation number alone — a newer `hc` that keeps `generation 1` is compatible even though the version string moved.
+- Then round-trip the methods that client actually calls on one channel, because `hello` can answer while a method is missing or stream-only: `terminal.run` (pass `no_parent`/`no_notify`) → `terminal.send` → `terminal.read` (its `text` must contain what you sent) → `terminal.rm`; plus `doc.get`/`doc.set` and `machine.exec` if the client uses them. `machine.exec` returns **base64** `stdout`/`stderr`; `doc.get` answers `version: 0` for a never-written document.
+- A `terminal.run` name stays taken while that terminal lives: a probe left behind by an earlier attempt makes the next run fail with `kind: name_taken`, so `hc kill <name>` / `hc rm <name>` first and clean up everything you created before reporting. Compare response shapes (`terminal.interrupt` → `{"key": …, "outcome": …}`) against the client's recorded fixtures rather than assuming a minor version kept them.
+
 ## Safety and coordination rules
 
 - Use `--no-focus` for background work unless the user asked to switch context.

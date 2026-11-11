@@ -95,13 +95,37 @@ If review or validation finds a defect after a commit:
 - If the commit is unpushed and unreviewed, you may fold the fix into it (`git commit --amend` for the latest commit, or `git commit --fixup=<sha>` then `git rebase --autosquash` before pushing).
 - If the commit has been pushed, reviewed, or is part of an orchestrated job, make a new focused `fix(...)` commit; never rewrite it.
 
+## Solo-maintained repository: land without pull requests
+
+A pull request exists to carry a review across people. When the user is the only developer and says so — "why PRs, you
+can just commit and merge" — the object adds a queue and a second CI cycle per change and buys no check. Keep the gate,
+drop the ceremony:
+
+1. Commit the slice on a short branch (`feat/…`, `fix/…`, `chore/…`) exactly as in the planned track.
+2. Push the branch and make CI run on it. Check the workflow trigger first: with `on: push: branches: [main]` a branch push
+   runs nothing, so there is no way to verify before landing — extend the trigger to the branch prefixes. Saying "CI is the
+gate" while the gate only fires after the merge is the mistake this step exists to prevent.
+3. Wait for the branch run, then land with `git checkout main && git pull --ff-only && git merge --ff-only <branch> && git
+   push` and delete the branch (`git push origin --delete <branch>`, `git branch -d <branch>`). Fast-forward only, so
+   history stays linear and no merge commit obscures which change did what.
+4. Prove the landing before anything reads it — a tag, a release, a deploy: `git log --oneline -1` on the merged default
+   branch and the version file in that tree. A `git merge` whose output you did not read, or a `gh pr merge` that exits 0
+   while printing an administrator-privileges notice, both leave the default branch untouched.
+5. Keep the pull request for changes that want an opinion CI cannot give: security-sensitive code, crypto, signing,
+   permissions, anything a reviewer bot or a human would inspect line by line.
+
+If the user prefers pushing straight to the default branch, do it — that is their call — but say the trade-off in one line:
+the checks then run after the merge, and a red one means fixing forward on top of what is already published. Prefer
+branch + fast-forward whenever the user has not asked for direct pushes, because it keeps verification before landing at
+no extra cost.
+
 ## Integration
 
 Merge only when the user asks. Unless the repository says otherwise:
 
 - Merge a finished branch into its base with `git merge --no-ff <branch>` so the atomic commits stay intact and grouped. Do not squash them away.
 - Resolve conflicts by preserving both sides' intent, rerun validation, and report what was resolved.
-- Delete the merged local branch only when the user agrees.
+- Delete the merged local branch only when the user agrees. `git branch -d` refuses when the branch tip is a merge commit that reached the base under a different sha, even with identical content: check `git diff --stat <base>...<branch>` — an empty diff means the trees match, so `-D` is safe, and say why in the report instead of leaving a stale branch behind.
 
 ## Handoff
 
