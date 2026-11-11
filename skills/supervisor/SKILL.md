@@ -184,6 +184,26 @@ on a mismatch. Touch only your own tabs and panes.
 | Framing, judgement, authority, escalation | strongest available |
 | Final review, Trunk | different family |
 
+**The conversation and the decision are separate cost centres.** Keep the chat
+session on the cheap model — exploration, ops, environment work and single
+mechanical edits live there — and when an intent becomes a delivery, run the
+deciding turn as one dedicated one-shot call on the strongest reasoner (whichever
+non-interactive entry point your agent CLI offers: `claude -p`, `codex exec`, or
+the host agent's own one-shot flag), then hand execution back to the cheap worker.
+Say which call decided and what it returned; silence about it is how a cheap model
+ends up owning an irreversible choice nobody audited.
+
+**A lead helper fails loudly.** If no lead model is configured, refuse with an
+exit code and a message naming the setting — never fall back to the session model,
+because the fallback is invisible and lands exactly on the decisions that cost the
+most to get wrong.
+
+**Read quota pressure from every door before scheduling heavy work.** The same
+weekly bucket can be spent through two independent clients — the vendor's own agent
+CLI and an IDE that resells the same models — so a quota that looks healthy in one
+is often exhausted in the other, and a plan built on the healthy number dies
+mid-round instead of being cut up front.
+
 ## Report to the human
 
 State the outcome, the work branch and its commits, the evidence you ran

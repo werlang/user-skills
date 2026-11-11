@@ -123,7 +123,7 @@ no extra cost.
 
 Merge only when the user asks. Unless the repository says otherwise:
 
-- Merge a finished branch into its base with `git merge --no-ff <branch>` so the atomic commits stay intact and grouped. Do not squash them away.
+- Merge a finished branch into its base with `git merge --no-ff <branch>` so the atomic commits stay intact and grouped. Do not squash them away. **In a solo-maintained repository the landing rule above wins:** `git merge --ff-only` plus branch deletion, so there is no merge commit and no divergence between the two sections.
 - Resolve conflicts by preserving both sides' intent, rerun validation, and report what was resolved.
 - Delete the merged local branch only when the user agrees. `git branch -d` refuses when the branch tip is a merge commit that reached the base under a different sha, even with identical content: check `git diff --stat <base>...<branch>` — an empty diff means the trees match, so `-D` is safe, and say why in the report instead of leaving a stale branch behind.
 

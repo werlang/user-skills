@@ -57,6 +57,30 @@ Unconfigured → Fast Sabotage per `verification.md`. Never unconstrained repo-w
 - Lint/typecheck (`npm run lint`, `tsc --noEmit`) are hygiene, not behavior proof.
 - Leaf tier never escalates to full-stack: nearest suite + browser spot-check is the ceiling unless a coupled contract broke.
 
+## Baseline before blame
+
+Before fixing or attributing any failure, run the failing scope against the tree as it was. A failure
+you cannot reproduce at baseline is not your diff's, and "it was already red" needs the same
+evidence as a green run.
+
+```bash
+git worktree add /tmp/<repo>-base HEAD          # uncommitted changes stay behind
+docker run --rm -v /tmp/<repo>-base:/app -v "$PWD/api/node_modules:/app/api/node_modules" \
+  -w /app/api -e NODE_ENV=test <image> npx vitest run <failing files>
+git worktree remove /tmp/<repo>-base --force
+```
+
+- Run the suite in the image whose base stage built `node_modules`. Native addons are compiled per
+  libc: a musl-built `node_modules` (installed inside an Alpine stage) fails on a glibc host with
+  `libc.musl-*.so.1: cannot open shared object file`, which kills whole test FILES at import
+  rather than tests. Signature: many failed files, very few failed tests — read the first error,
+  it is a collection error, not logic.
+- Mounting the real `node_modules` into the baseline worktree keeps both runs comparable; a fresh
+  install would also change the runner version.
+- Report the delta against baseline ("1419 pass, 2 fail, both already red in `publishers` and
+  `developer-profile`") instead of an absolute count, and re-run the full suite only after the
+  targeted files are green.
+
 ## Browser proof (UI-affecting changes only)
 
 When the change affects what a user sees or clicks, automated DOM assertions alone are insufficient. Exercise the flow in a real browser session:

@@ -26,6 +26,41 @@ More:
 - `hc update [--version X.Y.Z] [--from <file>] [--force]`
 - `hc machine add|ls|login|update|rename|rm` — other machines reached over ssh
 
+## Typing into a terminal: `send` submits, `keys` presses
+
+Two methods type, and they are not interchangeable. The core's own schema and help text are the authority — read them before building any client workaround:
+
+- `terminal.send` / `hc send <t> <text>` — "**Pasted, then submitted with Enter**". One call types the text **and presses Enter**. It is the right method for "run this line"; it is the wrong one for a keystroke.
+- `terminal.keys` / `hc keys <t> <keys...>` — presses key names and nothing else. Accepted: named keys (`enter`, `esc`, `tab`, `space`, `backspace`, `delete`, `up`/`down`/`left`/`right`, `home`, `end`, `pageup`, `pagedown`, `ctrl+c`, `ctrl+<letter>`, `alt+x`, `f5`) and a **single unshifted printable ASCII character** as its own argument (`a`, `1`, `/`, `-`, `;`, `'`, `[`, `]`, `\\`, `=`, `,`, `.`, `` ` ``). It never appends Enter.
+- **Shift only reaches letters.** A bare uppercase letter arrives lowercase: `hc keys t A` types `a`. Uppercase is `shift+a` → `A`. `shift+1`, `shift+/`, `shift+;` are accepted but type the *unshifted* character, so `! ? : ( ) @ # $ % & * + " | ~ _ { } ^ < >` **cannot be typed through `keys` at all** — print the accepted set from `hc schema`/`--help`, and treat every shifted symbol as not-a-key in the client rather than sending it and hoping.
+
+```sh
+# client-side: one key per press, in order, in one call per press
+hc keys t3 l; hc keys t3 s; hc keys t3 enter      # program receives "ls\n"
+```
+
+- **Multi-character text is refused, not typed.** `hc keys <t> 'hello world'` answers `invalid_params: unknown key "hello world" (try enter, esc, up, ctrl+c, alt+x, f5, a)` — there is no way to send a *string* without Enter.
+- **Non-ASCII has no key name.** `ã`, `é`, `ç`, an emoji: all refused the same way. A client that needs them cannot use `keys`, and must not put them through `send` (that submits the line) — drop them with a visible notice, or the user watches a line submit mid-word.
+- On hc 0.1.19 the accepted set is exactly that: named keys plus single unshifted ASCII characters, with Shift applying to letters only. Check the list against the running build (`hc keys <t> <candidate>` and read the `kind`), not against this file.
+- **Prove each key by its bytes, not by absence of error.** A hex-dumping program in a terminal answers what actually arrived: `hc run --bg python3 /tmp/hex.py` (a three-line loop printing `format(ord(ch),'02x')` per stdin line), then `hc keys <t> shift+a` + `hc keys <t> enter` and `hc read <t>` → `41`. That is how the lowercase-`A` and `shift+1`→`1` behaviours above were found; a `{"status":null}` reply only means the name parsed.
+
+Prove the semantics in bytes before shipping a client that depends on them — a terminal running `od -c` is the whole test:
+
+```sh
+hc run --bg od -c                     # → {"address":"t95",...}
+hc send t95 a; hc send t95 b          # od shows  a\nb\n     ← send presses Enter every time
+hc keys t95 a; hc keys t95 b; hc keys t95 enter   # od shows  ab\n   ← keys presses only what you name
+hc rm t95
+```
+
+A symptom like "every character I type is submitted as its own line" is this method choice, not a timing or buffering problem on the client — the fix is the method, not a debounce.
+
+## Scrollback travels only if the client asks
+
+`terminal.attach` takes `history` ("scrollback lines to show first, **main screen only**"). A client that omits it receives no scrollback, so a freshly opened terminal has nothing above its screen to scroll until it has itself printed a screenful — which reads to the user as "scrolling broke again" on a terminal opened seconds ago and "scrolling works" on a long-lived one. Ask for a few thousand lines at attach, and keep a fallback: an older core that rejects the parameter must still open the terminal without it.
+
+A full-screen program (alternate screen) has no scrollback by design, on any terminal: there is nothing above the screen to show. Scrolling there means paging the program itself — draw the pointer drag into `pageup`/`pagedown` keys rather than into a local scroll box that can never move.
+
 ## Update semantics
 
 `hc update` swaps this binary and restarts, and terminals keep running. `--version X` means *at least* X — nothing changes when the installed build is already that or newer. `--force` is required to install an older build or another protocol generation; saved state only moves forward.
