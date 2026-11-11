@@ -121,6 +121,30 @@ Authority follows the cost of being wrong, not seniority.
 Concrete model ids, hosts, quotas and permission profiles live in the machine-local
 copy of this skill, never here.
 
+### Cheap conversation, expensive decision
+
+The conversational session and the deciding session are two different cost
+centres, and they must not share a model.
+
+- **Conversation runs cheap.** Exploratory talk, ops, log reading, environment
+  work and single mechanical edits happen on the cheap model. That is where the
+  tokens are.
+- **A job engagement escalates the lead.** The moment an intent becomes a delivery
+  — a scope, an architecture, a release, a behaviour the user can see — the lead
+  work is dispatched as one dedicated call on the strongest reasoner available,
+  carrying the intent, the evidence and the constraints. The conversation does not
+  silently continue deciding on the cheap model.
+- **The escalation is explicit.** Say that the job is engaged, name the call that
+  carries the decision, and what it returns: options with cost, a recommendation,
+  the acceptance command, and the non-goals. Silence about which model decided is
+  how a cheap model ends up owning an irreversible choice.
+- **Coming back is also explicit.** Once the brief is closed, execution returns to
+  the cheap worker and the conversation returns to cheap. Cost control lives in
+  that boundary, not in downgrading the decision.
+
+The failure this prevents: a cheap session that keeps answering "sure, let's do
+it" until an irreversible change is already committed.
+
 ## 8. Anti-patterns
 
 - Asking permission for reversible work; making the director do the thinking you
