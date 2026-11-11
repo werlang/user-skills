@@ -49,6 +49,29 @@ Use the host language's native documentation style: JSDoc for JavaScript/TypeScr
 - Keep local comments sparse and explanatory. Add them around non-obvious ordering, cache precedence, data normalization, state transitions, concurrency, retries, validation boundaries, DOM timing, security constraints, migrations, and edge-case handling.
 - Remove or rewrite comments that describe the next line mechanically, mention abandoned ideas, contradict the code, or preserve obsolete behavior.
 
+## Gated And Deferred Features
+
+A capability that ships behind a default-off flag, a Compose profile, or a later-stage plan is
+documented as **conditional**, never as delivered. The code gate alone leaves the manual, the
+roadmap and the stage tracker claiming behavior no user can observe.
+
+1. Pick one canonical owner for the gate — usually the operational reference for the feature — and
+   put the whole matrix there: flag name, default, what stays inert while off, how to enable, and
+   which migrations/columns remain but dormant. Every other document gets at most one sentence
+   pointing at it; duplicating the matrix guarantees drift.
+2. Sweep the feature's own vocabulary (`rg -i "<term>|<synonym>" README.md docs/ .agents/`), not the
+   flag name: the documents that lie predate the flag. Classify each hit — still true (keep), now
+   conditional (add a dated status note), or belonging to a later stage (move it there).
+3. Rewrite claims that read as current guarantees — "approval is blocked", "the inspection runs on
+   submit" — into "when active, …". A deferred feature documented as active is worse than one left
+   undocumented: readers plan around it.
+4. Roadmap hygiene: the delivering stage describes what is actually operative, and activation of a
+   finished-but-off capability becomes a line item of the stage where it will be turned on.
+5. State only the decision and the driver you were actually given. Never invent a technical
+   justification for a deferral — a false-positive class, a cost figure, a load estimate. If the
+   reason is unstated, record that the decision belongs to the product owner and leave the cause
+   out rather than fabricating a plausible one.
+
 ## Ownership Heuristics
 
 - Setup, install, and first-run changes usually belong in the root README and any getting-started guide.
