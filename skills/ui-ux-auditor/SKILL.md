@@ -53,6 +53,24 @@ Use [references/browser-audit-checklist.md](references/browser-audit-checklist.m
 - When multiple services are involved, make sure the UI has the backend dependencies it needs before starting the audit.
 - If a browser sidecar or containerized browser exists, prefer that supported setup.
 
+### When the full app cannot be booted: render the real component surface
+
+For a change that only shows or hides blocks (conditional rendering, a new card, a new empty
+state), a static harness beats both a code-only audit and a multi-service boot:
+
+1. Serve the repository root (`python3 -m http.server <port>`) and open a page that `import`s the
+   **real** template module and helper (`/web/src/js/templates/...`, `renderTemplate`) and links the
+   **real** stylesheets — never hand-copy the markup into HTML, or you are auditing your copy.
+2. Render each variant the change produces (e.g. disabled / minimal / unchanged) stacked on one
+   page, then screenshot at desktop and mobile widths and inspect them at full size.
+3. Check overflow numerically, not by eye: `document.documentElement.scrollWidth === window.innerWidth`.
+   Include `<meta name="viewport" content="width=device-width, initial-scale=1">` — without it mobile
+   emulation reports a 980 px layout viewport and every page "fits" or "overflows" for the wrong reason.
+4. Delete the harness file and stop the server before reporting; the evidence is the screenshots.
+
+State the limit in the report: this proves the rendered surface (spacing, wrapping, the three
+states), not the flow behind it — navigation, permissions and data still need the running app.
+
 ## 3. Map The Target Flows
 
 - Read the nearest browser specs and helper selectors first.
