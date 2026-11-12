@@ -140,6 +140,21 @@ first failure:
 4. Only when the mechanical checks pass and a criterion is visual, open the
    screenshot at full size. Otherwise the `shot:` hash and sentence are enough.
 
+**A `done:` line is a claim; the diff is the fact.** A round that says a finding
+is resolved can coexist with the original unfiltered call site — the worker
+patched the helper and left the caller, or the other way round. Grep the
+*enforcement point* named by the finding (the guard, the filter, the branch) and
+quote the line you found, instead of accepting the sentence that says it exists.
+
+**A verdict written before you consumed the delegator's findings is void.** If a
+human or lead sends findings while the supervisor pane is mid-turn, the message
+can be appended to the input and skipped; the pane then writes `accepted:` as if
+nothing arrived. Re-open it — append `rejected: <n> open — <the unanswered
+findings>` and drive one more round — and never defend the acceptance by citing
+the suite that was green for the smaller scope. Two habits prevent it: send
+findings only when `hc get` reports the pane idle, and re-read the status tail
+after every verdict rather than trusting the screen that scrolled.
+
 Demand proof by action when a claim is hard to verify: "type into the field
 without clicking, then screenshot it" settles in one round what prose cannot.
 
