@@ -38,6 +38,12 @@ Skip edits only after verifying that existing docs and comments still match the 
 7. Review touched code comments before finishing: complete doc comments, remove comments that narrate obvious statements, and add focused local comments where ordering, invariants, fallback logic, edge cases, or non-obvious constraints are hard to infer.
 8. Validate references by checking that mentioned files, commands, routes, scripts, env vars, and docs exist or are intentionally described as external.
 9. Run the lightest reliable validation available for the kind of change. If no runtime validation is appropriate, run syntax, link/path, or targeted search checks and report that scope.
+10. **When a find-and-replace refuses to match text that `grep` proves is in the file**, stop
+    adding context to the search string. Long prose lines (a 600-character bullet, a sentence with
+    an em dash) defeat the matcher, and a third retry costs a turn without changing the outcome.
+    Do the edit with a short script instead — read the file, assert the occurrence count, replace,
+    write, then print the changed line — so the assertion fails loudly when the text really is
+    different, instead of the edit silently landing on a near-match.
 
 ## Comment And Doc Comment Standard
 
