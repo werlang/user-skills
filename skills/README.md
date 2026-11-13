@@ -8,8 +8,7 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
-| `agent-browser` | Browser automation CLI workflows, including web pages, Electron apps, exploratory testing, and QA. The entrypoint is a discovery stub; load the installed CLI's current workflow before running commands. | [`SKILL.md`](agent-browser/SKILL.md) |
-| `chrome-browser` | Operating within the user's real Chrome session via the Chrome browser extension (tabs, permissions, recordings, console logs). | [`SKILL.md`](chrome-browser/SKILL.md) |
+| `browser-control` | Choosing and driving a browser: the user's real logged-in Chrome over CDP (`scripts/cdp.mjs`), chrome-devtools MCP with `--autoConnect`, agent-browser, an isolated browser, or the Claude in Chrome extension; shared rules for reading, recording UI requests, safe writes, verification and screenshots. | [`SKILL.md`](browser-control/SKILL.md) |
 | `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
 | `herdr` | Controlling a Herdr terminal multiplexer session from inside a Herdr-managed pane: agents, panes, tabs, workspaces, saved SSH machines, and output reads. | [`SKILL.md`](herdr/SKILL.md) |
