@@ -1,6 +1,6 @@
 ---
 name: git-change-workflow
-description: "Choose and apply a Git branching, worktree, and commit workflow for implementation, refactor, bug-fix, documentation, and configuration work. Use this skill whenever a task may need a branch, worktree, commits, commit messages, staging, merging, or delivery-policy decisions: keep simple fast work on the current branch with no Git mutations, put complex or large work on a new branch (or an isolated worktree when needed) with small, focused, atomic Conventional Commits, and follow the repository's CONTRIBUTING.md, offering to create one when it is missing."
+description: "Choose and apply a Git branching, worktree, and commit workflow for implementation, refactor, bug-fix, documentation, and configuration work. Use this skill whenever a task may need a branch, worktree, commits, commit messages, staging, merging, or delivery-policy decisions: keep simple fast work on the current branch with no Git mutations, put complex or large work on a new branch (or an isolated worktree when needed) with small, focused, atomic Conventional Commits that may span several files, plus guardrails against generated or oversized bulk, and follow the repository's CONTRIBUTING.md, offering to create one when it is missing."
 ---
 
 # Git Change Workflow
@@ -78,12 +78,24 @@ Never delete a worktree or its branch that holds uncommitted or unmerged work. R
 
 ## Atomic commit workflow
 
-Create as many commits as the work requires. A commit should represent one logical, independently understandable unit: one feature slice, bug fix, refactor, test change that belongs to that unit, or documentation/configuration update. Keep commits small so each one can be reviewed, reverted, or cherry-picked without carrying unrelated changes.
+Create as many commits as the work requires. **Atomic means one intent, not one file.** A commit should represent one logical, independently understandable unit: one feature slice, bug fix, refactor, test change that belongs to that unit, or documentation/configuration update. That unit may span several files — a model, a route, a UI component, and their tests are one commit when they implement one incremental change. Do not split a coherent change into per-file commits just because the files are separate, and do not bundle two unrelated changes just because they share a file. When one file carries two intents, stage its hunks separately: `git add -p -- <path>` with a terminal available, or write a patch and run `git apply --cached` without one.
+
+### Commit content guardrails
+
+These guardrails override a bare request to commit everything. On conflict, stop and ask, naming the path and reason, before unstaging or excluding anything.
+
+1. **Measure.** Before staging, check `git status --short` and `git ls-files --others --exclude-standard` for untracked bulk. After staging, the index is authoritative: use `git diff --cached --shortstat` for the total and `git diff --cached --numstat | awk -F '\t' 'NF>=3 && $1!="-" {print $1+$2 "\t" $3}' | sort -nr | head` for the largest files. Changed lines are additions plus deletions; a `Bin` entry or `-` in `numstat` is also a stop signal.
+2. **Justify size.** More than 500 changed lines in one file or 1,000 in one commit is a stop signal, not a ban: review it and state the reason in the commit body or handoff. Exclude it when the volume is generated noise rather than the intended change.
+3. **Default-deny untracked generated or vendored bulk:** build output (`dist/`, `build/`, `target/`, `.next/`, `out/`), dependency trees (`node_modules/`, `vendor/`, `Pods/`), minified bundles and maps, coverage, caches, logs, database dumps, data exports, and large binaries. Exceptions are artifacts the repository already tracks, its rules require, or that belong in Git LFS.
+4. **Unstage before ignoring.** `.gitignore` does not remove a staged path: use `git restore --staged <path>` for a new file, or `git rm --cached <path>` for one tracked in `HEAD` and commit that removal. Add the ignore rule separately. Do not force a path through with `git add -f` or `git commit --no-verify` unless the repository rules require it; say why in the body.
+5. **Stop on secrets.** Never commit credentials, keys, tokens, or environment files containing real values. Unstage, report without printing the value, and if one was ever committed, tell the user to rotate it and purge history with their involvement.
+6. **Keep coupled artifacts together.** A schema and migration, a manifest and lockfile, or a generated client and its source are one intent: same commit, primary-purpose type, with the generator and expected volume in the body. Commit an artifact separately only when no source change produces it, using `build:` or `chore:`.
+7. **Protect existing work.** For accidental volume — a formatter run, line-ending conversion, lockfile churn, or a copied environment file — confirm the path has no user edits before restoring or regenerating it, and revert only the hunks the agent created.
 
 Before every commit:
 
 1. Stage only the completed unit with explicit paths, for example `git add -- path/to/file-a path/to/file-b`. Never use `git add .` or `git add -A` when unrelated work may exist.
-2. Inspect the staged file list and diff: `git diff --cached --name-only`, `git diff --cached --stat`, and `git diff --cached` as needed.
+2. Inspect the staged file list, size, and diff: `git diff --cached --name-only`, `git diff --cached --stat`, `git diff --cached --numstat`, and `git diff --cached` as needed. Apply the content guardrails above before continuing.
 3. Run `git diff --cached --check` and the targeted tests or validation for the unit.
 4. Write the message following [`references/commit-messages.md`](references/commit-messages.md) (Conventional Commits), using the repository's scopes and rules where it defines them. If the staged changes need two types or two unrelated summaries, split the commit instead.
 5. Confirm that only intended files are staged, that the slice has been reviewed, and that validation passes; then commit.

@@ -36,6 +36,42 @@
       "prompt": "Commit the staged changes. They contain a bug fix in the parser and an unrelated README rewrite.",
       "expected_output": "Do not write one compromise message; split into two atomic commits (a fix(<scope>) commit and a docs commit) by staging explicit paths, each with an imperative subject of at most 72 characters.",
       "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Commit the staged changes: a two-line fix in src/parser.js and a 60,000-line bundle in build/app.min.js that a local build generated.",
+      "expected_output": "Stop before committing and name build/app.min.js as generated bulk; with confirmation, unstage it, add the exact path to .gitignore in its own chore commit or leave that edit uncommitted and report it, commit only src/parser.js as fix(<scope>), and report the excluded path and reason.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Commit the account deletion feature. It touches the database model, API route, settings page, and their tests — six files and about 1,200 changed lines in one coherent change.",
+      "expected_output": "Create one atomic feat(<scope>) commit containing all six files because they implement one functional unit; do not split the files into per-file commits, note the reviewed size in the commit body, and stage explicit paths.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Stage and commit this refactor: one file loses 700 lines and gains 10 as old branches are removed.",
+      "expected_output": "Count additions plus deletions, so the file exceeds the 500-line threshold: review the deletion-heavy diff, justify the size in the commit body or handoff, and commit it as refactor(<scope>) rather than treating deletions as small.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Commit a dependency bump: package.json changes and the lockfile grows by 2,000 lines, all from the same install.",
+      "expected_output": "Keep the manifest and lockfile in one build(deps) commit because they are one dependency intent; state in the body that the lockfile volume follows the install. Do not split the lockfile into its own commit or treat it as bulk noise.",
+      "files": []
+    },
+    {
+      "id": 11,
+      "prompt": "Stage and commit a 700-line refactor that renames src/my module.js to src/my module-v2.js; the numstat path contains a space.",
+      "expected_output": "Use the tab-delimited numstat check so the spaced and renamed path is not dropped, count additions plus deletions, and review and justify the size before committing as refactor(<scope>).",
+      "files": []
+    },
+    {
+      "id": 12,
+      "prompt": "This repo tracks dist/ and CONTRIBUTING.md requires committing the built bundle with the source. A source change also regenerates dist/app.js by about 3,000 lines.",
+      "expected_output": "Follow the repository rule: commit the source change and the tracked dist/app.js together as one intent, use the primary-purpose type, and note in the body that the generated volume is required by the repo. Do not add dist/ to .gitignore.",
+      "files": []
     }
   ]
 }
