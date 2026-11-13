@@ -10,12 +10,9 @@ choosing which skill to read.
 | --- | --- | --- |
 | `agent-browser` | Browser automation CLI workflows, including web pages, Electron apps, exploratory testing, and QA. The entrypoint is a discovery stub; load the installed CLI's current workflow before running commands. | [`SKILL.md`](agent-browser/SKILL.md) |
 | `chrome-browser` | Operating within the user's real Chrome session via the Chrome browser extension (tabs, permissions, recordings, console logs). | [`SKILL.md`](chrome-browser/SKILL.md) |
-| `computer-use` | Inspecting and operating local desktop app windows via Orca computer-use CLI (accessibility trees, screenshots, UI actions). | [`SKILL.md`](computer-use/SKILL.md) |
 | `context7-mcp` | Fetching current library and framework documentation or code examples through Context7. | [`SKILL.md`](context7-mcp/SKILL.md) |
 | `find-skills` | Discovering and installing skills that match a user's requested capability. | [`SKILL.md`](find-skills/SKILL.md) |
 | `herdr` | Controlling a Herdr terminal multiplexer session from inside a Herdr-managed pane: agents, panes, tabs, workspaces, saved SSH machines, and output reads. | [`SKILL.md`](herdr/SKILL.md) |
-| `orca-cli` | Operating Orca-managed worktrees, terminals, repos, automations, worktree comments, and the embedded browser via the public `orca` CLI. | [`SKILL.md`](orca-cli/SKILL.md) |
-| `orchestration` | Structured multi-agent coordination and dispatched-worker duties via Orca orchestration (threads, task DAGs, coordinator loops, decision gates). | [`SKILL.md`](orchestration/SKILL.md) |
 
 ## API and application structure
 
@@ -34,7 +31,7 @@ choosing which skill to read.
 | `code-review` | Risk-calibrated review of a diff (Trunk vs Leaf) on standards, spec, evidence, and launch-readiness, with independent red-team discovery, gated cross-examination plus adjudication, auto-fix with regression tests, and closed-loop re-review until clean. | [`SKILL.md`](code-review/SKILL.md) |
 | `delivery-lead` | The authority contract above a delegated job: who decides what (director, tech lead, supervisor, worker), the closed four-item escalation list with its decision format and deadline, the dispatch brief with written acceptance evidence, proof rules for gates and declared numbers, and the reporting cadence. Defers mechanics to job-orchestration and worker driving to supervisor. | [`SKILL.md`](delivery-lead/SKILL.md) |
 | `git-change-workflow` | Choosing current-branch fast tracks, dedicated branches, or isolated worktrees; atomic Conventional Commits; merging; and following or creating a repository's `CONTRIBUTING.md`. | [`SKILL.md`](git-change-workflow/SKILL.md) |
-| `job-orchestration` | End-to-end delegated jobs with exploration, user grilling, worktree isolation, Orca-orchestrated subagent dispatch, risk-tiered (Trunk / Branch / Leaf) independent TDD and adversarial reviews, a full final review of the integrated diff, clean code and OOP standards, synchronized documentation, and atomic semantic commits. | [`SKILL.md`](job-orchestration/SKILL.md) |
+| `job-orchestration` | End-to-end delegated jobs with exploration, user grilling, worktree isolation, native subagent dispatch, risk-tiered (Trunk / Branch / Leaf) independent TDD and adversarial reviews, a full final review of the integrated diff, clean code and OOP standards, synchronized documentation, and atomic semantic commits. | [`SKILL.md`](job-orchestration/SKILL.md) |
 | `supervisor` | Supervising one worker agent in another terminal or session: work branch and per-worker worktrees with merge and cleanup, the eight-field brief with preflight, a single status file of claims and verdicts, blocking waits, proof-based review, model allocation, and loop bounds. | [`SKILL.md`](supervisor/SKILL.md) |
 | `testing` | Behavior testing for any code change — tiered Trunk/Branch/Leaf effort, human-anchored oracles, falsification triad, freeze guard, and mutation/sabotage verification. | [`SKILL.md`](testing/SKILL.md) |
 | `ui-ux-auditor` | Auditing a product journey or interface through browser-based user-flow validation. Pairs with frontend-design and impeccable for visual craft and aesthetic review alongside functional testing. | [`SKILL.md`](ui-ux-auditor/SKILL.md) |

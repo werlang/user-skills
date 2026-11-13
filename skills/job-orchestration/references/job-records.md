@@ -145,7 +145,7 @@ Save as `docs/orchestration/<job-slug>.md`.
 
 ## Worker brief template
 
-Send as the Orca task body. Keep it self-contained but short: link the digest
+Send as the subagent task body. Keep it self-contained but short: link the digest
 and spec rather than pasting them.
 
 ```markdown

@@ -69,7 +69,7 @@ Use a separate worktree instead of a branch in the current checkout only when is
 
 When creating one:
 
-1. Prefer the harness's or Orca's worktree tooling when available; otherwise run `git worktree add -b <type>/<slug> ../<repo>-<slug> <base>`.
+1. Prefer the harness's worktree tooling when available; otherwise run `git worktree add -b <type>/<slug> ../<repo>-<slug> <base>`.
 2. Create it as a sibling of the main checkout, never inside it, so tooling and `git status` do not pick it up.
 3. Remember that ignored files are not copied: reinstall dependencies, copy local `.env` files only with the user's consent, and confirm services or ports do not clash with the main checkout.
 4. Record the path, branch, and base commit in the handoff.

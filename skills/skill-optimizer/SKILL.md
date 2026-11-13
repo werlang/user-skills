@@ -21,7 +21,7 @@ Unless the user specifies otherwise, **act as the parent orchestrator**. The orc
 
 ### User Customization Points
 The user may override or guide any part of the review loop:
-- **Designated Review Execution**: The user can specify how review rounds are executed according to their active environment—such as an external orchestrator (e.g. Orca), specific sub-agents, or alternative models.
+- **Designated Review Execution**: The user can specify how review rounds are executed according to their active environment—such as an external orchestrator, specific sub-agents, or alternative models.
 - **Custom Orchestration Method**: The user can mandate a specific evaluation protocol (e.g., single-turn triage, tournament rounds between competing proposals, or multi-round adversarial verification).
 - **Default Method**: When not specified, default to the **Iterative Adversarial Review Loop** below.
 
@@ -65,7 +65,7 @@ The user may override or guide any part of the review loop:
 ### Phase 3: Adversarial Review Round (Dispatch Contract)
 To execute the review round, follow this 3-tier dispatch contract:
 1. **User-Designated Harness**: If the user specified a harness or review mechanism:
-   - Validate target availability (e.g. `which orca` or environment presence).
+   - Validate target availability (e.g. the subagent tool or a named harness executable).
    - Dispatch to that harness with the checklist path and diff. If the designated target is missing, stop and ask the user rather than guessing.
 2. **Sub-Agent Invocation (Default Automated)**: If a subagent tool is available:
    - Launch an independent sub-agent with a clean context. Provide the diff (`git diff BASE_SHA..HEAD`) and instruct it to audit using [references/adversarial-review-checklist.md](references/adversarial-review-checklist.md) and emit findings conforming to [references/finding-contract.md](references/finding-contract.md).

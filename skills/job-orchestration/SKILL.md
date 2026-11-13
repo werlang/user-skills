@@ -8,10 +8,10 @@ description: >-
   Branch / Leaf) to save time and tokens without weakening the final gates. Use
   when the user asks to orchestrate a job, oversee an entire implementation,
   delegate a multi-agent build, or repeat implementation/review/test cycles until
-  complete. Launch every subagent through Orca using the orca-cli and
-  orchestration skills; if Orca cannot be found or run, warn the user. Pairs with
-  grilling, clean-code-and-oop, testing, code-review, git-change-workflow,
-  document-touched-code, documentation-maintenance, orca-cli, and orchestration.
+  complete. Launch every subagent through the harness's native subagent or task
+  tool; if that tool cannot be found or run, warn the user. Pairs with grilling,
+  clean-code-and-oop, testing, code-review, git-change-workflow,
+  document-touched-code, and documentation-maintenance.
 ---
 
 # Job Orchestration
@@ -35,10 +35,10 @@ model IDs, agent activity, or test results. If a required tool/model is
 unavailable, report the blocker before substituting it. Do not silently fall
 back to doing the entire job yourself.
 
-Defaults: one dedicated job worktree, grilling after exploration,
-Orca-orchestrated subagent dispatch, risk-tiered independent test-first
-development and review, a full adversarial review of the integrated result,
-synchronized documentation, and atomic semantic local commits. Continue beyond
+Defaults: one dedicated job worktree, grilling after exploration, native
+subagent dispatch, risk-tiered independent test-first development and review,
+a full adversarial review of the integrated result, synchronized
+documentation, and atomic semantic local commits. Continue beyond
 planning and the first green test run until the completion gate passes or a
 documented blocker requires user input.
 
@@ -55,8 +55,8 @@ None of these rules relaxes a gate in section 10.
   integrated review (section 8) always runs the full protocol, so it is the
   backstop for any task that was under-tiered.
 - **Load skills per phase, not up front.** The orchestrator loads `grilling`
-  for section 2, `git-change-workflow` + `orca-cli` + `orchestration` for
-  section 3, `testing` and `code-review` when the first Branch/Trunk gate runs.
+  for section 2, `git-change-workflow` for section 3, `testing` and
+  `code-review` when the first Branch/Trunk gate runs.
   Domain skills (frontend, security, API, models) are loaded **by workers**:
   name them in the brief and inline only their few non-negotiable rules.
 - **Write shared context once.** Put the project digest in
@@ -136,12 +136,11 @@ artifacts, and integration. Separate worktrees are optional for genuine
 isolation needs, not required per worker. If the user requires one worktree,
 serialize conflicting work rather than creating child worktrees.
 
-Load [`orca-cli`](../orca-cli/SKILL.md) and
-[`orchestration`](../orchestration/SKILL.md), then their version-matched runtime
-guides. Verify which worker/isolation modes the runtime supports. If Orca cannot
-be found or cannot run, warn the user with the exact error before any dispatch.
-If it cannot honor the agreed worktree strategy, explain the conflict and get a
-decision before dispatching; do not invent runtime support or bypass its rules.
+Verify which worker and isolation modes the harness's subagent tooling supports.
+If no subagent mechanism is available, warn the user with the exact error before
+any dispatch. If it cannot honor the agreed worktree strategy, explain the
+conflict and get a decision before dispatching; do not invent runtime support or
+bypass its rules.
 
 Do not move/stash user changes automatically or delete worktrees as a cleanup
 shortcut. Preserve the delivered job worktree for inspection; remove other
@@ -211,19 +210,19 @@ context digest, exact working directory, starting revision, owned
 files/interfaces, forbidden writes, skills to load, required validation, and
 the structured report format.
 
-### Worker dispatch runs through Orca
+### Worker dispatch runs through the harness
 
-- Resolve the Orca executable once per session and load each skill's
-  version-matched runtime guide before running Orca commands.
-- Dispatch each brief as a real Orca task in the job worktree; read worker
-  state, messages, and results from the runtime. Never simulate agent activity
-  or substitute a non-Orca subagent mechanism.
+- Resolve the harness's native subagent or task mechanism once per session and
+  verify its worker and isolation capabilities before dispatch.
+- Dispatch each brief as a real subagent task in the job worktree; read worker
+  state, messages, and results from the harness. Never simulate agent activity
+  or substitute a different execution mechanism.
 - Route fixes to the live implementer session when it still exists and its
   context is relevant; otherwise dispatch a fresh fixer with the finding and
   the task brief.
-- If Orca cannot be found or cannot run, stop and warn the user with the exact
+- If the harness cannot run subagents, stop and warn the user with the exact
   resolution attempts and errors, record the blocker in the ledger, and obtain
-  an explicit decision before falling back to any other subagent mechanism.
+  an explicit decision before falling back to any other mechanism.
 
 ### Domain skills for workers
 
