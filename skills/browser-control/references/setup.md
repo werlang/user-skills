@@ -16,7 +16,26 @@ In this mode `http://127.0.0.1:<port>/json/version` returns 404 (normal).
 Alternative: Chrome started with `--remote-debugging-port=9222` (then `/json/version` works).
 
 Each **new connection** may show **"Allow remote debugging?"** in Chrome and block until the
-user answers. A connection that hangs right away is almost always this.
+user answers. The bundled helper reuses one background connection across commands, so
+approval is needed only when that connection is first established. A connection that
+hangs right away is almost always a pending consent prompt.
+
+The relay closes after **30 minutes idle**, measured from the last command client
+exiting. Active commands suspend the timer. `--timeout` limits one command and
+does not terminate the relay. `--status` neither starts Chrome nor resets idle time;
+it reports `idleExpiresAt` (epoch milliseconds, null during active commands).
+`--stop` closes the connection immediately. The next browser command starts a new
+one and may require approval again. No command is automatically replayed after a
+transport failure.
+
+The relay requires macOS/Linux (Unix sockets), Node ≥ 22, and permission to use local
+sockets and connect to Chrome. Its socket lives in an owner-only `0700` temporary
+directory and has `0600` permissions; it exposes no HTTP/TCP listener. Same-user
+processes can use it. Restricted agent sandboxes may need an approved shell call.
+Relay identity includes the installed helper location and `CDP_WS`/`CDP_PORT`; keep
+those overrides consistent for commands, status, and stop. Distinct copies of the
+helper have separate relays. Chrome restart/disconnect or relay exit ends approval.
+For an already-running older relay, use `--stop` before expecting updated behavior.
 
 ### Agent sandbox cannot read the file
 
@@ -56,3 +75,7 @@ Tools `mcp__claude-in-chrome__*` act in the user's real Chrome through the exten
 Claude). Follow Claude's built-in guidance for it: check open tabs first and work in a new tab,
 wait for site permissions instead of working around them, avoid actions that raise browser
 dialogs, stop and ask after repeated failures. Not available to other agents.
+
+Relay startup is serialized. If an interrupted starter leaves a `.starting`
+directory, setup fails with its path after five seconds. Remove that empty
+directory only after confirming no helper is still starting, then retry a read.

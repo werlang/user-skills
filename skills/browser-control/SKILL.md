@@ -56,6 +56,8 @@ Prerequisite (once, by the user): Chrome 144+, `chrome://inspect/#remote-debuggi
 ```bash
 S=<this skill>/scripts
 node $S/cdp.mjs --list                                   # pages; pick a URL regex
+node $S/cdp.mjs --status                                 # inspect relay; no Chrome connection
+node $S/cdp.mjs --stop                                   # release the shared connection
 node $S/cdp.mjs --tab 'host\.com/app' --expr 'document.title'
 node $S/cdp.mjs --tab 'app' --pre helper.js --eval check.js
 node $S/cdp.mjs --tab 'app' --pre $S/recorder.js --expr '"recording"'
@@ -64,7 +66,14 @@ node $S/cdp.mjs --tab 'app' --expr '1' --shot /tmp/x.png --clip '#panel'
 node $S/cdp.mjs --open 'https://host.com/page' --close --expr 'document.title'
 ```
 
-- Each call is one short connection. Put state you need between calls on `window.*`
+- Reuse the bundled relay: the first command starts one background Chrome connection;
+  later commands share it. Ask for Chrome approval once per connection. It closes after
+  30 minutes without an active command, on `--stop`, or on Chrome/relay disconnect.
+  Running commands suspend idle expiry; `--status` does not extend it. Never replay a
+  failed write automatically; re-read its outcome first.
+- The relay needs macOS/Linux and local-socket permissions. Keep `connection.mjs`,
+  `relay.mjs`, and `idle-timeout.mjs` beside `cdp.mjs` when copying it.
+- Put state you need between calls on `window.*`
   (helpers via `--pre`), long code in files (`--eval file.js`), files via `--attach` — never
   giant shell strings.
 - Expressions may return promises; the result must be JSON-serializable.
@@ -76,5 +85,5 @@ node $S/cdp.mjs --open 'https://host.com/page' --close --expr 'document.title'
 ## 4. Projects
 
 A project can ship its own skill on top of this one (site-specific tab regex, auth token
-discovery, injected tools, proven API semantics) and may vendor a copy of `scripts/cdp.mjs`.
+discovery, injected tools, proven API semantics) and may vendor the helper and its three transport modules from `scripts/`.
 Read the project skill first when it exists; this skill supplies the method.
