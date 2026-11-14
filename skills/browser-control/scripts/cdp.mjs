@@ -16,6 +16,8 @@
  *   node cdp.mjs --open 'https://example.com' --wait 3000 --expr 'location.href'
  *
  * Options
+ *   --status               show relay status without connecting to Chrome
+ *   --stop                 close the persistent Chrome connection
  *   --list                 list open pages (id, url, title) and exit
  *   --tab <regex>          use the first page whose URL matches (required unless --open)
  *   --open <url>           open a NEW tab for this run instead (the user's tabs stay untouched);
@@ -32,13 +34,14 @@
  *   --timeout <ms>         whole-run limit (default 60000)
  *   --help                 this text
  *
+ * Commands reuse one background connection; it closes after 30 minutes idle.
  * Endpoint: $CDP_WS, else http://127.0.0.1:${CDP_PORT:-9222}/json/version, else the
- * DevToolsActivePort file of the default Chrome profile (macOS, Linux, Windows).
+ * DevToolsActivePort file of the default Chrome profile. Relay requires macOS/Linux (Unix sockets).
  * Exit codes: 0 ok · 1 page error · 2 connection problem (a hint explains what to do).
  */
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
+import { openConnection, readMessages } from './connection.mjs';
 
 const argv = process.argv.slice(2);
 if (!argv.length || argv.includes('--help')) {
@@ -50,7 +53,9 @@ const opt = { pre: [], attach: [], click: [], wait: 0, timeout: 60000 };
 for (let i = 0; i < argv.length; i += 1) {
   const a = argv[i];
   const next = () => argv[++i];
-  if (a === '--list') opt.list = true;
+  if (a === '--status') opt.status = true;
+  else if (a === '--stop') opt.stop = true;
+  else if (a === '--list') opt.list = true;
   else if (a === '--tab') opt.tab = next();
   else if (a === '--open') opt.open = next();
   else if (a === '--close') opt.close = true;
@@ -75,57 +80,39 @@ const HINT = [
 ].join('\n');
 const killer = setTimeout(() => { console.error('TIMEOUT after ' + opt.timeout + ' ms\n' + HINT); process.exit(2); }, opt.timeout);
 
-/** Browser WebSocket endpoint. */
-async function endpoint() {
-  if (process.env.CDP_WS) return process.env.CDP_WS;
-  const port = process.env.CDP_PORT || '9222';
-  try {
-    const r = await fetch(`http://127.0.0.1:${port}/json/version`, { signal: AbortSignal.timeout(2000) });
-    if (r.ok) { const j = await r.json(); if (j.webSocketDebuggerUrl) return j.webSocketDebuggerUrl; }
-  } catch { /* chrome://inspect mode has no HTTP endpoint */ }
-  const home = os.homedir();
-  const files = [
-    path.join(home, 'Library/Application Support/Google/Chrome/DevToolsActivePort'),
-    path.join(home, '.config/google-chrome/DevToolsActivePort'),
-    path.join(home, '.config/chromium/DevToolsActivePort'),
-    path.join(process.env.LOCALAPPDATA || '', 'Google/Chrome/User Data/DevToolsActivePort')
-  ];
-  const denied = [];
-  for (const f of files) {
-    try {
-      const [p, wsPath] = fs.readFileSync(f, 'utf8').split('\n');
-      if (p && wsPath) return `ws://127.0.0.1:${p.trim()}${wsPath.trim()}`;
-    } catch (e) { if (e.code === 'EPERM' || e.code === 'EACCES') denied.push(f); }
-  }
-  if (denied.length) {
-    throw new Error('Permission denied reading ' + denied[0] + ' (agent sandbox).\n' +
-      'Read it outside the sandbox (or ask the user to run: cat "' + denied[0] + '") and\n' +
-      '  export CDP_WS=ws://127.0.0.1:<line 1><line 2>');
-  }
-  throw new Error('No Chrome debugging endpoint found.\n' + HINT);
-}
-
-if (typeof WebSocket === 'undefined') { console.error('Node >= 22 is required (global WebSocket).'); process.exit(2); }
-let ws;
+let connection;
 try {
-  ws = new WebSocket(await endpoint());
-  await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = () => reject(new Error('WebSocket error\n' + HINT)); });
-} catch (e) { console.error(e.message); process.exit(2); }
+  connection = await openConnection({ start: !opt.status && !opt.stop });
+} catch (error) { console.error(error.message); process.exit(2); }
+if (!connection) {
+  console.log(JSON.stringify({ running: false, connected: false }));
+  process.exit(0);
+}
 
 let seq = 0;
 const pending = new Map();
-ws.onmessage = (m) => {
-  const d = JSON.parse(m.data);
-  if (d.id && pending.has(d.id)) {
-    const { resolve, reject } = pending.get(d.id);
-    pending.delete(d.id);
-    d.error ? reject(new Error(JSON.stringify(d.error))) : resolve(d.result);
-  }
-};
+/** Report transport loss promptly; never reconnect/replay a possibly executed page mutation. */
+function fail(message) { console.error(message + '\n' + HINT); process.exit(2); }
+connection.on('error', (error) => fail(error.message));
+connection.on('close', () => fail('CDP relay disconnected. Command outcome may be unknown.'));
+readMessages(connection, (response) => {
+  if (opt.stop && response.fatal) { console.log('CDP connection stopped.'); process.exit(0); }
+  if (response.fatal) { fail(response.fatal); return; }
+  if (opt.status) { console.log(JSON.stringify(response)); process.exit(0); }
+  if (!pending.has(response.id)) return;
+  const { resolve, reject } = pending.get(response.id);
+  pending.delete(response.id);
+  response.error ? reject(new Error(JSON.stringify(response.error))) : resolve(response.result);
+});
+if (opt.status || opt.stop) {
+  connection.write(JSON.stringify({ control: opt.stop ? 'stop' : 'status' }) + '\n');
+  await new Promise(() => {});
+}
+/** Send once via the relay; IDs and target sessions remain private to this command. */
 const send = (method, params = {}, sessionId) => new Promise((resolve, reject) => {
   const id = ++seq;
   pending.set(id, { resolve, reject });
-  ws.send(JSON.stringify({ id, method, params, sessionId }));
+  connection.write(JSON.stringify({ id, method, params, sessionId }) + '\n');
 });
 
 const { targetInfos } = await send('Target.getTargets');
