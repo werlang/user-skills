@@ -45,17 +45,19 @@ Systematically improve resilience:
   white-space: nowrap;
 }
 
-/* Multi-line with clamp */
+/* Multi-line with clamp: the -webkit- triad is still the only shipped
+   form; unprefixed line-clamp is forward-compatible and ignored today.
+   overflow: clip clips without creating a scroll container. */
 .line-clamp {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-clamp: 3;
+  overflow: clip;
 }
 
-/* Allow wrapping */
+/* Allow wrapping (word-wrap is a legacy alias; use overflow-wrap only) */
 .wrap {
-  word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
 }
