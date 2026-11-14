@@ -62,7 +62,7 @@ choosing which skill to read.
 
 | Skill | Use it for | Definition |
 | --- | --- | --- |
-| `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, and responsive conventions. Pairs with frontend-design and impeccable for visual identity and craft. | [`SKILL.md`](css-standards/SKILL.md) |
+| `css-standards` | Shared CSS tokens, entrypoint imports, scoped component styles, responsive conventions (media queries for pages, container queries for components), and modern platform defaults such as cascade layers, `color-scheme`, `dvh` and reduced-motion gating. Pairs with frontend-design and impeccable for visual identity and craft. | [`SKILL.md`](css-standards/SKILL.md) |
 | `frontend-design` | Distinctive visual design, typography, custom palettes, and anti-template aesthetics. Automatically triggers and pairs with impeccable, css-standards, and ui-ux-auditor. | [`SKILL.md`](frontend-design/SKILL.md) |
 | `impeccable` | Production implementation and technical frontend quality across visual hierarchy, craft, responsive behavior, and accessibility. Automatically pairs with frontend-design, css-standards, and ui-ux-auditor. | [`SKILL.md`](impeccable/SKILL.md) |
 | `modern-web-guidance` | Pinned local copy of the browser vendors' 209 Modern Web Guidance guides on native HTML, CSS and client-side JS features, with browser-support fallbacks. Consulted by css-standards, impeccable and web-frontend before hand-rolling UI or adding front-end dependencies. | [`SKILL.md`](modern-web-guidance/SKILL.md) |

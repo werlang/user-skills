@@ -1,4 +1,6 @@
 .card {
+    /* Reusable component: it adapts to the space it is given, not the viewport. */
+    container-type: inline-size;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -7,10 +9,13 @@
     border-radius: 8px;
     background-color: var(--main-color-light);
     box-shadow: var(--shadow-soft);
-    transition: transform var(--fade-time), box-shadow var(--fade-time);
+
+    @media (prefers-reduced-motion: no-preference) {
+        transition: translate var(--fade-time), box-shadow var(--fade-time);
+    }
 
     &:hover {
-        transform: translateY(-2px);
+        translate: 0 -2px;
         box-shadow: 0 10px 24px rgb(from var(--main-color) r g b / 0.22);
     }
 
@@ -21,5 +26,11 @@
 
     .card__meta {
         color: rgb(from var(--text-color) r g b / 0.75);
+    }
+
+    @container (min-width: 28rem) {
+        .card__meta {
+            font-size: 1.0625rem;
+        }
     }
 }

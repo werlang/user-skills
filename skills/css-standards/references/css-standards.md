@@ -62,9 +62,19 @@ web/src/css/
 - Use a mobile-first flow: base rules at `0`, then `@media (min-width: 640px)`, `768px`, `1024px`, `1280px`, and `1536px` as needed.
 - Avoid `max-width` breakpoints unless the user explicitly asks for them.
 - Avoid one large responsive override section disconnected from the component structure.
+- Media queries drive page layout; reusable components use `@container` queries against their own host width.
+- Full-height shells use `dvh` (or `svh`/`lvh`), not `vh`.
+
+## Platform Defaults
+
+- Declare `color-scheme` on `:root` in `tokens.css` (`light` for a single-theme app; `light dark` plus `light-dark()` tokens for a dual-theme app).
+- Gate `scroll-behavior: smooth` and non-essential motion behind `@media (prefers-reduced-motion: no-preference)`.
+- In a new tree, declare `@layer` order once in the page entry and import partials into layers; never layer only part of an existing unlayered tree.
+- Use `:where()` for low-priority defaults, logical properties where values should flip in right-to-left text, and `overflow: clip` when only clipping.
+- The browser-support target is a project decision; see the Modern Platform Defaults section in `../SKILL.md`.
 
 ## Bootstrap
 
-- Start from `references/mini-project/web/src/css/tokens.css`.
+- Start from `references/mini-project/web/src/css/tokens.css`; `home.css` shows the layered import pattern and `components/card.css` a container-query component.
 - Compose page styles by importing shared component styles.
 - Add one shared structural partial early when the UI clearly has repeated host/card shells.

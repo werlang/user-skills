@@ -51,6 +51,23 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 - When a repository already has its own documented breakpoint contract, follow that local rule instead of introducing a competing scale.
 - On phone layouts, prefer flush section shells when they improve readability: outer wrappers may drop to `padding: 0`, large sections/panels/modals may tighten to a smaller radius, and the breathing room should move into inner headers, bodies, facts, and action rows instead of staying on the outer shell.
 - Restore the roomier framed-card treatment at the first upward breakpoint used by the project rather than preserving desktop gutters on narrow screens.
+- Use media queries for page-level layout (entry files, page shells, global navigation). Use `@container` queries for reusable components that can sit in containers of different widths (cards, panels, list items), with `container-type: inline-size` on the component root or its host. A component partial should not read the viewport width.
+- Use `dvh`/`svh`/`lvh` for full-height shells instead of `vh`, so mobile browser bars appearing or disappearing do not break the layout.
+- Scale type with `clamp()` that mixes a `rem` and a viewport (or container) unit, never a bare `vw`/`cqi` font size.
+
+## Modern Platform Defaults
+
+These apply unless the project's own documented browser-support policy says otherwise. The policy belongs to the project (`AGENTS.md`/`CLAUDE.md`). Without one, treat Baseline Widely available features as safe and feature-detect anything newer (`@supports`) with a working fallback.
+
+- **Cascade layers**: In a new stylesheet tree, declare the layer order once, before any import, in the page entry (for example `@layer tokens, components;` then `@import "./tokens.css" layer(tokens);`). Leave page-entry rules unlayered so they win. In an existing project without layers, do not layer only some files: unlayered rules always beat layered ones, so a partial retrofit silently changes priority.
+- **Low-priority defaults**: Wrap one-off, easily overridable defaults and incidental filters in `:where()` so they add zero specificity, instead of raising specificity elsewhere. Combined with layers, this is how cascade conflicts get solved without `!important`.
+- **Logical properties**: Prefer `margin-inline`, `padding-block`, `inset-inline-start`, `inline-size` and similar where the value should flip in right-to-left text. Keep physical properties where it should not (for example a shadow offset or a deliberately left-anchored decoration).
+- **Color scheme**: Always declare `color-scheme` on `:root` in `tokens.css`. A single-theme app declares only its scheme (`color-scheme: light`), which adds no dark theme and keeps native scrollbars and form controls consistent. A dual-theme app declares `light dark` and defines its theme tokens with `light-dark()`.
+- **Motion**: Put `scroll-behavior: smooth` and non-essential transitions or animations inside `@media (prefers-reduced-motion: no-preference)`. Prefer individual transform properties (`translate`, `scale`, `rotate`) over composing `transform` strings for hover lifts and state changes.
+- **Text**: Use `text-wrap: balance` on headings and `text-wrap: pretty` on short body copy. Use `overflow-wrap`, not the legacy `word-wrap` alias.
+- **Clipping**: Prefer `overflow: clip` to `overflow: hidden` when content should only be clipped, because `hidden` creates a scroll container.
+- **State selectors**: Use `:has()`, `:focus-visible`, `:user-invalid`/`:user-valid` and `[open]` to style from native state instead of toggling mirror classes from JavaScript.
+- **Native primitives first**: Style `<dialog>`, the Popover API, `<details>` and native form controls (`accent-color`, `::backdrop`, `@starting-style` for entry animation) before building custom overlay or toggle CSS. For deep, current guidance on any of these, read [`modern-web-guidance`](../modern-web-guidance/SKILL.md).
 
 ## Selector Nesting
 
@@ -141,6 +158,10 @@ Preferred shape:
 - Does the style live in the correct page or component CSS file?
 - Are nested selectors used for component internals and states where that matches the project’s CSS style?
 - Are responsive rules mobile first and limited to `min-width` queries with the shared breakpoint scale?
+- Do reusable components respond to their container (`@container`) rather than the viewport, and do full-height shells use `dvh`/`svh` instead of `vh`?
+- Is `color-scheme` declared on `:root`, and are smooth scrolling and non-essential motion gated behind `prefers-reduced-motion: no-preference`?
+- If the stylesheet tree uses `@layer`, is the order declared once up front and applied to every partial (no partial retrofit)?
+- Are logical properties used where the value should flip in right-to-left layouts?
 - Do responsive overrides stay colocated with the component they modify?
 - On phones, do outer shells use the available width efficiently, with breathing room pushed inward instead of trapped in desktop wrapper padding?
 - Do icon treatments follow the shared icon setup instead of introducing a second icon system or version-pinned font-family names?

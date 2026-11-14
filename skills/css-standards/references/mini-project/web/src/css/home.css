@@ -1,11 +1,14 @@
-@import "./tokens.css";
-@import "./components/card.css";
+/* Layer order is declared once, before any import. Page-entry rules below
+   stay unlayered on purpose, so they win over every layer. */
+@layer tokens, components;
+@import "./tokens.css" layer(tokens);
+@import "./components/card.css" layer(components);
 
 #frame {
     gap: 24px;
     padding: 24px 16px 48px;
 
-    @media only screen and (min-width: 700px) {
+    @media (min-width: 640px) {
         padding-inline: 32px;
     }
 }
@@ -24,13 +27,14 @@
     .hero__title {
         margin: 0;
         font-size: 2rem;
+        text-wrap: balance;
     }
 
     .hero__cards {
         display: grid;
         gap: 16px;
 
-        @media only screen and (min-width: 700px) {
+        @media (min-width: 640px) {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }

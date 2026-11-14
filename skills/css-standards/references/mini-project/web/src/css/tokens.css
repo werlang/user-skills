@@ -1,4 +1,8 @@
 :root {
+    /* Single-theme app: declare it so native UI (scrollbars, form controls,
+       canvas) matches. A dual-theme app uses `light dark` plus light-dark(). */
+    color-scheme: light;
+
     --main-color-light: #e1eedc;
     --main-color: #3d6648;
     --main-color-dark: #0a2906;
@@ -7,24 +11,27 @@
     --border-color: #93a183;
     --text-color: #324632;
     --text-color-inverse: #e6f0e6;
+    --font-body: 'Roboto', sans-serif;
     --shadow-soft: 0 2px 8px rgb(from var(--main-color) r g b / 0.2);
     --fade-time: 0.3s;
 }
 
 html {
-    scroll-behavior: smooth;
+    @media (prefers-reduced-motion: no-preference) {
+        scroll-behavior: smooth;
+    }
 }
 
 body {
     margin: 0;
-    min-height: 100vh;
-    font-family: 'Roboto', sans-serif;
+    min-height: 100dvh;
+    font-family: var(--font-body);
     color: var(--text-color);
     background-color: var(--bg-color);
 }
 
 #frame {
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
