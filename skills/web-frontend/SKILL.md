@@ -57,6 +57,7 @@ web/
   - Automatically apply [`impeccable`](../impeccable/SKILL.md) for production-grade craft, surface-mode execution (`Persuade` / `Operate` / `Read` / `Experience`), responsive polish, accessibility, and micro-interactions.
   - Automatically apply [`css-standards`](../css-standards/SKILL.md) for shared CSS tokens (`var(--font-*)`), scoped component nesting under `web/src/css/`, and brand consistency.
   - Run [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to validate end-to-end user journeys and catch friction in the rendered browser view.
+  - Consult [`modern-web-guidance`](../modern-web-guidance/SKILL.md) before hand-rolling a component, browser workaround, or front-end dependency that a native platform feature may cover (dialogs, popovers, forms, view transitions, sanitizing, performance scheduling).
 - **Frontend Security & Hardening**: When configuring `web/app.js`, sessions, cookies, or templates:
   - Automatically apply [`security-defense-and-mitigation`](../security-defense-and-mitigation/SKILL.md): enforce multi-tier HTTP security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options), secure session cookie attributes (`HttpOnly; Secure; SameSite=Strict`), CSRF protection on forms, and XSS auto-escaping in templates.
 - **Object-Oriented Architecture**:

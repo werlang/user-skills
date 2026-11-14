@@ -12,6 +12,7 @@ Use this skill when a frontend project needs a consistent, maintainable CSS arch
 - **Aesthetic Direction & Tokens**: Pair with [`frontend-design`](../frontend-design/SKILL.md) to define intentional palettes, display/body typographic hierarchies, and avoid generic templated defaults.
 - **Craft & Accessibility**: Pair with [`impeccable`](../impeccable/SKILL.md) for surface modes, responsive spacing floors, dark/light theme tokens, and accessible focus states.
 - **Validation**: Pair with [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) to visually audit rendered styles and breakpoint transitions in real browser views.
+- **Platform Reference**: Consult [`modern-web-guidance`](../modern-web-guidance/SKILL.md) (a pinned local copy of the browser vendors' guides) before hand-rolling a component, effect or workaround the platform may already provide.
 
 ## Scope
 

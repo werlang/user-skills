@@ -19,6 +19,7 @@ Core principles:
 When executing frontend interface work:
 - **Creative Direction**: Pair with [`frontend-design`](../frontend-design/SKILL.md) to establish a distinctive visual identity, deliberate typography, and anti-template aesthetics before refining code.
 - **CSS Architecture**: Pair with [`css-standards`](../css-standards/SKILL.md) to ground spacing, colors, and typography in shared tokens and maintain scoped component CSS nesting.
+- **Platform Mechanics**: Pair with [`modern-web-guidance`](../modern-web-guidance/SKILL.md) for current native implementations (top-layer UI, anchor positioning, scroll-driven and view-transition motion, form states) and their browser-support fallbacks.
 - **User Flow & QA**: Pair with [`ui-ux-auditor`](../ui-ux-auditor/SKILL.md) for full browser journey verification, edge case exploration, and accessibility audits.
 
 ## Setup
