@@ -39,11 +39,16 @@ On engagement, always ask for all missing role assignments in one message, listi
 
 Each assignment uses `[harness] [model] [effort]`. Do not ask role-by-role across turns or propose a default menu unless the owner requests one. If the message already names all three, echo them in one line and proceed. Resolve all three before dispatch; never silently substitute a model. If a chosen harness/model is unavailable, report the blocker and wait for the owner's replacement.
 
+Echo the three back in one line and wait for the owner's confirmation before dispatching — a line, not a form. The owner carries the assignment in his head and will correct a role the instant he sees it written down.
+
+**A role corrected after dispatch means killing the run.** Kill the harness process (the wrapper, the timeout and the CLI child — all three) and re-dispatch with the corrected brief; a job decided on the wrong worker has to be redone anyway, and its output only invites being trusted. Never let it finish "since it is already running".
+
 ## 3. Dispatching the tech lead
 
 Make one non-interactive call to the chosen harness/model with the chosen effort, carrying:
 
 - The owner's request verbatim, repository, and working directory.
+- The **verified state**, labelled "verified in this session — do not re-discover": what already passed with numbers, commit ids, worktree paths and known-broken pieces. Without it the tech lead spends its budget re-running gates that are already green.
 - Every constraint the owner stated and the supervisor and worker assignments.
 - Instructions to plan and decide, delegate implementation to the supervisor following the [supervisor skill](../supervisor/SKILL.md), and implement nothing itself.
 
@@ -85,6 +90,12 @@ carry the number into the message. An escalation with a measurement is a decisio
 worries matters to you?" is a menu with extra steps and hands back the thinking that was delegated.
 Never probe by taking the action that itself needs approval.
 
+Measure accuracy on the **degraded** input, not the clean sample: real photos are rotated, blurred,
+low-light and JPEG-crushed, and reading numbers is where a pipeline breaks. A reader that returns
+three of three lines but maps `690→890` is disqualified however tidy its output looks — and when
+the volume is low, a form prefilled from the last recorded transaction beats any reader, because
+the human is already checking every line.
+
 Send one message in three lines: decision; options with cost; recommendation plus deadline. Everything else the tech lead decides. Reversible work does not ask; irreversible work always asks for approval through the assistant and waits. A deadline is not approval.
 
 ## 7. Proof rules
@@ -94,6 +105,7 @@ Send one message in three lines: decision; options with cost; recommendation plu
 - Answer a review finding with a fix or evidence, never by closing it or re-running until green.
 - A declared number is an assertion: reconcile it against real output before quoting it.
 - **"Not verified" is a required field.** Silence is not proof.
+- **A worker killed at its timeout is not a result.** Exit 124 (or any timeout kill) leaves the change half-written; a green suite on that tree proves nothing until the worker delivers a report *and* the supervisor reviews the finished diff. Mark the partial tree uncommittable and say which files are dirty.
 - Independence beats raw power: a reviewer that runs the command outranks a stronger reviewer reading the author's summary.
 
 ## 8. Cadence
