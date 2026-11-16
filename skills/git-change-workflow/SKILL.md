@@ -47,7 +47,7 @@ Avoid Git commands on this path. Use a read-only status check only when needed t
 ## Planned-track workflow
 
 1. Before editing, inspect the repository with read-only commands such as `git status --short`, `git branch --show-current`, and `git log -1 --oneline`.
-2. Preserve pre-existing user changes. Never use `git reset --hard`, `git clean`, broad stashing, or history rewriting to make the worktree convenient. If existing changes overlap the request or make branch ownership unclear, stop and ask before proceeding.
+2. Preserve pre-existing user changes. Never use `git reset --hard`, `git clean`, broad stashing, or history rewriting to make the worktree convenient. If existing changes overlap the request or make branch ownership unclear, stop and ask before proceeding. When dropping a temporary edit (a debug patch, a probe) restore that path alone — `git restore -- <path>` or `git checkout -- <path>`. `git checkout -- .` writes the whole index back over the tree and silently destroys every other uncommitted change in it, including your own in-flight work.
 3. Create a new local branch before implementation, from the base branch the repository names (often an integration branch such as `dev`), otherwise from the current `HEAD`:
    - Name it `<type>/<short-slug>` using the commit types in [`references/commit-messages.md`](references/commit-messages.md): `feat/contest-export`, `fix/login-redirect`, `docs/setup-guide`.
    - Use lowercase, hyphen-separated slugs of a few words.
@@ -75,6 +75,8 @@ When creating one:
 4. Record the path, branch, and base commit in the handoff.
 
 Never delete a worktree or its branch that holds uncommitted or unmerged work. Remove one (`git worktree remove <path>`, then `git worktree prune`) only after its branch is merged or the user authorizes it.
+
+Branch pointers and worktrees interact in two ways that read as bugs but are not: `git branch -f <branch>` refuses while that branch is checked out in a worktree, so move it from the worktree's own commit run or detach first; and after moving a pointer, verify with `git log -1 <branch>` — a bare `git log -1` shows the current checkout's HEAD and makes a correct move look like an accidental reset.
 
 ## Atomic commit workflow
 
