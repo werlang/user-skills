@@ -21,6 +21,27 @@ equipped with procedural knowledge that no model can fully possess.
 3. Domain expertise - Company-specific knowledge, schemas, business logic
 4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
 
+### Where a skill belongs
+
+Keep two libraries and put each lesson in the one that will still be true later:
+
+- **Shared / global library** — used by several agents, on several machines: only knowledge
+  that survives a change of machine, repository and agent. The test is one question: *would
+  this still be right in another repo, on another host, for another agent?*
+- **Agent-specific library** — one agent's own skill set: its configuration, provider quirks,
+  CLI flags, delivery rules, and anything only it must know.
+
+The leak patterns look harmless when written and rot within a week: a project codename or
+repository path, a hostname or IP, a credential location, one vendor's CLI invocation inside
+an otherwise vendor-neutral procedure, a hardcoded absolute path to a file on the author's
+machine. Replace each with the resolution step instead of the value — environment variable,
+then a local config file, then a discovery command (`mdfind`, `fd`, `docker inspect`), then a
+loud failure — so the procedure runs unchanged on the next machine.
+
+Prefer a neutral example over a specific one: naming several agents' non-interactive entry
+points (`claude -p`, `codex exec`, "the host agent's own one-shot flag") reads the same
+everywhere, while one product's exact command line pins the skill to that product for good.
+
 ## Core Principles
 
 ### Concise is Key
