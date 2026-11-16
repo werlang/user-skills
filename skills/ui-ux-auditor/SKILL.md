@@ -95,6 +95,24 @@ Whenever useful, check:
 - what API or side effect was triggered,
 - and whether the UI made that consequence understandable.
 
+### Click like a user, not like a test suite
+
+An automated `element.click()` dispatches the event with `target` set to the element itself, so it
+passes flows a human cannot reach. Before calling a control working, prove the click the user
+actually makes:
+
+1. `const r = el.getBoundingClientRect(); document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)`
+   reports what is painted under the cursor — frequently a nested `<svg>`/`<use>`, not the button.
+2. Dispatch real input at those coordinates (`Input.dispatchMouseEvent` `mousePressed` +
+   `mouseReleased`, or Playwright's `page.mouse.click(x, y)`), then assert the state change.
+3. Compare both results. A control that responds on its padding but not on its icon is broken for
+every user, and the clean-room pass will never show it.
+
+The code shape behind that failure: a delegated handler guarded with
+`event.target instanceof HTMLElement ? event.target.closest('[data-action]') : null` drops every click
+that lands on an `SVGElement`, and an icon-only button puts the icon across its whole hit area.
+`Element` (not `HTMLElement`) is the correct guard, and the regression test must dispatch on the icon.
+
 ## 5. Extend The Audit Beyond The Request
 
 Always add a focused exploratory pass for nearby risks, especially:
