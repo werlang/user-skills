@@ -48,6 +48,13 @@ launches its own Chrome without the user's logins — the usual reason "the agen
    don't leave injected state or test data behind.
 7. **Stop and ask** after 2 failed attempts at the same thing, when the browser asks for a
    permission ("Allow remote debugging?", site permission, login), or when a dialog is open.
+8. **A control the page's own JS gates is not filled by assignment.** Setting `input.value` and
+   dispatching `input`/`change` satisfies native form validation and nothing else — a submit button
+   that stays `disabled` after you filled every field is the signature that the page's handler never
+   ran, not that the form is broken. Type like a user (`fill_input`, `--type`, CDP
+   `Input.insertText`) so the real events fire. And take field identity from `form.elements`: a
+   control's `name` is not its `id`, and `getElementById('<name>')` returning null reads exactly
+   like a missing field — `querySelector('[name="…"]')` is the safe read when the markup has no id.
 
 ## 3. Real Chrome via `scripts/cdp.mjs` (row A)
 
