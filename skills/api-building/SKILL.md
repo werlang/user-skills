@@ -12,32 +12,43 @@ Use this skill when an API should follow this default structure:
 - ESM imports only.
 - Named exports only. Never default export.
 - `model/` for entity classes and persistence.
-- `routes/` for API endpoints.
+- `route/` for API endpoints.
 - `helpers/` for utilities that are not routes, middleware, or entities.
-- `middlewares/` for auth and other pre-route logic.
+- `middleware/` for auth and other pre-route logic.
 - Only `GET`, `POST`, `PUT`, and `DELETE` endpoints.
+- **Folder names come from the repo, not from this page.** The convention below is the default for a new
+  service; in an existing tree you copy what is there. The reference project (`node-aec`) uses `api/` and
+  `web/` as separate packages, `route/` and `middleware/` in the singular, and `app.js` at the package root.
 
 ## Required Structure
 
 ```text
-src/
+api/                       # package root in the reference project; app.js sits beside the folders
 	app.js
-	routes/
+	route/
 	model/
 	helpers/
-	middlewares/
+	middleware/
+	locales/<lang>/
+	migrations/001_initial_schema.sql
+	scripts/migrate.js
+	tests/
 ```
 
 ## Responsibility Split
 
 - `app.js`: compose Express, shared middleware, and route mounts.
-- `routes/*.js`: parse input, validate request data, run request-scoped business logic, and shape HTTP responses.
+- `route/*.js`: parse input, validate request data, run request-scoped business logic, and shape HTTP responses.
 - `model/*.js`: entity classes, persistence methods, normalization, relation loading.
 - `helpers/*.js`: response helpers, database helpers, date utilities, mailers, render helpers, or other support code.
-- `middlewares/*.js`: JWT auth, request guards, and reusable cross-cutting logic.
+- `middleware/*.js`: device or JWT auth, request guards, and reusable cross-cutting logic.
 
 - Routes talk to model instances, not raw SQL.
 - Only models use the database driver.
+- A route module builds `const router = Router()`, wraps every handler in `try { … } catch (error) { return next(error); }`, and exports by alias: `export { router as productsRouter };`. Handlers `return res.send({ … })` with the resource named in the payload.
+- Domain failures are thrown as `CustomError(status, message, code, data)` from `helpers/error.js`; the error middleware is the only place that renders `{ error, code, message }`.
+- A synchronous driver keeps the layering unchanged: handlers stay `async` for consistency, model calls need no `await`, and only the model opens a transaction around a multi-row write — `db.transaction(...)` on `better-sqlite3`, `db.exec('BEGIN')`/`'COMMIT'`/`'ROLLBACK'` wrapped in one `runInTransaction(fn)` helper on `node:sqlite`.
+- Tests are `vitest` + `supertest` against the real app object, split into unit and integration configs and driven from `npm test`; migrations run through `npm run db:migrate` → `scripts/migrate.js`.
 - Passwords are hashed with `bcrypt`.
 - Auth defaults to JWT bearer tokens.
 - Helpers are for support logic, not endpoint handlers and not direct entities.
