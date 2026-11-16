@@ -52,6 +52,14 @@ Author the Falsification Triad per seam — happy path from independent literal,
 
 Reviewer context receives `requirement + tests` only. Reject missing triad, shallow assertions, recomputed expected values, snapshots, internal mocks, or suites that pass for `always-allow` / `always-deny` / off-by-one. One send-back max.
 
+**A harness that never loads the real entrypoint proves nothing.** Helpers, view models and reducers can all
+have green tests while the screen's entry file — the place where a refresh loses the idempotency key, a double
+click creates two records, or a reconnect never re-enables the submit button — stays unimported. Before calling
+a flow tested, prove the suite imports that entrypoint and drives it through the DOM, not a hand-copied model of
+it. And a stub that only answers success cannot falsify: reproduce the peer's refusals (idempotent replay,
+uniqueness conflict, `404`/`410` on an expired job, the validation error the API really returns), or every
+negative path silently collapses into the happy one and the bugs it hides ship green.
+
 ### 3.3 Freeze, then implement
 
 Freeze approved authoritative files before implementation. Record digests. Implementer may run them and may add `tests/work/**` probes, but never edits authoritative to green. Controlled changes go through a Test Change Request (reason + contract change + new literal + affected paths) approved independently. Mechanics in [verification](references/verification.md).
