@@ -101,6 +101,21 @@ nothing — the row action emits `data-action="edit"` and the cached script is s
   places (below the mobile breakpoint the row lives in one tab and the form in another, so the click
   fills a form off-screen — carrying the user there is part of the action).
 
+## Offline-first: the queue is the feature, not a cache
+
+When a screen must work with the network down, the storage layer is product code and gets product
+rigour. Condensed rules (full checklist: [`references/offline-queue.md`](references/offline-queue.md)):
+
+- Persist the intention and **await the storage transaction's commit** before the UI says "salvo".
+- One idempotency key per intention, reused on every retry, with dependent ids derived from it so the
+  replayed body is identical.
+- "Desfazer" must distinguish *never sent* (delete) from *sent, response lost* (enqueue a dependent undo).
+  Deleting the second kind leaves the write accepted on the server while the UI says it was undone.
+- A person switch is a security boundary: close connections, treat a blocked `deleteDatabase` as
+  failure, stamp each queued write with its person, and have the server refuse a foreign-person write.
+  Never cache personal HTML (keys, balances) in Cache Storage, and never serve one person's shell to another.
+- Keep failed operations in a list rendered from queue state, not in DOM nodes that disappear.
+
 ## References
 
 - Read `references/frontend-structure.md` for the generic structure.
