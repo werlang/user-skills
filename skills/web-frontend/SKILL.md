@@ -63,6 +63,26 @@ web/
 - **Object-Oriented Architecture**:
   - Apply [`clean-code-and-oop`](../clean-code-and-oop/SKILL.md) when structuring component classes, event listeners, and API model wrappers.
 
+## Prove it against the running API, not only against the stub
+
+A rendered page whose route tests stub the API proves the templates and the view-models; it proves
+nothing about the wire. Before calling any writing screen done, start the API and the web process
+and drive the screen in a browser.
+
+- **Every server-to-server call must forward the identity the browser sent.** The device/session
+  cookie travels on each renderer → API request, or the screen renders as anonymous while the route
+test passes.
+- **Writes are signed with the renderer's own public origin.** The API validates `Origin`; the
+  renderer must send the same `PUBLIC_ORIGIN` value the API was configured with, not its internal
+  address and not nothing. A stub ignores the header, so the whole suite stays green while every
+  POST answers 403 and the UI says "não consegui salvar". Read the API's own request log to see it.
+- **Confirm the port is your app before driving it.** `ss -ltnp | grep :<port>`, and check the page
+  title or `/health` payload names this project — another container on that port answers 200 with a
+  different product's page and your browser run then exercises the wrong app.
+- **A JS-gated submit stays disabled until the page's handler runs.** Fill fields with real input
+  events and select the review/confirmation checkbox the page requires; a `disabled` save button
+after a complete-looking form is the handler not firing, not a broken form.
+
 ## References
 
 - Read `references/frontend-structure.md` for the generic structure.
