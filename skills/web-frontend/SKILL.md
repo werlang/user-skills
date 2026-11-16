@@ -83,6 +83,24 @@ test passes.
   events and select the review/confirmation checkbox the page requires; a `disabled` save button
 after a complete-looking form is the handler not firing, not a broken form.
 
+## Ship markup changes with stamped asset URLs
+
+Server-rendered HTML is always fresh and static assets are not, so a page can render the new markup
+while the browser still runs yesterday's handlers. The symptom is a control that looks alive and does
+nothing — the row action emits `data-action="edit"` and the cached script is still listening for
+`data-role=schedule-edit`, with no error anywhere. Two habits:
+
+- **Version every script/stylesheet URL** (build stamp or content hash in the query, rendered by the
+  template middleware) or serve HTML `no-store` and assets `immutable` with hashed names. Decide what
+  happens to an already-open tab and say it: a stamp means the next navigation picks up the new code,
+  nothing more.
+- **When the owner reports a dead control you cannot reproduce, test the stale-asset path first**,
+  then the two structural ones: an action deliberately gated by state (a `sent` row has no edit
+  button, and a control that vanishes reads as "the button is broken" — render it disabled with the
+  reason instead of removing it), and a layout that puts the action and its target in different
+  places (below the mobile breakpoint the row lives in one tab and the form in another, so the click
+  fills a form off-screen — carrying the user there is part of the action).
+
 ## References
 
 - Read `references/frontend-structure.md` for the generic structure.
