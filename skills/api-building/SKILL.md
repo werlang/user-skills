@@ -144,6 +144,11 @@ Prefer this request flow:
 
 ## Error Response Format
 
+**Precedence first: if the product spec defines an envelope, the spec wins — including when it is nested
+and this section is not.** The shape below is the house default for a service with no contract of its own;
+a house style copied over a written contract is a review rejection, not a style choice, and the failure is
+silent for every client that reads `error.code`.
+
 Error responses emitted by API error middleware must return HTTP status codes along with machine-readable error codes (`code`) and default messages (`error`, `message`) to enable frontend localization:
 
 ```json
