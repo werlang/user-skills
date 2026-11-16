@@ -51,3 +51,42 @@ api/
 
 - Start from `references/mini-project/src/app.js`.
 - Reuse the same separation of concerns when building new resources.
+## Layout variants in the wild
+
+Two shapes are common. The repository you are in decides which one applies; this page only describes
+them so the reader recognises the tree instead of inventing one.
+
+**Split packages** — API and front-end as sibling packages, each with its own `package.json`:
+
+```text
+package.json          # workspace root, when the repo uses workspaces
+api/
+  app.js
+  route/              # singular
+  middleware/         # singular
+  model/
+  helpers/
+web/
+  package.json
+  src/
+```
+
+**Single package** — one `package.json`, the API at the root of `src/`:
+
+```text
+package.json
+src/
+  app.js
+  routes/             # plural
+  middlewares/        # plural
+  models/
+  services/
+```
+
+Rules that apply to both:
+
+- Take the shape you find: singular vs plural directory names, `app.js` at the package root or under
+  `src/`, front-end as a sibling package or not.
+- Read `package.json` and a couple of imports before choosing; a directory rename is never part of an
+  API change.
+- New files follow their neighbours: same casing, same noun form, same export style.

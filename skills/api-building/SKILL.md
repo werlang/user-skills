@@ -17,8 +17,8 @@ Use this skill when an API should follow this default structure:
 - `middleware/` for auth and other pre-route logic.
 - Only `GET`, `POST`, `PUT`, and `DELETE` endpoints.
 - **Folder names come from the repo, not from this page.** The convention below is the default for a new
-  service; in an existing tree you copy what is there. The reference project (`node-aec`) uses `api/` and
-  `web/` as separate packages, `route/` and `middleware/` in the singular, and `app.js` at the package root.
+  service; in an existing tree you copy what is there. Two worked shapes — split packages and single
+  package — are in [`references/architecture.md`](references/architecture.md#layout-variants-in-the-wild).
 
 ## Required Structure
 
