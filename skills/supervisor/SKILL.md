@@ -18,10 +18,9 @@ Do the work directly, without supervising, when either holds:
   wait`, or a background subagent that notifies on completion, you would poll in
   turns, which is the expensive failure this skill exists to avoid.
 
-Move to [`job-orchestration`](../job-orchestration/SKILL.md) when the change
-touches auth, money, migrations, or a shared public contract, or when more than
-three workers must run. Independent tasks that should run in parallel also go
-there; this skill runs them one after another.
+Route job-level decisions through [`tech-lead`](../tech-lead/SKILL.md); the
+tech lead owns the job, and the supervisor owns the round. This skill drives
+one worker at a time; the tech lead coordinates independent tasks.
 
 ## The one rule
 

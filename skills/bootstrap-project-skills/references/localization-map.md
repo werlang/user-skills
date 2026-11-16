@@ -19,7 +19,7 @@ Merge two globals into one project skill when the project treats them as one con
 
 ## Keep global (generic workflows)
 
-`code-review`, `git-change-workflow`, `job-orchestration`, `grilling`, `skill-optimizer`, `audit-project-context`, `migrate-project-context`, `clean-code-and-oop`, `security-defense-and-mitigation` (beyond what `api-development` captures). The repository's own rules for these live in `CONTRIBUTING.md` or `AGENTS.md`; list these skills in the project index as applying unchanged.
+`code-review`, `git-change-workflow`, `grilling`, `skill-optimizer`, `audit-project-context`, `migrate-project-context`, `clean-code-and-oop`, `security-defense-and-mitigation` (beyond what `api-development` captures). The repository's own rules for these live in `CONTRIBUTING.md` or `AGENTS.md`; list these skills in the project index as applying unchanged.
 
 ## Never localize (tools and documents)
 

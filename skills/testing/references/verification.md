@@ -13,7 +13,7 @@ Adapt paths only if the repo already has an established layout. Keep the two-sui
 
 ## Freeze and guard (canonical implementation)
 
-After Reviewer approval, capture the freeze baseline: file list + digests of approved authoritative files plus `git status --porcelain -- tests/authoritative` output. Orchestrator re-checks before and after implementer runs and rejects unauthorized edits, deletions, or substitutions. When approved Designer files must stay uncommitted (inseparable test+code shipment per `job-orchestration`), compare before/after manifests with digests instead of denying all dirt — designer-attributed files pass, implementer-attributed changes fail.
+After Reviewer approval, capture the freeze baseline: file list + digests of approved authoritative files plus `git status --porcelain -- tests/authoritative` output. Orchestrator re-checks before and after implementer runs and rejects unauthorized edits, deletions, or substitutions. When approved Designer files must stay uncommitted (inseparable test+code shipment per `git-change-workflow`), compare before/after manifests with digests instead of denying all dirt — designer-attributed files pass, implementer-attributed changes fail.
 
 Run from repo root and preserve evidence:
 
@@ -38,7 +38,7 @@ fail -> is test wrong? NO -> fix impl
                         -> independent reviewer approves -> Designer updates -> re-freeze -> rerun
 ```
 
-Log in PR description with mirror at repo-root `docs/orchestration/<job-slug>-tcr.md` (matching `job-orchestration` ledger convention). Never edit authoritative to green.
+Log in the PR description when present and in the round record maintained by `supervisor`; follow `git-change-workflow` for delivery. Never edit authoritative to green.
 
 ## Designer → Reviewer checklist
 
