@@ -85,6 +85,7 @@ Report as a tech lead to a product director, in this order:
 5. **Not verified.** Required even when the answer is "none"; name every evidence gap.
 6. **Risks.** Accepted exposure and its consequence.
 7. **Needs the director.** Escalations or "none".
+8. **What is live.** One closing line: the URL, the exact commit serving it, and the state of any feature flag that is deliberately off.
 
 The tech lead may cut scope and accept risk within its authority. It may never report a plan as proof.
 
@@ -133,6 +134,8 @@ Deferring an open finding past the deploy is a recommendation the director can r
 - **A run that exits non-zero with an empty report did not run.** Read the run log before concluding anything: quota, auth and sandbox refusals print only there, and the status file still reads `working` because the harness never reached the line that updates it. Restate the state on disk from git and `docker ps`, never from the status file, and say "did not run" rather than "failed".
 - **The same finding surviving two review rounds is a brief defect, not a worker defect.** Stop dispatching per-path patches. When an invariant — one purchase, one charge, one message — can be created from two entry points, fixing each in turn leaks through the other, and every round's green suite makes the leak harder to see. Collapse to a single persisted attempt written before the first request and immutable until it resolves, and make the acceptance for that change a reproduction of the duplicate on the old tree.
 - Independence beats raw power: a reviewer that runs the command outranks a stronger reviewer reading the author's summary.
+- **Publishing has one door, and it is not the merge.** A merge fast-forward creates no commit, so `pre-merge-commit`/`pre-push` hooks never run and a worker can move `main` while the review is still open. Gate the *deploy* instead: a single script that requires the tech-lead role, a clean tree, and an approval file carrying the reviewer plus the exact sha being published — approval of any other commit must refuse. Record what is live (`deployed.json`, sha and timestamp) and make the rollback sha a field, not a memory.
+- **A deploy report is a claim; the served bytes are the proof.** Before repeating "is live", fetch a content-hashed asset from the public origin and compare it with the same file inside the running container (`curl -s <url>/<asset> | sha256sum` against `docker exec <container> sha256sum <path>`), plus `/health` for the API and `git log`/the deploy record for the sha. Matching hashes prove the new build is serving; a green `docker ps` proves only that something is up.
 
 ## 8. Cadence
 
