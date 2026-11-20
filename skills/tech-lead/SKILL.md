@@ -130,11 +130,24 @@ Deferring an open finding past the deploy is a recommendation the director can r
 - A declared number is an assertion: reconcile it against real output before quoting it.
 - **"Not verified" is a required field.** Silence is not proof.
 - **A worker killed at its timeout is not a result.** Exit 124 (or any timeout kill) leaves the change half-written; a green suite on that tree proves nothing until the worker delivers a report *and* the supervisor reviews the finished diff. Mark the partial tree uncommittable and say which files are dirty.
+- **A run that exits non-zero with an empty report did not run.** Read the run log before concluding anything: quota, auth and sandbox refusals print only there, and the status file still reads `working` because the harness never reached the line that updates it. Restate the state on disk from git and `docker ps`, never from the status file, and say "did not run" rather than "failed".
 - Independence beats raw power: a reviewer that runs the command outranks a stronger reviewer reading the author's summary.
 
 ## 8. Cadence
 
 One line per step, or every ~15 minutes: what changed, the evidence, what is next. When nothing changed, say "no change" and name the blocker. A dispatch that was not confirmed is a job that did not start.
+
+**Never read quota from a fresh probe while a run is live.** A second session on the same account is refused with the same "hit your usage limit" text even when quota remains, so the refusal is indistinguishable from exhaustion and reporting it as a blocker is a false alarm the owner has to correct. Check the process table first (`ps -eo pid,etime,args | grep <harness>`), probe only when nothing is running, and never wrap an automated retry in a probe — a watcher built that way fires a duplicate run the moment the account has room.
+
+**A reset time is a fact about now, not about when you read it.** A dispatch that follows a long round inherits a clock reading from minutes ago, and a harness whose window opened while the brief was being written is already available. Put `date`, the probe, and the dispatch in the same call, in that order; deciding on a stale reading hands the owner a blocker he can disprove by looking at the clock.
+
+**Kill a run by exact PID, never by pattern.** `pkill -f <script>` matches the invoking shell's own command line and takes the session down with it, and killing the launching shell leaves the `timeout` wrapper and the harness child running. Read the PIDs from `ps -eo pid,etime,args`, kill the wrapper and the child, and confirm with `ps -p <pid>` before reporting the run stopped.
+
+**Sweep the orphans before dispatching the next round.** A killed tech-lead run leaves the worker CLI it spawned (`opencode run …`, `codex exec …`) alive under `init`, still editing the same worktree; two agents in one tree overwrite each other and the loss is silent. After a kill, list the processes, kill every harness child older than the new dispatch, and state in the next brief whether the worktree is clean or carries uncommitted work.
+
+**A run that vanished after a machine reboot produced nothing, and its leftovers are not a result.** The envelope, the log and the started marker all live in `/tmp`, which a reboot wipes, while the worktree keeps every edit the worker had made. Check `uptime -p` and `who -b` before concluding "the run failed": a boot inside the run's window plus no wrapper process (`ps -p <pid>`) means the round ended without a report, so the dirty files are uncommittable. Re-dispatch rather than discard, and put the facts in the brief — reboot time, the files still dirty, the `EXIT` that was never written — so the tech lead decides keep, finish or `git checkout -- .` instead of re-deriving the state.
+
+**A tech-lead run that ends `status: SUCCESS` with a progress log stopping mid-sentence exhausted its own time budget.** The JSON envelope still says success, with a large `duration_seconds` and `num_turns: 1`, while the response ends in "awaiting the worker". Read the envelope fields and the tail before concluding anything, then resume from what the branch, the commits and the findings file already hold — a fresh brief that re-runs the finished stages throws away the whole round.
 
 ## 9. Anti-patterns
 
