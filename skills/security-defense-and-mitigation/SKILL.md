@@ -108,3 +108,8 @@ When reviewing, writing, or refactoring code, run through these foundational def
 - Every web application and API service must maintain automated unit or integration tests asserting the presence and values of all required security headers.
 - Enforce supply-chain audits (`npm audit --audit-level=high` or `pip-audit`) and static analysis (SAST) in CI pipelines.
 - Never let headers or security checks be dropped or relaxed during refactoring; gate CI builds on security assertions.
+
+### 12. CSRF Origin Checks Need a Signal That Survives the Path
+- A same-origin **form POST can arrive with no `Origin`** header (browsers omit it on same-origin navigation), and reverse proxies/CDNs routinely strip `Sec-Fetch-*`. If `Referrer-Policy: no-referrer` also removes `Referer`, an Origin/Referer-only CSRF check has nothing to compare and rejects every legitimate write with `403` — the app looks broken while the middleware looks satisfied.
+- Never make origin headers the sole barrier on a form flow: pair it with a per-session token (double-submit cookie plus hidden field), or at minimum keep a policy that still sends a Referer for same-origin requests (`same-origin` or `strict-origin-when-cross-origin`).
+- When writes fail behind a tunnel with a CSRF error, run the four-way matrix before touching app code — POST with `Origin`, with `Referer` only, with `Sec-Fetch-Site: same-origin` only, and with none — and compare status codes. That tells you which signal the real client actually sends and where it is being lost.
