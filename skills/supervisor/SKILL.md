@@ -207,6 +207,21 @@ after every verdict rather than trusting the screen that scrolled.
 Demand proof by action when a claim is hard to verify: "type into the field
 without clicking, then screenshot it" settles in one round what prose cannot.
 
+**Each evidence class is produced where its tooling lives.** A worker CLI with no
+browser cannot screenshot a UI, and a supervisor on another host cannot see the
+served tree; planning both criteria into one round leaves them unprovable and the
+reviewer rejecting on measurement rather than on product. Say in the brief which
+actor produces which evidence — the worker the code and the tests, the driving
+agent the screenshots — and keep the acceptance wording identical so the split is
+mechanical.
+
+**A metric that cannot observe the artifact is not evidence.** Reading a WebGL
+canvas with `drawImage` returns an empty buffer unless the context kept its
+drawing buffer, so `coverage: 0` says nothing about whether a model rendered, and
+an alpha-only coverage also cannot tell two differently coloured swatches apart —
+hash the RGB. Capture the screen region (animation paused) and compare hashes;
+accept a pixel-coverage number only from a 2D canvas you know paints its pixels.
+
 **A reviewer that cannot install the toolchain still owes you a repro.** When the review host has no
 network, a reading-only pass degrades into style commentary. Require throwaway scripts that import the
 project's own modules against an in-memory store (SQLite, a fake transport) and reproduce each suspected
