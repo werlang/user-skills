@@ -174,9 +174,9 @@ Validate all deployed environments against industry-standard security header ben
      ```text
      https://securityheaders.com/?q=<domain>&hide=on&followRedirects=on
      ```
-     Example: `https://securityheaders.com/?q=nodeaec.com.br&hide=on&followRedirects=on`
+     Example: `https://securityheaders.com/?q=example.com&hide=on&followRedirects=on`
    - **Why these URL parameters are mandatory**:
-     - `q=<domain>`: The target domain or subdomain to evaluate (e.g. `nodeaec.com.br` or `api.nodeaec.com.br`).
+     - `q=<domain>`: The target domain or subdomain to evaluate (e.g. `example.com` or `api.example.com`).
      - `hide=on`: **Privacy protection**. Prevents the scanned domain and its score from being broadcast in the public "Recent Scans" table on the SecurityHeaders.com front page (vital during development, staging, or confidential releases).
      - `followRedirects=on`: **Full journey audit**. Follows redirect chains (e.g., `http://` -> `https://` or apex -> `www`) so the scanner grades the final landing HTML page rather than halting at the initial 301/302 redirect.
    - **Interactive vs. CLI Audits**: SecurityHeaders.com protects its web interface with Cloudflare Bot Management (`cf-mitigated: challenge`, returning HTTP 403 to raw `curl` user-agents). Open the canonical audit URL directly in a browser or browser automation agent (`agent-browser`) to review the interactive score and recommendations.

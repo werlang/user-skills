@@ -10,10 +10,10 @@ Use this skill as the persistent memory, changelog recorder, component registry,
 **Vault Base Directory Path**: resolve it per machine instead of assuming one path —
 check `$OBSIDIAN_VAULT`, then the skill's own local config, then locate the vault
 (e.g. `mdfind -name dev-changelog` on macOS, `fd -t d dev-changelog ~` elsewhere). If
-no vault is found, say so and skip vault writes; never invent a path. A known layout
-on Pablo's mac, for reference only:
+no vault is found, say so and skip vault writes; never invent a path. The common
+macOS layout, for reference only:
 
-`/Users/pablowerlang/Library/CloudStorage/GoogleDrive-<account>/My Drive/obsidian/dev-changelog`
+`$HOME/Library/CloudStorage/GoogleDrive-<account>/My Drive/obsidian/dev-changelog`
 
 The in-vault copy of this protocol lives at `00 - Inbox/Vault Protocol Guide.md`. If this skill's rules change, update that note in the same pass.
 
