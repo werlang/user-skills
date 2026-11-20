@@ -10,6 +10,13 @@ Terminals:
 
 - `hc run <cmd|template> [task]` — run it and wait like a shell; `--bg` does not wait
 - `hc ls` (`--all` includes finished), `hc get <t>`, `hc read <t>`, `hc attach [t]` (ctrl+\ detaches)
+
+`hc ls` hides finished terminals and reports how many it hid as `hidden_finished` in the JSON (`{"hidden_finished":28,
+"machines":[…],"terminals":[…]}`) — so "four lines on the CLI, thirty black panes in my client" is a client asking for
+`all`, not a core that disagrees with itself. A finished terminal also keeps no screen: `screens/<t>.snap` is what an
+attach would replay and the program that drew it is gone, which is why a client should not list one at all. Entry fields
+that matter when reading the list: `state` (`live`/`finished`), `status`, `cwd`, `exit_code`, `agent`, and `where` (the
+`<folder> / <agent>` label the desktop app writes on the terminals it starts).
 - `hc kill <t>`, `hc rm <t>`, `hc label <t> k=v...`, `hc keep <t> [--off]` (replace a lost program with a shell)
 - `hc send <t> <text>`, `hc keys <t> <keys...>`, `hc interrupt <t>`, `hc wait <t>` (`--output X`, `--children`)
 - `hc put <t> <file>`
@@ -63,6 +70,16 @@ A symptom like "every character I type is submitted as its own line" is this met
 
 A full-screen program (alternate screen) has no scrollback by design, on any terminal: there is nothing above the screen to show. Scrolling there means paging the program itself — draw the pointer drag into `pageup`/`pagedown` keys rather than into a local scroll box that can never move.
 
+`hc read <t>` says which case you are in: the JSON `how` field is `screen` for a full-screen program and `stitched` when
+history was joined above it (`--lines N` asks for that history). Prove the keys move the program before building the drag:
+hash the text, press, hash again —
+
+```sh
+h(){ hc read t1 | md5; }; h; hc keys t1 pageup; sleep 1; h; hc keys t1 pagedown; sleep 1; h   # move, then exactly back
+```
+
+A program that ignores `pageup` shows the same hash three times; that, not a client-side scroll, is the thing to fix.
+
 ## Update semantics
 
 `hc update` swaps this binary and restarts, and terminals keep running. `--version X` means *at least* X — nothing changes when the installed build is already that or newer. `--force` is required to install an older build or another protocol generation; saved state only moves forward.
@@ -70,6 +87,13 @@ A full-screen program (alternate screen) has no scrollback by design, on any ter
 ## State and sockets
 
 - state: `~/.local/state/herdr-core/<session>/` → `terminals.json`, `peers.json`, `docs.json`, `core.json`, `core.log`, `screens/`, `execs/`
+
+`docs.json` is keyed by **document name, one per writing app** — read it before guessing where another client keeps its
+state: a desktop Herdr writes `herdr-app` (`{"spaces":[{"id","name","folder","tabs"}]}`) beside this app's `whistl`, and
+`doc.get` on either answers `version: 0` with `value: null` until something writes it. That shared store is the one thing
+two clients on the same core really see alike, so cross-client features read the sibling's document instead of asking the
+user to retype it; ids are per app (`sp` + 32 hex against `sp_` + 16 hex), and a space label pointing at an id that is not
+in your own document is a sibling space, not a broken one.
 - runtime: `/run/user/<uid>/herdr-core/<session>.sock` plus `<session>.holder.<id>.sock`
 - default session name: `default`
 
