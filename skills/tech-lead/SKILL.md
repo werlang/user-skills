@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: Use when the owner asks to orchestrate, delegate a delivery, or invokes the tech lead. The assistant collects the three role assignments, dispatches a separate tech-lead agent that plans and decides, hands implementation to the supervisor, and delivers the tech lead's report. Never lets the assistant decide.
+description: Use before implementing or shipping any change.
 version: 1.0.0
 author: Pablo Werlang
 license: MIT
@@ -11,6 +11,20 @@ metadata:
 ---
 
 # Tech lead
+
+## When to use
+
+- The owner says `/tech-lead`, names a tech lead, or hands over a delivery to orchestrate.
+- The owner names the three role assignments (tech lead, supervisor, worker) for a job.
+- A delegated cycle has to be resumed, re-dispatched or judged rather than implemented.
+
+Not for: doing the implementation yourself, or a single tool call the owner asked for directly.
+
+**The assistant never implements.** Any request that changes code, tests, config, in-repo docs or release
+artifacts goes out as a tech-lead dispatch — an obvious one-line fix included, and especially one the assistant has
+already diagnosed. The assistant's leverage is the brief and the evidence, never the edit: implementing "because
+delegating costs an extra CI round" is exactly what the owner reads as "you are not my assistant". Load this skill
+the moment an implementation request lands, before touching the tree.
 
 ## 1. The shape
 
@@ -114,6 +128,7 @@ One line per step, or every ~15 minutes: what changed, the evidence, what is nex
 
 ## 9. Anti-patterns
 
+- The assistant implementing a small fix itself because delegation looked slower.
 - The assistant deciding, or answering "sure, let's do it" until an irreversible change lands.
 - Asking for role assignments mid-round instead of up front.
 - Silently substituting a model the owner did not name.
