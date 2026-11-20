@@ -47,6 +47,7 @@ Avoid Git commands on this path. Use a read-only status check only when needed t
 ## Planned-track workflow
 
 1. Before editing, inspect the repository with read-only commands such as `git status --short`, `git branch --show-current`, and `git log -1 --oneline`.
+   Edit with targeted replacements, never by rewriting a whole file from a read: the file reader returns numbered lines and redacts credential-shaped strings, so writing that content back injects `***` into the source and the build dies at parse time in suites that look unrelated. Use one unique old/new pair per change and re-read only the region you are about to touch.
 2. Preserve pre-existing user changes. Never use `git reset --hard`, `git clean`, broad stashing, or history rewriting to make the worktree convenient. If existing changes overlap the request or make branch ownership unclear, stop and ask before proceeding. When dropping a temporary edit (a debug patch, a probe) restore that path alone — `git restore -- <path>` or `git checkout -- <path>`. `git checkout -- .` writes the whole index back over the tree and silently destroys every other uncommitted change in it, including your own in-flight work.
 3. Create a new local branch before implementation, from the base branch the repository names (often an integration branch such as `dev`), otherwise from the current `HEAD`:
    - Name it `<type>/<short-slug>` using the commit types in [`references/commit-messages.md`](references/commit-messages.md): `feat/contest-export`, `fix/login-redirect`, `docs/setup-guide`.
