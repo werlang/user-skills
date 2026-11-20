@@ -68,6 +68,12 @@ Make one non-interactive call to the chosen harness/model with the chosen effort
 
 Carry the owner's Git restrictions into the delegation; use [git-change-workflow](../git-change-workflow/SKILL.md) for job delivery mechanics and [code-review](../code-review/SKILL.md) for review gates. In the assistant's very next message to the owner, name the actual call carrying the decision and its assigned harness, model, and effort. Confirm dispatch from the harness; an attempted call is not confirmation.
 
+Concrete probe and capability commands per harness — including how to tell a real quota refusal from a concurrent-session refusal, and which roles need shell access: `references/harness-probes.md`.
+
+A brief that carries all of the above in the order a reviewer needs it: `templates/techlead-brief.md`. Copy it, fill the placeholders, and pass the file as one argument — the template also states why each section exists, which is what turns "have a look at this" into findings with a disposition.
+
+Scripts that enforce "one agent per tree" and "publishing has one door" (lock + pid registry, git hooks, approval bound to the sha, deploy record): `references/delegation-harness.md`.
+
 ## 4. What the tech lead returns
 
 Report as a tech lead to a product director, in this order:
