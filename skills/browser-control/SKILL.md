@@ -88,6 +88,8 @@ node $S/cdp.mjs --open 'https://host.com/page' --close --expr 'document.title'
 - Exit 2 prints what to fix. Most common: **"Allow remote debugging?"** waiting in Chrome
   (ask the user, retry once) and **sandbox can't read `DevToolsActivePort`** → set `CDP_WS`
   (`references/setup.md`).
+- No MCP and no `agent-browser`, but a Node on the box that owns the Chrome? Drive it from a script over
+  CDP — recipe, cookie rules and the mistakes that cost a run: `references/headless-cdp-script.md`.
 
 ## 4. Projects
 
