@@ -66,7 +66,7 @@ Make one non-interactive call to the chosen harness/model with the chosen effort
 - Every constraint the owner stated and the supervisor and worker assignments.
 - Instructions to plan and decide, delegate implementation to the supervisor following the [supervisor skill](../supervisor/SKILL.md), and implement nothing itself.
 
-Carry the owner's Git restrictions into the delegation; use [git-change-workflow](../git-change-workflow/SKILL.md) for job delivery mechanics and [code-review](../code-review/SKILL.md) for review gates. In the assistant's very next message to the owner, name the actual call carrying the decision and its assigned harness, model, and effort. Confirm dispatch from the harness; an attempted call is not confirmation.
+Carry the owner's Git restrictions into the delegation; use [git-change-workflow](../git-change-workflow/SKILL.md) for job delivery mechanics and [code-review](../code-review/SKILL.md) for review gates. **Carry his complaint as an acceptance criterion, not as a symptom to string-fix.** When he says a screen contradicts itself ("the agent is running and it says I am not signed in"), the brief states the acceptance as "the two things that screen says must agree", plus the measured facts behind each side, and leaves the mechanism to the tech lead — a brief that quotes the complaint but asks for a wording change gets a wording change. In the assistant's very next message to the owner, name the actual call carrying the decision and its assigned harness, model, and effort. Confirm dispatch from the harness; an attempted call is not confirmation.
 
 Concrete probe and capability commands per harness — including how to tell a real quota refusal from a concurrent-session refusal, and which roles need shell access: `references/harness-probes.md`.
 
@@ -117,6 +117,10 @@ the volume is low, a form prefilled from the last recorded transaction beats any
 the human is already checking every line.
 
 Send one message in three lines: decision; options with cost; recommendation plus deadline. Everything else the tech lead decides. Reversible work does not ask; irreversible work always asks for approval through the assistant and waits. A deadline is not approval.
+
+**A design fork is not an escalation.** Two ways to build the thing — read the token from a file the user writes once, or scrape it out of the running process — is the tech lead's call, not the director's: he owns intent, scope, version, and anything outside the standing exception, and "which approach do you prefer?" hands back exactly the thinking the layer exists to absorb. Write both paths as facts in the brief and let the tech lead pick; what reaches the owner afterwards is the decision and its trade-off, in one line, with the evidence. The tell that this went wrong: an escalation message that ends in a question mark.
+
+Deferring an open finding past the deploy is a recommendation the director can refuse. When he answers a deferral with a bare "fix, merge, deploy", every open finding is in scope — mediums and lows included — and the next brief must carry that mandate explicitly. Re-offering the deferral reads as not having listened.
 
 ## 7. Proof rules
 
