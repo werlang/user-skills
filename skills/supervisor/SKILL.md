@@ -279,6 +279,17 @@ renaming a finding does not count.
 Exception: two failed fixes on the same finding → stop that finding and put a
 fresh reviewer on it alone. Do not feed that reviewer your narrative.
 
+**A finding that survives two rounds unchanged is the brief's fault, not the
+worker's.** When the same invariant — one purchase, one charge, one message — can
+be reached from two entry points (a review screen and a manual form, a CLI and an
+API), each round patches the path the finding named and the other one leaks, and
+every green suite makes the leak harder to see. Stop dispatching per-path fixes:
+write the round as one structural change (a single persisted attempt, written
+before the first request and immutable until it resolves, with recovery on
+load) and make its acceptance the reproduction of the duplicate on the pre-fix
+tree. A finding that returns three times with the same root is a signal to
+re-read your own brief, not to send a fourth patch.
+
 Targets are fixed too. Label the worker's terminal at spawn (`hc label <t>
 task=<id>`). Check the label with `hc get <t>` before each send and refuse to send
 on a mismatch. Touch only your own tabs and panes.

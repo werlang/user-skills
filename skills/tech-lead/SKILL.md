@@ -131,6 +131,7 @@ Deferring an open finding past the deploy is a recommendation the director can r
 - **"Not verified" is a required field.** Silence is not proof.
 - **A worker killed at its timeout is not a result.** Exit 124 (or any timeout kill) leaves the change half-written; a green suite on that tree proves nothing until the worker delivers a report *and* the supervisor reviews the finished diff. Mark the partial tree uncommittable and say which files are dirty.
 - **A run that exits non-zero with an empty report did not run.** Read the run log before concluding anything: quota, auth and sandbox refusals print only there, and the status file still reads `working` because the harness never reached the line that updates it. Restate the state on disk from git and `docker ps`, never from the status file, and say "did not run" rather than "failed".
+- **The same finding surviving two review rounds is a brief defect, not a worker defect.** Stop dispatching per-path patches. When an invariant — one purchase, one charge, one message — can be created from two entry points, fixing each in turn leaks through the other, and every round's green suite makes the leak harder to see. Collapse to a single persisted attempt written before the first request and immutable until it resolves, and make the acceptance for that change a reproduction of the duplicate on the old tree.
 - Independence beats raw power: a reviewer that runs the command outranks a stronger reviewer reading the author's summary.
 
 ## 8. Cadence
