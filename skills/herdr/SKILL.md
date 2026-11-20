@@ -230,6 +230,17 @@ A host that a *client* drives — a phone app, another machine, an editor plugin
 - Then round-trip the methods that client actually calls on one channel, because `hello` can answer while a method is missing or stream-only: `terminal.run` (pass `no_parent`/`no_notify`) → `terminal.send` → `terminal.read` (its `text` must contain what you sent) → `terminal.rm`; plus `doc.get`/`doc.set` and `machine.exec` if the client uses them. `machine.exec` returns **base64** `stdout`/`stderr`; `doc.get` answers `version: 0` for a never-written document.
 - A `terminal.run` name stays taken while that terminal lives: a probe left behind by an earlier attempt makes the next run fail with `kind: name_taken`, so `hc kill <name>` / `hc rm <name>` first and clean up everything you created before reporting. Compare response shapes (`terminal.interrupt` → `{"key": …, "outcome": …}`) against the client's recorded fixtures rather than assuming a minor version kept them.
 
+## Usage and subscription limits
+
+"How much of the agent's subscription is left, and when does it reset" is answered by the desktop app's status-bar gauge,
+which is a mod with one helper per provider — not a core feature, and not portable as it ships (the Claude helper reads
+the macOS login Keychain). When a phone app, a TUI or a script on another host needs the same numbers, read the installed
+mod for the endpoints and response shapes, then reimplement the readers portably: token locations per platform, one
+module per provider, a failed provider reported as data instead of taking the document down, and never a token refresh the
+CLI itself owns. Sources, the trust rules and the verification recipe: `references/subscription-limits.md`; a working
+reader is `scripts/agent-limits.py` (`python3 agent-limits.py --pretty`, one JSON document, exit 0 even when a provider
+cannot answer).
+
 ## Safety and coordination rules
 
 - Use `--no-focus` for background work unless the user asked to switch context.
